@@ -1,28 +1,31 @@
 package org.hqcplays.hqcsoneblock;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.*;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
 import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
 import org.hqcplays.hqcsoneblock.commands.IslandCommand;
 import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
-import org.hqcplays.hqcsoneblock.enchantments.TurbulenceEnchantment;
-import org.hqcplays.hqcsoneblock.enchantments.VampirismEnchantment;
-import org.hqcplays.hqcsoneblock.enchantments.VitalityEnchantment;
-import org.hqcplays.hqcsoneblock.enchantments.VoidingEnchantment;
+import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.UUID;
 
 public final class HQCsOneBlock extends JavaPlugin implements Listener {
     // Variables
@@ -45,10 +48,8 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new AmethystShardItems(), this);
 
         // Register enchantments
-        getServer().getPluginManager().registerEvents(new VoidingEnchantment(this), this);
-        getServer().getPluginManager().registerEvents(new VitalityEnchantment(this), this);
-        getServer().getPluginManager().registerEvents(new VampirismEnchantment(this), this);
-        getServer().getPluginManager().registerEvents(new TurbulenceEnchantment(this), this);
+        ShardEnchantment.createEnchantments();
+        getServer().getPluginManager().registerEvents(ShardEnchantment.listener, this);
 
         // Register command executors
         if (this.getCommand("bcshop") != null) {
