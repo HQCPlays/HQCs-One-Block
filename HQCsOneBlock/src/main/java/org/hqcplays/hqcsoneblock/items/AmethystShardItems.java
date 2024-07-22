@@ -1,8 +1,10 @@
 package org.hqcplays.hqcsoneblock.items;
 
-import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
-import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Player;
@@ -10,11 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,8 +22,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
+import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerBalances;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
@@ -100,15 +103,15 @@ public class AmethystShardItems implements Listener {
         createRainbowShard();
 
         // Swords
-        createBlackShardSword();
-        createWhiteShardSword();
-        createRedShardSword();
+        blackShardSword = createShardSword(Material.NETHERITE_SWORD, ChatColor.DARK_GRAY, "Black Shard Sword", "black_shard_sword", blackShard, ShardEnchantment.voiding);
+        whiteShardSword = createShardSword(Material.IRON_SWORD, ChatColor.WHITE, "White Shard Sword", "white_shard_sword", whiteShard, ShardEnchantment.turbulence);
+        redShardSword = createShardSword(Material.WOODEN_SWORD, ChatColor.RED, "Red Shard Sword", "red_shard_sword", redShard, ShardEnchantment.vampirism);
 
         // Armors
-        createRedShardHelmet();
-        createRedShardChestplate();
-        createRedShardLeggings();
-        createRedShardBoots();
+        redShardHelmet = createShardHelmet(Material.DIAMOND_HELMET, ChatColor.RED, "Red Shard Helmet", "red_shard_helmet", redShard, ShardEnchantment.vitality);
+        redShardChestplate = createShardChestplate(Material.DIAMOND_CHESTPLATE, ChatColor.RED, "Red Shard Chestplate", "red_shard_chestplate", redShard, ShardEnchantment.vitality);
+        redShardLeggings = createShardLeggings(Material.DIAMOND_LEGGINGS, ChatColor.RED, "Red Shard Leggings", "red_shard_leggings", redShard, ShardEnchantment.vitality);
+        redShardBoots = createShardBoots(Material.DIAMOND_BOOTS, ChatColor.RED, "Red Shard Boots", "red_shard_boots", redShard, ShardEnchantment.vitality);
     }
 
     public static void createGoldShard() {
@@ -201,147 +204,114 @@ public class AmethystShardItems implements Listener {
         rainbowShard = customItem;
     }
 
-    public static void createBlackShardSword() {
-        ItemStack customItem = new ItemStack(Material.NETHERITE_SWORD, 1);
+    public static ItemStack createShardSword(Material material, ChatColor color, String name, String craftingKey, ItemStack craftingShard, ShardEnchantment enchantment) {
+        ItemStack customItem = new ItemStack(material, 1);
         ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.DARK_GRAY + "Black Shard Sword");
-        meta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Voiding I"));
-        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-        dataContainer.set(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "voiding_I"), PersistentDataType.STRING, "voiding_I");
+        meta.setDisplayName(color + name);
+        if (enchantment != null) {
+            meta.setLore(Collections.singletonList(enchantment.getLoreName()));
+            meta.getPersistentDataContainer().set(enchantment.getItemMetaKey(), PersistentDataType.BOOLEAN, true);
+        }
         customItem.setItemMeta(meta);
 
-        blackShardSword = customItem;
-
         // Crafting recipe
-        ShapedRecipe sr = new ShapedRecipe(NamespacedKey.minecraft("blackshardsword"), customItem);
-        sr.shape(" B ",
-                " B ",
+        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
+        sr.shape(" A ",
+                " A ",
                 " S ");
-        sr.setIngredient('B', blackShard);
+        sr.setIngredient('A', craftingShard);
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
+
+        return customItem;
     }
 
-    public static void createWhiteShardSword() {
-        ItemStack customItem = new ItemStack(Material.IRON_SWORD, 1);
+    public static ItemStack createShardHelmet(Material material, ChatColor color, String name, String craftingKey, ItemStack craftingShard, ShardEnchantment enchantment) {
+        ItemStack customItem = new ItemStack(material, 1);
         ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.WHITE + "White Shard Sword");
-        meta.setLore(Collections.singletonList(ChatColor.WHITE + "Turbulence I"));
-        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-        dataContainer.set(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "turbulence_I"), PersistentDataType.STRING, "turbulence_I");
+        meta.setDisplayName(color + name);
+        if (enchantment != null) {
+            meta.setLore(Collections.singletonList(enchantment.getLoreName()));
+            PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
+            dataContainer.set(enchantment.getItemMetaKey(), PersistentDataType.BOOLEAN, true);
+        }
         customItem.setItemMeta(meta);
 
-        whiteShardSword = customItem;
-
         // Crafting recipe
-        ShapedRecipe sr = new ShapedRecipe(NamespacedKey.minecraft("whiteshardsword"), customItem);
-        sr.shape(" B ",
-                " B ",
-                " S ");
-        sr.setIngredient('B', whiteShard);
-        sr.setIngredient('S', Material.STICK);
-        Bukkit.getServer().addRecipe(sr);
-    }
-
-    public static void createRedShardSword() {
-        ItemStack customItem = new ItemStack(Material.WOODEN_SWORD, 1);
-        ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.DARK_RED + "Red Shard Sword");
-        meta.setLore(Collections.singletonList(ChatColor.DARK_RED + "Vampirism I"));
-        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-        dataContainer.set(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "vampirism_I"), PersistentDataType.STRING, "vampirism_I");
-        customItem.setItemMeta(meta);
-
-        redShardSword = customItem;
-
-        // Crafting recipe
-        ShapedRecipe sr = new ShapedRecipe(NamespacedKey.minecraft("redshardsword"), customItem);
-        sr.shape(" B ",
-                " B ",
-                " S ");
-        sr.setIngredient('B', redShard);
-        sr.setIngredient('S', Material.STICK);
-        Bukkit.getServer().addRecipe(sr);
-    }
-
-    public static void createRedShardHelmet() {
-        ItemStack customItem = new ItemStack(Material.DIAMOND_HELMET, 1);
-        ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.RED + "Red Shard Helmet");
-        meta.setLore(Collections.singletonList(ChatColor.YELLOW + "Vitality I"));
-        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-        dataContainer.set(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "vitality_I"), PersistentDataType.STRING, "vitality_I");
-        customItem.setItemMeta(meta);
-
-        redShardHelmet = customItem;
-
-        // Crafting recipe
-        ShapedRecipe sr = new ShapedRecipe(NamespacedKey.minecraft("redshardhelmet"), customItem);
-        sr.shape("RRR",
-                "R R",
+        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
+        sr.shape("AAA",
+                "A A",
                 "   ");
-        sr.setIngredient('R', redShard);
+        sr.setIngredient('A', craftingShard);
         Bukkit.getServer().addRecipe(sr);
+
+        return customItem;
     }
 
-    public static void createRedShardChestplate() {
-        ItemStack customItem = new ItemStack(Material.DIAMOND_CHESTPLATE, 1);
+    public static ItemStack createShardChestplate(Material material, ChatColor color, String name, String craftingKey, ItemStack craftingShard, ShardEnchantment enchantment) {
+        ItemStack customItem = new ItemStack(material, 1);
         ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.RED + "Red Shard Chestplate");
-        meta.setLore(Collections.singletonList(ChatColor.YELLOW + "Vitality I"));
-        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-        dataContainer.set(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "vitality_I"), PersistentDataType.STRING, "vitality_I");
+        meta.setDisplayName(color + name);
+        if (enchantment != null) {
+            meta.setLore(Collections.singletonList(enchantment.getLoreName()));
+            PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
+            dataContainer.set(enchantment.getItemMetaKey(), PersistentDataType.BOOLEAN, true);
+        }
         customItem.setItemMeta(meta);
 
-        redShardChestplate = customItem;
-
         // Crafting recipe
-        ShapedRecipe sr = new ShapedRecipe(NamespacedKey.minecraft("redshardchestplate"), customItem);
-        sr.shape("R R",
-                "RRR",
-                "RRR");
-        sr.setIngredient('R', redShard);
+        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
+        sr.shape("A A",
+                "AAA",
+                "AAA");
+        sr.setIngredient('A', craftingShard);
         Bukkit.getServer().addRecipe(sr);
+
+        return customItem;
     }
 
-    public static void createRedShardLeggings() {
-        ItemStack customItem = new ItemStack(Material.DIAMOND_LEGGINGS, 1);
+    public static ItemStack createShardLeggings(Material material, ChatColor color, String name, String craftingKey, ItemStack craftingShard, ShardEnchantment enchantment) {
+        ItemStack customItem = new ItemStack(material, 1);
         ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.RED + "Red Shard Leggings");
-        meta.setLore(Collections.singletonList(ChatColor.YELLOW + "Vitality I"));
-        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-        dataContainer.set(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "vitality_I"), PersistentDataType.STRING, "vitality_I");
+        meta.setDisplayName(color + name);
+        if (enchantment != null) {
+            meta.setLore(Collections.singletonList(enchantment.getLoreName()));
+            PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
+            dataContainer.set(enchantment.getItemMetaKey(), PersistentDataType.BOOLEAN, true);
+        }
         customItem.setItemMeta(meta);
 
-        redShardLeggings = customItem;
-
         // Crafting recipe
-        ShapedRecipe sr = new ShapedRecipe(NamespacedKey.minecraft("redshardleggings"), customItem);
-        sr.shape("RRR",
-                "R R",
-                "R R");
-        sr.setIngredient('R', redShard);
+        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
+        sr.shape("AAA",
+                "A A",
+                "A A");
+        sr.setIngredient('A', craftingShard);
         Bukkit.getServer().addRecipe(sr);
+
+        return customItem;
     }
 
-    public static void createRedShardBoots() {
-        ItemStack customItem = new ItemStack(Material.DIAMOND_BOOTS, 1);
+    public static ItemStack createShardBoots(Material material, ChatColor color, String name, String craftingKey, ItemStack craftingShard, ShardEnchantment enchantment) {
+        ItemStack customItem = new ItemStack(material, 1);
         ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.RED + "Red Shard Boots");
-        meta.setLore(Collections.singletonList(ChatColor.YELLOW + "Vitality I"));
-        PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-        dataContainer.set(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "vitality_I"), PersistentDataType.STRING, "vitality_I");
+        meta.setDisplayName(color + name);
+        if (enchantment != null) {
+            meta.setLore(Collections.singletonList(enchantment.getLoreName()));
+            PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
+            dataContainer.set(enchantment.getItemMetaKey(), PersistentDataType.BOOLEAN, true);
+        }
         customItem.setItemMeta(meta);
 
-        redShardBoots = customItem;
-
         // Crafting recipe
-        ShapedRecipe sr1 = new ShapedRecipe(NamespacedKey.minecraft("redshardboots"), customItem);
+        ShapedRecipe sr1 = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
         sr1.shape("   ",
-                "R R",
-                "R R");
-        sr1.setIngredient('R', redShard);
+                "A A",
+                "A A");
+        sr1.setIngredient('A', craftingShard);
         Bukkit.getServer().addRecipe(sr1);
+
+        return customItem;
     }
 
     @EventHandler
