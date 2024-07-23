@@ -6,12 +6,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Ageable;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -20,7 +19,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 
@@ -359,7 +357,7 @@ public class AmethystShardItems implements Listener {
             }
 
             if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Green Shard") && player.getWorld().getName().contains("island_")) {
-                //AmethystShardItems.greenShardEffect(growEvent);
+                AmethystShardItems.greenShardEffect(event);
             }
 
             if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Rainbow Shard") && player.getWorld().getName().contains("island_")) {
@@ -439,63 +437,41 @@ public class AmethystShardItems implements Listener {
         }
     }
 
-    // Makes all plants on the island grow
-    public void dropGreenShard(Player player) {
+    // Makes all plants within 24 blocks of the player grow
+    public static void dropGreenShard(Player player) {
         player.getInventory().addItem(greenShard);
     }
 
-    public void greenShardEffect (BlockGrowEvent growEvent) {
-        Block block = growEvent.getBlock();
-        Material material = block.getType();
+    public static void greenShardEffect(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
 
-        // Check if the block is a plant that can grow
-        if (material == Material.WHEAT || material == Material.CARROTS || material == Material.POTATOES ||
-                material == Material.BEETROOTS || material == Material.NETHER_WART || material == Material.COCOA ||
-                material == Material.MELON_STEM || material == Material.PUMPKIN_STEM || material == Material.SWEET_BERRY_BUSH) {
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Location c = player.getLocation();
+            int r = 24;
+            boolean didUse = false;
 
-            // Cancel the event to prevent default growth
-            growEvent.setCancelled(true);
-
-            // Set the block to its fully-grown state
-            if (block.getBlockData() instanceof Ageable ageable) {
-                ageable.setAge(ageable.getMaximumAge());
-                block.setBlockData(ageable);
-            }
-        } else if (material == Material.OAK_SAPLING || material == Material.SPRUCE_SAPLING ||
-                material == Material.BIRCH_SAPLING || material == Material.JUNGLE_SAPLING ||
-                material == Material.ACACIA_SAPLING || material == Material.DARK_OAK_SAPLING) {
-
-            // Cancel the event to prevent default growth
-            growEvent.setCancelled(true);
-
-            // Schedule task to replace the sapling with the corresponding tree type
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    switch (material) {
-                        case OAK_SAPLING:
-                            block.setType(Material.OAK_LOG);
-                            break;
-                        case SPRUCE_SAPLING:
-                            block.setType(Material.SPRUCE_LOG);
-                            break;
-                        case BIRCH_SAPLING:
-                            block.setType(Material.BIRCH_LOG);
-                            break;
-                        case JUNGLE_SAPLING:
-                            block.setType(Material.JUNGLE_LOG);
-                            break;
-                        case ACACIA_SAPLING:
-                            block.setType(Material.ACACIA_LOG);
-                            break;
-                        case DARK_OAK_SAPLING:
-                            block.setType(Material.DARK_OAK_LOG);
-                            break;
-                        default:
-                            break;
+            for (int x = c.getBlockX() - r; x <= c.getBlockX() + r; x++) {
+                for (int y = c.getBlockY() - r; y <= c.getBlockY() + r; y++) {
+                    for (int z = c.getBlockZ() - r; z <= c.getBlockZ() + r; z++) {
+                        Block block = new Location(c.getWorld(), x, y, z).getBlock();
+                        // Keep bonemealing 30 times or until the block can't be bonemealed anymore.
+                        for (int i = 0; i < 30; i++) {
+                            if (block.applyBoneMeal(BlockFace.NORTH))
+                                didUse = true;
+                            else
+                                break;
+                        }
                     }
                 }
-            }.runTaskLater(HQCsOneBlock.getPlugin(HQCsOneBlock.class), 1L); // Schedule to run immediately (1 tick delay)
+            }
+
+            if (didUse) {
+                player.sendMessage(ChatColor.GREEN + "Nearby plants are now fully grown!");
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.sendMessage(ChatColor.DARK_GREEN + "Use this shard near some growable plants");
+            }
         }
     }
 
@@ -577,7 +553,7 @@ public class AmethystShardItems implements Listener {
             event.getPlayer().addPotionEffect(new PotionEffect(effectType, duration, amplifier));
 
             // Notify the player
-            event.getPlayer().sendMessage(ChatColor.GREEN + "You now have a level " + amplifier + " random effect for " + duration/20 + " seconds!");
+            event.getPlayer().sendMessage(ChatColor.GREEN + "You now have a level " + amplifier + " random effect for " + duration / 20 + " seconds!");
 
             // Decrease the item amount by 1
             item.setAmount(item.getAmount() - 1);
@@ -595,7 +571,7 @@ public class AmethystShardItems implements Listener {
         UUID playerUUID = player.getUniqueId();
 
         Random rand = new Random(System.currentTimeMillis());
-        int randomInt = rand.nextInt(7);
+        int randomInt = rand.nextInt(8);
 
         switch (randomInt) {
             case 0:
@@ -619,9 +595,9 @@ public class AmethystShardItems implements Listener {
             case 6:
                 effectShardEffect(event);
                 break;
-//            case 7:
-//                greenShardEffect(growEvent);
-//                break;
+            case 7:
+                greenShardEffect(event);
+                break;
         }
     }
 }

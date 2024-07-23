@@ -120,7 +120,7 @@ public class OneBlockController implements Listener {
                             AmethystShardItems.dropRedShard(player);
                             break;
                         case 2:
-                            player.sendMessage(ChatColor.RED + "Fix the green shard ya nerd");
+                            AmethystShardItems.dropGreenShard(player);
                             break;
                         case 3:
                             AmethystShardItems.dropBlackShard(player);
