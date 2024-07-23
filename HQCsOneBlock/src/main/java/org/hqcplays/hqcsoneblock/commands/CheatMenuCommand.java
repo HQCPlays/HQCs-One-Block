@@ -41,6 +41,7 @@ public class CheatMenuCommand implements CommandExecutor, Listener {
         cheatItemList.add(AmethystShardItems.blackShardSword);
         cheatItemList.add(AmethystShardItems.whiteShardSword);
         cheatItemList.add(AmethystShardItems.redShardSword);
+        cheatItemList.add(AmethystShardItems.blueShardSword);
 
         // Armor
         cheatItemList.add(AmethystShardItems.redShardHelmet);

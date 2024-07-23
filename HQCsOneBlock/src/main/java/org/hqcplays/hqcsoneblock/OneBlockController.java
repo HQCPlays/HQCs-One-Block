@@ -8,11 +8,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 
 import java.util.*;
 
@@ -193,7 +192,7 @@ public class OneBlockController implements Listener {
 
     public static void updateBlockChances(UUID playerUUID, Material newBlock) {
         HashMap<Material, Double> blockChances = playerBlockChances.get(playerUUID);
-        double newBlockChance = 0.1;
+        double newBlockChance = 0.01;
 
         blockChances.replace(Material.COBBLESTONE, blockChances.get(Material.COBBLESTONE) - newBlockChance);
         blockChances.put(newBlock, newBlockChance);

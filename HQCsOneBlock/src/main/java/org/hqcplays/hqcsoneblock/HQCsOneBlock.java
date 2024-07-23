@@ -8,8 +8,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -23,6 +25,7 @@ import org.hqcplays.hqcsoneblock.commands.IslandCommand;
 import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -46,6 +49,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new OneBlockController(), this);
         getServer().getPluginManager().registerEvents(new PickaxeController(), this);
         getServer().getPluginManager().registerEvents(new AmethystShardItems(), this);
+        getServer().getPluginManager().registerEvents(new CustomPickaxes(), this);
 
         // Register enchantments
         ShardEnchantment.createEnchantments();
@@ -113,6 +117,12 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         OneBlockController.initializeBlockChances(playerUUID);
     }
 
+    // Disable durability globally
+    @EventHandler
+    public void onPlayerItemDamage(PlayerItemDamageEvent event) {
+        event.setCancelled(true);
+    }
+
     // Prevent players from breaking blocks in the lobby
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
@@ -120,6 +130,16 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         if (lobbyWorld != null && event.getBlock().getWorld().equals(lobbyWorld)) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.RED + "You cannot break blocks here!");
+        }
+    }
+
+    // Prevent players from placing blocks in the lobby
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        World lobbyWorld = Bukkit.getWorld("world");
+        if (lobbyWorld != null && event.getBlock().getWorld().equals(lobbyWorld)) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.RED + "You cannot place blocks here!");
         }
     }
 

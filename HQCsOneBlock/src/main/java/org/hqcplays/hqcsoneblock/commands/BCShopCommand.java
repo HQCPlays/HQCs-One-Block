@@ -13,10 +13,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.OneBlockController;
 import org.hqcplays.hqcsoneblock.PickaxeController;
-import org.hqcplays.hqcsoneblock.PricesSheet;
+import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -25,7 +24,7 @@ import java.util.UUID;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerBalances;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 import static org.hqcplays.hqcsoneblock.PickaxeController.playerPickaxes;
-import static org.hqcplays.hqcsoneblock.PricesSheet.*;
+import static org.hqcplays.hqcsoneblock.numberSheets.PricesSheet.*;
 
 public class BCShopCommand implements CommandExecutor, Listener {
     @Override

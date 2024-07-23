@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -55,16 +56,6 @@ public class PickaxeController implements Listener {
             meta.setDisplayName(ChatColor.AQUA + "Pickaxe");
             pickaxe.setItemMeta(meta);
             player.getInventory().addItem(pickaxe);
-        }
-    }
-
-    // Prevent the player from crafting pickaxes
-    @EventHandler
-    public void onCraftItem(CraftItemEvent event) {
-        ItemStack result = event.getRecipe().getResult();
-        if (result.getType().toString().endsWith("_PICKAXE")) {
-            event.setCancelled(true);
-            ((Player) event.getWhoClicked()).sendMessage(ChatColor.RED + "You cannot craft pickaxes. Please use the shop to upgrade your pickaxe.");
         }
     }
 

@@ -13,6 +13,7 @@ public abstract class ShardEnchantment {
     public static ShardEnchantment vitality;
     public static ShardEnchantment vampirism;
     public static ShardEnchantment turbulence;
+    public static ShardEnchantment asphyxiation;
 
     public static EnchantmentEventsListener listener = new EnchantmentEventsListener();
 
@@ -28,6 +29,7 @@ public abstract class ShardEnchantment {
         vitality = new VitalityEnchantment(HQCsOneBlock.getPlugin(HQCsOneBlock.class));
         vampirism = new VampirismEnchantment(HQCsOneBlock.getPlugin(HQCsOneBlock.class));
         turbulence = new TurbulenceEnchantment(HQCsOneBlock.getPlugin(HQCsOneBlock.class));
+        asphyxiation = new AsphyxiationEnchantment(HQCsOneBlock.getPlugin(HQCsOneBlock.class));
     }
 
     protected void applyHitEffect(EntityDamageByEntityEvent event, Player player) {

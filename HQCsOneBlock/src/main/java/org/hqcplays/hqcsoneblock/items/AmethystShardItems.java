@@ -49,12 +49,18 @@ public class AmethystShardItems implements Listener {
     public static ItemStack blackShardSword;
     public static ItemStack whiteShardSword;
     public static ItemStack redShardSword;
+    public static ItemStack blueShardSword;
 
     // Shard Armor
     public static ItemStack redShardHelmet;
     public static ItemStack redShardChestplate;
     public static ItemStack redShardLeggings;
     public static ItemStack redShardBoots;
+
+    public static ItemStack purpleShardHelmet;
+    public static ItemStack purpleShardChestplate;
+    public static ItemStack purpleShardLeggings;
+    public static ItemStack purpleShardBoots;
 
     private static final List<PotionEffectType> potionEffects = Arrays.asList(
             PotionEffectType.SPEED,
@@ -106,6 +112,7 @@ public class AmethystShardItems implements Listener {
         blackShardSword = createShardSword(Material.NETHERITE_SWORD, ChatColor.DARK_GRAY, "Black Shard Sword", "black_shard_sword", blackShard, ShardEnchantment.voiding);
         whiteShardSword = createShardSword(Material.IRON_SWORD, ChatColor.WHITE, "White Shard Sword", "white_shard_sword", whiteShard, ShardEnchantment.turbulence);
         redShardSword = createShardSword(Material.WOODEN_SWORD, ChatColor.RED, "Red Shard Sword", "red_shard_sword", redShard, ShardEnchantment.vampirism);
+        blueShardSword = createShardSword(Material.DIAMOND_SWORD, ChatColor.DARK_BLUE, "Blue Shard Sword", "blue_shard_sword", blueShard, ShardEnchantment.asphyxiation);
 
         // Armors
         redShardHelmet = createShardHelmet(Material.DIAMOND_HELMET, ChatColor.RED, "Red Shard Helmet", "red_shard_helmet", redShard, ShardEnchantment.vitality);
