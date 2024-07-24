@@ -27,13 +27,17 @@ import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
 import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
+import java.util.Arrays;
 
 public final class HQCsOneBlock extends JavaPlugin implements Listener {
     // Variables
     public static final HashMap<UUID, Integer> playerBalances = new HashMap<>();
     private final String scoreboardTitle = ChatColor.GOLD + "Block Coins";
+    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Entitylght"); // Replace with actual usernames
 
     // Command classes
     private BCShopCommand bcShopCommand;
@@ -157,7 +161,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     @EventHandler
     public void onGameModeChange(PlayerGameModeChangeEvent event) {
         String playerName = event.getPlayer().getName();
-        if (!playerName.equals("HQC_Plays")) {
+        if (!authorizedUsers.contains(playerName)) {
             event.getPlayer().setGameMode(GameMode.SURVIVAL);
             event.setCancelled(true);
             event.getPlayer().sendMessage("You are not allowed to change your game mode!");
