@@ -19,11 +19,9 @@ public class IslandCommand implements CommandExecutor, Listener {
             Player player = (Player) sender;
             String playerWorldName = "island_" + player.getUniqueId();
 
-            World playerWorld = Bukkit.getWorld(playerWorldName);
-            boolean worldExists = Bukkit.getWorlds().stream()
-                    .anyMatch(world -> world.getName().equals(playerWorldName));
-
-            if (!worldExists) {
+            World playerWorld;
+            File worldFolder = new File(Bukkit.getWorldContainer(), playerWorldName);
+            if (!worldFolder.exists()) {
                 // World doesn't exist, clone it
                 cloneWorld("world_island", playerWorldName);
                 playerWorld = Bukkit.createWorld(new WorldCreator(playerWorldName));

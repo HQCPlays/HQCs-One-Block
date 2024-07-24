@@ -15,30 +15,25 @@ import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 
 import java.util.*;
 
-import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerBalances;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
 public class OneBlockController implements Listener {
-    private static final HashMap<UUID, HashMap<Material, Double>> playerBlockChances = new HashMap<>();
-    private static final HashMap<UUID, Set<Material>> playerUnlockedBlocks = new HashMap<>();
+    public static final Map<Material, Double> blockChances = new HashMap<>();
 
-    public static void initializeBlockChances(UUID playerUUID) {
-        HashMap<Material, Double> blockChances = new HashMap<>();
+    public static void initializeBlockChances() {
         blockChances.put(Material.COBBLESTONE, 0.85);
         blockChances.put(Material.OAK_WOOD, 0.09);
         blockChances.put(Material.DIRT, 0.05);
         blockChances.put(Material.AMETHYST_BLOCK, 0.01);
-        playerBlockChances.putIfAbsent(playerUUID, blockChances);
-        playerUnlockedBlocks.putIfAbsent(playerUUID, new HashSet<>());
     }
 
     @EventHandler
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
-        if (!playerBlockChances.containsKey(playerUUID)) {
-            initializeBlockChances(playerUUID);
-        }
+//        if (!playerBlockChances.containsKey(playerUUID)) {
+//            initializeBlockChances(playerUUID);
+//        }
 
         World world = event.getPlayer().getWorld();
         if (world.getName().contains("island_" + playerUUID.toString())) {
@@ -100,10 +95,11 @@ public class OneBlockController implements Listener {
         UUID playerUUID = player.getUniqueId();
         World world = player.getWorld();
 
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(playerUUID);
+
         if (world.getName().contains("island_" + playerUUID.toString())) {
             if (loc.getBlockX() == 0 && loc.getBlockY() == 0 && loc.getBlockZ() == 0) {
-                int currentBalance = playerBalances.getOrDefault(playerUUID, 0);
-                playerBalances.put(playerUUID, currentBalance + 1);
+                playerData.balance++;
                 updateScoreboard(player);
 
                 if (loc.getBlock().getType() == Material.AMETHYST_BLOCK) {
@@ -150,12 +146,11 @@ public class OneBlockController implements Listener {
                     @Override
                     public void run() {
                         Random rand = new Random();
-                        HashMap<Material, Double> blockChances = playerBlockChances.get(playerUUID);
-                        double totalChance = blockChances.values().stream().mapToDouble(Double::doubleValue).sum();
+                        double totalChance = playerData.blockChances.values().stream().mapToDouble(Double::doubleValue).sum();
                         double randomDouble = rand.nextDouble() * totalChance;
                         double cumulativeChance = 0.0;
 
-                        for (Map.Entry<Material, Double> entry : blockChances.entrySet()) {
+                        for (Map.Entry<Material, Double> entry : playerData.blockChances.entrySet()) {
                             cumulativeChance += entry.getValue();
                             if (randomDouble <= cumulativeChance) {
                                 loc.getBlock().setType(entry.getKey());
@@ -169,29 +164,28 @@ public class OneBlockController implements Listener {
     }
 
     public static void handleBlockUnlock(Player player, ItemStack item) {
-        UUID playerUUID = player.getUniqueId();
-        int playerBalance = playerBalances.getOrDefault(playerUUID, 0);
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
         Material itemType = item.getType();
         int price = PricesSheet.getBlockUnlockPrices(itemType);
 
-        if (playerUnlockedBlocks.get(playerUUID).contains(itemType)) {
+        if (playerData.unlockedBlocks.contains(itemType)) {
             player.sendMessage(ChatColor.RED + "You have already unlocked " + itemType.name() + ".");
             return;
         }
 
-        if (playerBalance >= price) {
-            playerBalances.put(playerUUID, playerBalance - price);
-            updateBlockChances(playerUUID, itemType);
+        if (playerData.balance >= price) {
+            playerData.balance -= price;
+            updateBlockChances(playerData, itemType);
             updateScoreboard(player);
-            playerUnlockedBlocks.get(playerUUID).add(itemType);
+            playerData.unlockedBlocks.add(itemType);
             player.sendMessage(ChatColor.GREEN + "You unlocked " + itemType.name() + " for " + price + " Block Coins.");
         } else {
             player.sendMessage(ChatColor.RED + "You don't have enough Block Coins.");
         }
     }
 
-    public static void updateBlockChances(UUID playerUUID, Material newBlock) {
-        HashMap<Material, Double> blockChances = playerBlockChances.get(playerUUID);
+    public static void updateBlockChances(PlayerSaveData playerData, Material newBlock) {
+        Map<Material, Double> blockChances = playerData.blockChances;
         double newBlockChance = 0.01;
 
         blockChances.replace(Material.COBBLESTONE, blockChances.get(Material.COBBLESTONE) - newBlockChance);

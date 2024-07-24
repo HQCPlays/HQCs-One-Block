@@ -20,6 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
+import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 
 import java.util.Arrays;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerBalances;
+import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerData;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
 public class AmethystShardItems implements Listener {
@@ -376,14 +377,13 @@ public class AmethystShardItems implements Listener {
     public static void goldShardEffect(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
-        UUID playerUUID = player.getUniqueId();
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
 
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             // Trigger custom event
             player.sendMessage(ChatColor.GREEN + "You have gained +10 Block Coin from the Gold Shard!");
 
-            int currentBalance = playerBalances.getOrDefault(playerUUID, 0);
-            playerBalances.put(playerUUID, currentBalance + 10);
+            playerData.balance += 10;
             updateScoreboard(player);
 
             item.setAmount(item.getAmount() - 1);

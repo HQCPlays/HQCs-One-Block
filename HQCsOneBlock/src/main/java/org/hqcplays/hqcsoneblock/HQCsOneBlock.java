@@ -13,12 +13,15 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
 import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
 import org.hqcplays.hqcsoneblock.commands.IslandCommand;
@@ -27,17 +30,22 @@ import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
 import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import java.util.Arrays;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public final class HQCsOneBlock extends JavaPlugin implements Listener {
     // Variables
-    public static final HashMap<UUID, Integer> playerBalances = new HashMap<>();
+    public static Map<UUID, PlayerSaveData> playerData = new HashMap<>();
     private final String scoreboardTitle = ChatColor.GOLD + "Block Coins";
-    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Entitylght"); // Replace with actual usernames
+    private File saveDataFile;
 
     // Command classes
     private BCShopCommand bcShopCommand;
@@ -58,6 +66,8 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         // Register enchantments
         ShardEnchantment.createEnchantments();
         getServer().getPluginManager().registerEvents(ShardEnchantment.listener, this);
+
+        OneBlockController.initializeBlockChances();
 
         // Register command executors
         if (this.getCommand("bcshop") != null) {
@@ -100,11 +110,53 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         AmethystShardItems.init();
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");
+
+        saveDataFile = new File("HQCsOneBlock.dat");
+        loadSaveData();
     }
 
     @Override
     public void onDisable() {
+        writeSaveData();
         getLogger().info("HQC's OneBlock Plugin has been disabled.");
+    }
+
+    public void loadSaveData() {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(saveDataFile);
+            GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
+            BukkitObjectInputStream objectInputStream = new BukkitObjectInputStream(gzipInputStream);
+            playerData = (Map<UUID, PlayerSaveData>) objectInputStream.readObject();
+            objectInputStream.close();
+        } catch (FileNotFoundException e) {
+            // No save file has been created yet, just use the new empty player data
+        } catch (IOException e) {
+            getLogger().severe("Unable to load player data: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            getLogger().severe("Invalid or corrupt save data: " + e.getMessage());
+        }
+        getLogger().info("Sucessfully loaded existing save data");
+    }
+
+    public void writeSaveData() {
+        getLogger().info("Saving player data...");
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(saveDataFile);
+            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(fileOutputStream);
+            BukkitObjectOutputStream objectOutputStream = new BukkitObjectOutputStream(gzipOutputStream);
+            objectOutputStream.writeObject(playerData);
+            objectOutputStream.close();
+        } catch (IOException e) {
+            getLogger().warning("Unable to save player data: " + e.getMessage());
+        }
+    }
+
+    @EventHandler
+    public void onWorldSave(WorldSaveEvent event) {
+        // Only save once per auto-save
+        if (event.getWorld().getName().equals("world")) {
+            writeSaveData();
+        }
     }
 
     @EventHandler
@@ -114,11 +166,10 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
 
         player.setGameMode(GameMode.SURVIVAL);
 
-        playerBalances.putIfAbsent(playerUUID, 0);
+        // Create new player data if none exists yet
+        playerData.putIfAbsent(playerUUID, new PlayerSaveData());
 
         setupScoreboard(player);
-
-        OneBlockController.initializeBlockChances(playerUUID);
     }
 
     // Disable durability globally
@@ -182,8 +233,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     }
 
     public static void updateScoreboard(Player player, Scoreboard scoreboard) {
-        UUID playerUUID = player.getUniqueId();
-        int balance = playerBalances.getOrDefault(playerUUID, 0);
+        int balance = playerData.get(player.getUniqueId()).balance;
         Objective objective = scoreboard.getObjective("blockCoins");
         Score score = objective.getScore(ChatColor.GREEN + "Coins: ");
         score.setScore(balance);
