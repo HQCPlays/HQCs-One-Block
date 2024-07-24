@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +14,6 @@ import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerBalances;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
 public class PickaxeController implements Listener {
@@ -73,11 +71,11 @@ public class PickaxeController implements Listener {
         UUID playerUUID = player.getUniqueId();
         Material currentPickaxeType = playerPickaxes.get(playerUUID);
         Material newPickaxeType = PricesSheet.getPickaxeUpgrade(currentPickaxeType);
-        int playerBalance = playerBalances.getOrDefault(playerUUID, 0);
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(playerUUID);
         int price = PricesSheet.getPickaxeUpgradePrices(currentPickaxeType);
 
-        if (playerBalance >= price) {
-            playerBalances.put(playerUUID, playerBalance - price);
+        if (playerData.balance >= price) {
+            playerData.balance -= price;
             replacePickaxe(player, newPickaxeType);
             updateScoreboard(player);
             player.sendMessage(ChatColor.GREEN + "You upgraded to a " + newPickaxeType.name() + " for " + price + " Block Coins.");

@@ -13,15 +13,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.OneBlockController;
 import org.hqcplays.hqcsoneblock.PickaxeController;
+import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerBalances;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 import static org.hqcplays.hqcsoneblock.PickaxeController.playerPickaxes;
 import static org.hqcplays.hqcsoneblock.numberSheets.PricesSheet.*;
@@ -188,14 +189,10 @@ public class BCShopCommand implements CommandExecutor, Listener {
     }
 
     public static void handleItemShopPurchase(Player player, Material item) {
-        UUID playerUUID = player.getUniqueId();
-
-        int playerBalance = playerBalances.getOrDefault(playerUUID, 0);
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
         int price = PricesSheet.getItemShopPrices(item);
-
-        if (playerBalance >= price) {
-            playerBalances.put(playerUUID, playerBalance - price);
-
+        if (playerData.balance >= price) {
+            playerData.balance -= price;
             ItemStack boughtItem = new ItemStack(item);
             player.getInventory().addItem(boughtItem);
             updateScoreboard(player);
