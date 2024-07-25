@@ -21,7 +21,7 @@ import java.util.List;
 
 public class CheatMenuCommand implements CommandExecutor, Listener {
     private final ArrayList<ItemStack> cheatItemList = new ArrayList<>();
-    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Jestarin", "Cflip_"); // Replace with actual usernames
+    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Jestarin", "Cflip_", "Entitylght"); // Replace with actual usernames
 
     private void addItems() {
         cheatItemList.clear();
