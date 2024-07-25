@@ -51,7 +51,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     public static Map<UUID, PlayerSaveData> playerData = new HashMap<>();
     private final String scoreboardTitle = ChatColor.GOLD + "Block Coins";
     private File saveDataFile;
-    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays"); // Replace with actual usernames
+    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Entitylght"); // Replace with actual usernames
     private ArrayList<FleaListing> listings = new ArrayList<>();
     private static Plugin plugin;
 
@@ -128,7 +128,10 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         AmethystShardItems.init();
 
         // Initialize Flea Market
-        FleaMarket fleaMarket = new FleaMarket(listings);
+        FleaMarket.clearFleaMarket(); // temporary empty flea market on init
+        FleaMarket.addListing(new FleaListing(AmethystShardItems.greenShard, 100.0, UUID.randomUUID()));
+        FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200.0, UUID.randomUUID()));
+        FleaMarket.addListing(new FleaListing(AmethystShardItems.redShard, 300.0, UUID.randomUUID()));
         plugin = this;
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");

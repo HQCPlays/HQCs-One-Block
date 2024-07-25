@@ -29,4 +29,12 @@ public class FleaMarket {
         listings.add(fleaListing);
     }
 
+    public static void removeListing(FleaListing fleaListing){
+        listings.remove(fleaListing);
+    }
+
+    public static void clearFleaMarket(){
+        listings.clear();
+    }
+
 }

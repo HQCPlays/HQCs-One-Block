@@ -1,0 +1,20 @@
+name: HQCsOneBlock
+version: 1.0.1
+main: org.hqcplays.hqcsoneblock.HQCsOneBlock
+api-version: 1.21
+commands:
+  bcshop:
+    description: Opens the Block Coin shop
+    usage: /bcshop
+  cheat:
+    description: Opens the cheat menu
+    usage: /cheat
+  lobby:
+    description: Teleports the player back to the lobby
+    usage: /lobby
+  island:
+    description: Teleports the player to their island. Creates one if they don't have one
+    usage: /island
+  flea:
+    description: Opens the Flea Market
+    usage: /flea

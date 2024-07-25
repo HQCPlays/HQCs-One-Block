@@ -18,13 +18,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hqcplays.hqcsoneblock.OneBlockController;
 import org.hqcplays.hqcsoneblock.PickaxeController;
+import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 import org.jetbrains.annotations.NotNull;
 
 import org.hqcplays.hqcsoneblock.FleaListing;
 import org.hqcplays.hqcsoneblock.FleaListingUtils;
 import org.hqcplays.hqcsoneblock.FleaMarket;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
+
+import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
 public class FleaCommand implements CommandExecutor, Listener {
 
@@ -50,9 +54,7 @@ public class FleaCommand implements CommandExecutor, Listener {
         Inventory fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET");
         FleaListingUtils fleaListingUltils = new FleaListingUtils(HQCsOneBlock.getPlugin());
 
-        FleaMarket.addListing(new FleaListing(AmethystShardItems.greenShard, 100.0, player.getUniqueId()));
-        FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200.0, player.getUniqueId()));
-        FleaMarket.addListing(new FleaListing(AmethystShardItems.redShard, 300.0, player.getUniqueId()));
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
 
         for (FleaListing listing : FleaMarket.getFleaListings()){
             ItemStack fleaListingItem = fleaListingUltils.createListingItem(listing);
@@ -63,7 +65,7 @@ public class FleaCommand implements CommandExecutor, Listener {
     }
 
 
-        // This function controls what happens when the player clicks in the shop
+    // This function controls what happens when the player clicks in the shop
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null) return;
@@ -74,11 +76,25 @@ public class FleaCommand implements CommandExecutor, Listener {
         ItemStack clickedItem = event.getCurrentItem();
         String inventoryTitle = event.getView().getTitle();
 
-        // Do nothing if player doesn't click anything
-        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "FLEA MARKET")) {
+            event.setCancelled(true);
+            if (clickedItem == null || clickedItem.getType() == Material.AIR) return; // Do nothing if player doesn't click anything
 
-        if (event.getClickedInventory() == event.getView().getTopInventory()) {
+            if (event.getClickedInventory() == event.getView().getTopInventory()) {
+                event.setCancelled(true); // prevents players from taking item
 
+                if (clickedItem != null) {
+                    FleaListingUtils listingUtils = new FleaListingUtils(HQCsOneBlock.getPlugin());
+                    UUID listingID = listingUtils.getListingIdFromItem(clickedItem); //obtain the listing ID from the clicked item
+
+                    if (listingID != null) {
+                        FleaListing fleaListing = findListingById(listingID);
+                        if (fleaListing != null) {
+                            handleFleaPurchase(player, fleaListing);
+                        }
+                    }
+                }
+            }
         }
 
         // Main menu controls
@@ -95,5 +111,34 @@ public class FleaCommand implements CommandExecutor, Listener {
         //         }
         //     }
         // }
+    }
+
+    // returns the actual listing via the listingID
+    private FleaListing findListingById(UUID listingId){
+        for (FleaListing listing : FleaMarket.getFleaListings()) {
+            if (listing.getId().equals(listingId)) {
+                return listing;
+            }
+        }
+        return null;
+    }
+
+    private void handleFleaPurchase(Player player, FleaListing listing){
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        double price = listing.getPrice();
+        System.out.println("Player balance = " + playerData.balance);
+        System.out.println("Listing price = " + price);
+        if (playerData.balance >= price) {
+            playerData.balance -= price;
+            player.getInventory().addItem(listing.getItem());
+            FleaMarket.removeListing(listing);
+            player.closeInventory();
+            openFleaGUI(player);
+            updateScoreboard(player);
+            player.sendMessage("Purchase Complete!");
+        } else {
+            player.sendMessage("Not enough funds!");
+        }
+
     }
 }
