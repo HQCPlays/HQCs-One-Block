@@ -24,6 +24,7 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
 import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
+import org.hqcplays.hqcsoneblock.commands.FleaCommand;
 import org.hqcplays.hqcsoneblock.commands.IslandCommand;
 import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
@@ -35,7 +36,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
@@ -46,12 +49,14 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     public static Map<UUID, PlayerSaveData> playerData = new HashMap<>();
     private final String scoreboardTitle = ChatColor.GOLD + "Block Coins";
     private File saveDataFile;
+    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays"); // Replace with actual usernames
 
     // Command classes
     private BCShopCommand bcShopCommand;
     private CheatMenuCommand cheatMenuCommand;
     private LobbyCommand lobbyCommand;
     private IslandCommand islandCommand;
+    private FleaCommand fleaCommand;
 
     // Functions
     @Override
@@ -104,6 +109,15 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(islandCommand, this);
         } else {
             getLogger().severe("Command 'island' is not defined!"); // Not defined in plugin.yml
+        }
+
+        if (this.getCommand("flea") != null) {
+            fleaCommand = new FleaCommand();
+            this.getCommand("flea").setExecutor(fleaCommand);
+            // Only register events if fleaCommand implements Listener
+            getServer().getPluginManager().registerEvents(fleaCommand, this);
+        } else {
+            getLogger().severe("Command 'flea' is not defined!"); // Not defined in plugin.yml
         }
 
         // Initialize items or other components

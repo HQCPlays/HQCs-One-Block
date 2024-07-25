@@ -15,3 +15,6 @@ commands:
   island:
     description: Teleports the player to their island. Creates one if they don't have one
     usage: /island
+  flea:
+    description: Opens the Flea Market
+    usage: /flea
