@@ -18,9 +18,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hqcplays.hqcsoneblock.OneBlockController;
 import org.hqcplays.hqcsoneblock.PickaxeController;
+import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
 import org.jetbrains.annotations.NotNull;
 
 import org.hqcplays.hqcsoneblock.FleaListing;
+import org.hqcplays.hqcsoneblock.FleaListingUtils;
+import org.hqcplays.hqcsoneblock.FleaMarket;
+import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 
 public class FleaCommand implements CommandExecutor, Listener {
 
@@ -44,6 +48,16 @@ public class FleaCommand implements CommandExecutor, Listener {
 
     public void openFleaGUI(Player player) {
         Inventory fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET");
+        FleaListingUtils fleaListingUltils = new FleaListingUtils(HQCsOneBlock.getPlugin());
+
+        FleaMarket.addListing(new FleaListing(AmethystShardItems.greenShard, 100.0, player.getUniqueId()));
+        FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200.0, player.getUniqueId()));
+        FleaMarket.addListing(new FleaListing(AmethystShardItems.redShard, 300.0, player.getUniqueId()));
+
+        for (FleaListing listing : FleaMarket.getFleaListings()){
+            ItemStack fleaListingItem = fleaListingUltils.createListingItem(listing);
+            fleaGUI.addItem(fleaListingItem);
+        }
 
         player.openInventory(fleaGUI);
     }

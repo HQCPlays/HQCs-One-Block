@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldSaveEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -36,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +52,8 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private final String scoreboardTitle = ChatColor.GOLD + "Block Coins";
     private File saveDataFile;
     private final List<String> authorizedUsers = Arrays.asList("HQC_Plays"); // Replace with actual usernames
+    private ArrayList<FleaListing> listings = new ArrayList<>();
+    private static Plugin plugin;
 
     // Command classes
     private BCShopCommand bcShopCommand;
@@ -122,6 +126,10 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
 
         // Initialize items or other components
         AmethystShardItems.init();
+
+        // Initialize Flea Market
+        FleaMarket fleaMarket = new FleaMarket(listings);
+        plugin = this;
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");
 
@@ -251,5 +259,9 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         Objective objective = scoreboard.getObjective("blockCoins");
         Score score = objective.getScore(ChatColor.GREEN + "Coins: ");
         score.setScore(balance);
+    }
+
+    public static Plugin getPlugin() {
+        return plugin;
     }
 }

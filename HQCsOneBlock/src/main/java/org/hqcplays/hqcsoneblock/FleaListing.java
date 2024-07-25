@@ -1,43 +1,55 @@
 package org.hqcplays.hqcsoneblock;
 
+import java.util.UUID;
+
+import org.bukkit.inventory.ItemStack;
+
 public class FleaListing {
     
     // Properties of a listing
-    private String itemName;
-    private int itemPrice;
-    private String sellerName;
+    private UUID id;
+    private ItemStack item;
+    private double price;
+    private UUID seller;
 
     // Main Constructor
-    public FleaListing(String itemName, int itemPrice, String sellerName){
-        this.itemName = itemName;
-        this.itemPrice = itemPrice;
-        this.sellerName = sellerName;
+    public FleaListing(ItemStack item, double price, UUID seller){
+        this.id = UUID.randomUUID(); // Each Listing has a random (and statistically unique) UUID
+        this.item = item;
+        this.price = price;
+        this.seller = seller;
     }
 
     // Getters and Setters
-    public String getItemName(){
-        return itemName;
+
+    public UUID getId(){
+        return id;
     }
     
-    public void setItemName(String itemName){
-        this.itemName = itemName;
+
+    public ItemStack getItem(){
+        return item;
+    }
+    
+    public void setItemName(ItemStack item){
+        this.item = item;
     }
 
     // Getters and Setters
-    public int getItemPrice(){
-        return itemPrice;
+    public double getPrice(){
+        return price;
     }
     
-    public void setItemName(int itemPrice){
-        this.itemPrice = itemPrice;
+    public void setPrice(double price){
+        this.price = price;
     }
 
     // Getters and Setters
-    public String getSellerName(){
-        return sellerName;
+    public UUID getSeller(){
+        return seller;
     }
     
-    public void setSellerName(String sellerName){
-        this.sellerName = sellerName;
+    public void setSellerName(UUID seller){
+        this.seller = seller;
     }
 }
