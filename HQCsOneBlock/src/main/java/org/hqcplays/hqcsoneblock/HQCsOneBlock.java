@@ -61,7 +61,6 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new OneBlockController(), this);
         getServer().getPluginManager().registerEvents(new PickaxeController(), this);
         getServer().getPluginManager().registerEvents(new AmethystShardItems(), this);
-        getServer().getPluginManager().registerEvents(new CustomPickaxes(), this);
 
         // Register enchantments
         ShardEnchantment.createEnchantments();
@@ -108,6 +107,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
 
         // Initialize items or other components
         AmethystShardItems.init();
+        CustomPickaxes.init();
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");
 

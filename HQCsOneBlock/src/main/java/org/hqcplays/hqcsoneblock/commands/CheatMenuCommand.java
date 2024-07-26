@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -48,6 +49,14 @@ public class CheatMenuCommand implements CommandExecutor, Listener {
         cheatItemList.add(AmethystShardItems.redShardChestplate);
         cheatItemList.add(AmethystShardItems.redShardLeggings);
         cheatItemList.add(AmethystShardItems.redShardBoots);
+
+        // Pickaxes
+        cheatItemList.add(CustomPickaxes.woodPickaxe);
+        cheatItemList.add(CustomPickaxes.stonePickaxe);
+        cheatItemList.add(CustomPickaxes.ironPickaxe);
+        cheatItemList.add(CustomPickaxes.goldenPickaxe);
+        cheatItemList.add(CustomPickaxes.diamondPickaxe);
+        cheatItemList.add(CustomPickaxes.netheritePickaxe);
     }
 
     @Override
