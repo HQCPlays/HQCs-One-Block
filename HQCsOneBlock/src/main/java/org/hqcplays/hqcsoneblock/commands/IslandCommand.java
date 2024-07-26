@@ -28,6 +28,10 @@ public class IslandCommand implements CommandExecutor, Listener {
             } else {
                 // World exists and is loaded
                 playerWorld = Bukkit.getWorld(playerWorldName);
+                if (playerWorld == null) {
+                    // Load the world if it isn't already loaded
+                    playerWorld = Bukkit.createWorld(new WorldCreator(playerWorldName));
+                }
             }
 
             // Teleport the player to their island
