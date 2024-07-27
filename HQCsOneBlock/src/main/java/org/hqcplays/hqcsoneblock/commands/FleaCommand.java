@@ -52,12 +52,11 @@ public class FleaCommand implements CommandExecutor, Listener {
 
     public void openFleaGUI(Player player) {
         Inventory fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET");
-        FleaListingUtils fleaListingUltils = new FleaListingUtils(HQCsOneBlock.getPlugin());
 
         PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
 
         for (FleaListing listing : FleaMarket.getFleaListings()){
-            ItemStack fleaListingItem = fleaListingUltils.createListingItem(listing);
+            ItemStack fleaListingItem = FleaListingUtils.createListingItem(listing);
             fleaGUI.addItem(fleaListingItem);
         }
 
@@ -84,8 +83,7 @@ public class FleaCommand implements CommandExecutor, Listener {
                 event.setCancelled(true); // prevents players from taking item
 
                 if (clickedItem != null) {
-                    FleaListingUtils listingUtils = new FleaListingUtils(HQCsOneBlock.getPlugin());
-                    UUID listingID = listingUtils.getListingIdFromItem(clickedItem); //obtain the listing ID from the clicked item
+                    UUID listingID = FleaListingUtils.getListingIdFromItem(clickedItem); //obtain the listing ID from the clicked item
 
                     if (listingID != null) {
                         FleaListing fleaListing = findListingById(listingID);
@@ -96,21 +94,6 @@ public class FleaCommand implements CommandExecutor, Listener {
                 }
             }
         }
-
-        // Main menu controls
-        // if (inventoryTitle.equals(ChatColor.DARK_GREEN + "Main Shop")) {
-        //     event.setCancelled(true);
-
-        //     if (event.getClickedInventory() == event.getView().getTopInventory()) {
-        //         if (clickedItem.getType() == Material.CHEST) {
-        //             openItemShopGUI(player);
-        //         } else if (clickedItem.getType() == Material.DIAMOND_PICKAXE) {
-        //             openPickaxeUpgradeShopGUI(player);
-        //         } else if (clickedItem.getType() == Material.GRASS_BLOCK) {
-        //             openBlockUpgradeShopGUI(player);
-        //         }
-        //     }
-        // }
     }
 
     // returns the actual listing via the listingID
@@ -126,19 +109,41 @@ public class FleaCommand implements CommandExecutor, Listener {
     private void handleFleaPurchase(Player player, FleaListing listing){
         PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
         double price = listing.getPrice();
-        System.out.println("Player balance = " + playerData.balance);
-        System.out.println("Listing price = " + price);
-        if (playerData.balance >= price) {
-            playerData.balance -= price;
-            player.getInventory().addItem(listing.getItem());
-            FleaMarket.removeListing(listing);
-            player.closeInventory();
-            openFleaGUI(player);
-            updateScoreboard(player);
-            player.sendMessage("Purchase Complete!");
+        if (!isInventoryFull(player)) {
+            if (playerData.balance >= price) {
+                playerData.balance -= price;
+                player.getInventory().addItem(listing.getItem());
+                FleaMarket.removeListing(listing);
+                player.closeInventory();
+                openFleaGUI(player);
+                updateScoreboard(player);
+                // Display confirmation message
+                ItemStack item = listing.getItem();
+                ItemMeta itemMeta = item.getItemMeta();
+                if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
+                    player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + itemMeta.getDisplayName() + " for $" + price);
+                } else { // for vanilla items
+                    player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + item.getType().toString() + " for $" + price);
+                }
+            } else {
+                player.sendMessage(ChatColor.RED + "Not enough funds!");
+            }
         } else {
-            player.sendMessage("Not enough funds!");
+            player.sendMessage(ChatColor.RED + "No space in inventory!");
         }
+        
 
+    }
+
+    public boolean isInventoryFull(Player player) {
+        // Iterate through the player's inventory excluding armor slots and off hand (last 5 slots)
+        for (int i = 0; i < player.getInventory().getSize()-5; i++) {
+            ItemStack item = player.getInventory().getItem(i);
+            // Check if any slot is empty (null)
+            if (item == null) {
+                return false; // Inventory is not full
+            }
+        }
+        return true; // Inventory is full
     }
 }

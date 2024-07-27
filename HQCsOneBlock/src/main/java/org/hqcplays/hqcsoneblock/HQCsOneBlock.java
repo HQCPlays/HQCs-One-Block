@@ -3,6 +3,7 @@ package org.hqcplays.hqcsoneblock;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,7 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.world.WorldSaveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -26,6 +28,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
 import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
 import org.hqcplays.hqcsoneblock.commands.FleaCommand;
+import org.hqcplays.hqcsoneblock.commands.ListCommand;
 import org.hqcplays.hqcsoneblock.commands.IslandCommand;
 import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
@@ -61,6 +64,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private LobbyCommand lobbyCommand;
     private IslandCommand islandCommand;
     private FleaCommand fleaCommand;
+    private ListCommand listCommand;
 
     // Functions
     @Override
@@ -124,14 +128,28 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             getLogger().severe("Command 'flea' is not defined!"); // Not defined in plugin.yml
         }
 
+        if (this.getCommand("list") != null) {
+            listCommand = new ListCommand();
+            this.getCommand("list").setExecutor(listCommand);
+            // Only register events if listCommand implements Listener
+            getServer().getPluginManager().registerEvents(listCommand, this);
+        } else {
+            getLogger().severe("Command 'list' is not defined!"); // Not defined in plugin.yml
+        }
+
         // Initialize items or other components
         AmethystShardItems.init();
 
+
         // Initialize Flea Market
+
+        ItemStack testItem = new ItemStack(Material.GRASS_BLOCK);
+        testItem.setAmount(64);
+
         FleaMarket.clearFleaMarket(); // temporary empty flea market on init
-        FleaMarket.addListing(new FleaListing(AmethystShardItems.greenShard, 100.0, UUID.randomUUID()));
-        FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200.0, UUID.randomUUID()));
-        FleaMarket.addListing(new FleaListing(AmethystShardItems.redShard, 300.0, UUID.randomUUID()));
+        FleaMarket.addListing(new FleaListing(testItem, 100, UUID.randomUUID()));
+        FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200, UUID.randomUUID()));
+        FleaMarket.addListing(new FleaListing(AmethystShardItems.redShard, 300, UUID.randomUUID()));
         plugin = this;
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");

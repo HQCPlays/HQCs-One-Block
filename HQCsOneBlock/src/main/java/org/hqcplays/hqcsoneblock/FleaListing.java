@@ -9,11 +9,11 @@ public class FleaListing {
     // Properties of a listing
     private UUID id;
     private ItemStack item;
-    private double price;
+    private int price;
     private UUID seller;
 
     // Main Constructor
-    public FleaListing(ItemStack item, double price, UUID seller){
+    public FleaListing(ItemStack item, int price, UUID seller){
         this.id = UUID.randomUUID(); // Each Listing has a random (and statistically unique) UUID
         this.item = item;
         this.price = price;
@@ -36,11 +36,11 @@ public class FleaListing {
     }
 
     // Getters and Setters
-    public double getPrice(){
+    public int getPrice(){
         return price;
     }
     
-    public void setPrice(double price){
+    public void setPrice(int price){
         this.price = price;
     }
 
