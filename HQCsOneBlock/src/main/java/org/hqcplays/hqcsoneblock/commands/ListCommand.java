@@ -23,6 +23,8 @@ import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.jetbrains.annotations.NotNull;
 
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
 public class ListCommand implements CommandExecutor, Listener {
 
     private int interactionFlag = 0; // tracks if players interact with the GUI in a meaningful way
@@ -39,7 +41,10 @@ public class ListCommand implements CommandExecutor, Listener {
              *      - an amount of the desired item (Integer)
              *      - a price (Integer)
              */
-
+            if (args.length != 2) {
+                player.sendMessage(ChatColor.RED + "Usage: /list <amount> <price>.");
+                return true;
+            }
              try {
                 // Check for valid integers
                 int amount = Integer.parseInt(args[0]);
@@ -94,12 +99,12 @@ public class ListCommand implements CommandExecutor, Listener {
         // Create Cancel and Confirm items to act as buttons
         ItemStack cancelButton = new ItemStack(Material.RED_CONCRETE);
         ItemMeta cancelButtonMeta = cancelButton.getItemMeta();
-        cancelButtonMeta.setDisplayName(ChatColor.GOLD + "CANCEL");
+        cancelButtonMeta.setDisplayName(ChatColor.GOLD + "CANCEL LISTING");
         cancelButton.setItemMeta(cancelButtonMeta);
 
         ItemStack confirmButton = new ItemStack(Material.LIME_CONCRETE);
         ItemMeta confirmButtonMeta = confirmButton.getItemMeta();
-        confirmButtonMeta.setDisplayName(ChatColor.GOLD + "CONFIRM");
+        confirmButtonMeta.setDisplayName(ChatColor.GOLD + "CONFIRM LISTING");
         confirmButton.setItemMeta(confirmButtonMeta);
 
 
@@ -159,7 +164,7 @@ public class ListCommand implements CommandExecutor, Listener {
 
                         // Display confirmation message
                         if (originalItemMeta != null && originalItemMeta.hasDisplayName()) { // For custom items
-                            player.sendMessage(ChatColor.GREEN + "Successfully listed " + originalItem.getAmount() + " " + originalItemMeta.getDisplayName() + " for $" + pendingListing.getPrice());
+                            player.sendMessage(ChatColor.GREEN + "Successfully listed " + originalItem.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(originalItemMeta.displayName()) + " for $" + pendingListing.getPrice());
                         } else { // for vanilla items
                             player.sendMessage(ChatColor.GREEN + "Successfully listed " + originalItem.getAmount() + " " + originalItem.getType().toString() + " for $" + pendingListing.getPrice());
                         }

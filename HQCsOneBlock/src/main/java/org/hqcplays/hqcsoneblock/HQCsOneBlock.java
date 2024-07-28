@@ -146,8 +146,12 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         ItemStack testItem = new ItemStack(Material.GRASS_BLOCK);
         testItem.setAmount(64);
 
+        ItemStack testItem1 = new ItemStack(Material.DIAMOND);
+        testItem1.setAmount(64);
+
         FleaMarket.clearFleaMarket(); // temporary empty flea market on init
         FleaMarket.addListing(new FleaListing(testItem, 100, UUID.randomUUID()));
+        FleaMarket.addListing(new FleaListing(testItem1, 10000000, UUID.randomUUID()));
         FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200, UUID.randomUUID()));
         FleaMarket.addListing(new FleaListing(AmethystShardItems.redShard, 300, UUID.randomUUID()));
         plugin = this;

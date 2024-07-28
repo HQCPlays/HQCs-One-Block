@@ -23,6 +23,8 @@ import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
 import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 import org.jetbrains.annotations.NotNull;
 
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
 import org.hqcplays.hqcsoneblock.FleaListing;
 import org.hqcplays.hqcsoneblock.FleaListingUtils;
 import org.hqcplays.hqcsoneblock.FleaMarket;
@@ -33,7 +35,8 @@ import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 public class FleaCommand implements CommandExecutor, Listener {
 
 
-    private List<FleaListing> listings;
+    Inventory fleaGUI;
+    Inventory listGUI;
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -51,7 +54,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
 
     public void openFleaGUI(Player player) {
-        Inventory fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET");
+        fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET");
 
         PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
 
@@ -61,6 +64,29 @@ public class FleaCommand implements CommandExecutor, Listener {
         }
 
         player.openInventory(fleaGUI);
+    }
+
+    public void openPurchaseConfirmationGUI(Player player, ItemStack fleaItem) {
+        listGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "CONFIRM PURCHASE");
+
+        // Create Cancel and Confirm items to act as buttons
+        ItemStack cancelButton = new ItemStack(Material.RED_CONCRETE);
+        ItemMeta cancelButtonMeta = cancelButton.getItemMeta();
+        cancelButtonMeta.setDisplayName(ChatColor.GOLD + "CANCEL PURCHASE");
+        cancelButton.setItemMeta(cancelButtonMeta);
+
+        ItemStack confirmButton = new ItemStack(Material.LIME_CONCRETE);
+        ItemMeta confirmButtonMeta = confirmButton.getItemMeta();
+        confirmButtonMeta.setDisplayName(ChatColor.GOLD + "CONFIRM PURCHASE");
+        confirmButton.setItemMeta(confirmButtonMeta);
+
+
+        // Place the items in the GUI
+        listGUI.setItem(13, fleaItem);
+        listGUI.setItem(29, cancelButton);
+        listGUI.setItem(33, confirmButton);
+
+        player.openInventory(listGUI);
     }
 
 
@@ -83,56 +109,80 @@ public class FleaCommand implements CommandExecutor, Listener {
                 event.setCancelled(true); // prevents players from taking item
 
                 if (clickedItem != null) {
-                    FleaListing fleaListing = FleaListingUtils.findPostedListingByItem(clickedItem);
-                    if (fleaListing != null) {
-                        handleFleaPurchase(player, fleaListing);
-                    }
+                    // FleaListing fleaListing = FleaListingUtils.findPostedListingByItem(clickedItem);
+                    // if (fleaListing != null) {
+                    //     handleFleaPurchase(player, fleaListing);
+                    // }
+                    openPurchaseConfirmationGUI(player, clickedItem);
                 }
             }
         }
-    }
 
-    // returns the actual listing via the listingID
-    private FleaListing findListingById(UUID listingId){
-        for (FleaListing listing : FleaMarket.getFleaListings()) {
-            if (listing.getId().equals(listingId)) {
-                return listing;
+        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "CONFIRM PURCHASE")) {
+            event.setCancelled(true);
+            if (clickedItem == null || clickedItem.getType() == Material.AIR) return; // Do nothing if player doesn't click anything
+
+            if (event.getClickedInventory() == event.getView().getTopInventory()) {
+                event.setCancelled(true); // prevents players from taking item
+                ItemStack fleaItem = event.getClickedInventory().getItem(13); 
+
+                if (clickedItem.getType() == Material.RED_CONCRETE) { // If player cancels the purchase
+                    player.sendMessage(ChatColor.RED + "Purchased canceled!");
+                    player.openInventory(fleaGUI);
+                } else if (clickedItem.getType() == Material.LIME_CONCRETE) { // if player confirms the purchase
+                    FleaListing listing = FleaListingUtils.findListingByItem(fleaItem);
+                    handleFleaPurchase(player, fleaItem, listing);
+                    player.closeInventory();
+                } 
             }
         }
-        return null;
     }
 
-    private void handleFleaPurchase(Player player, FleaListing listing){
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-        double price = listing.getPrice();
-        if (!isInventoryFull(player)) {
-            if (playerData.balance >= price) {
-                playerData.balance -= price;
-                player.getInventory().addItem(listing.getItem());
-                FleaMarket.removeListing(listing);
-                player.closeInventory();
-                openFleaGUI(player);
-                updateScoreboard(player);
-
-                // Give money to the seller
-                Player seller = Bukkit.getPlayer(listing.getSeller());
-                PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
-                sellerData.balance += price;
-
-                // Display confirmation message
-                ItemStack item = listing.getItem();
-                ItemMeta itemMeta = item.getItemMeta();
-                if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
-                    player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + itemMeta.getDisplayName() + " for $" + price);
-                } else { // for vanilla items
-                    player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + item.getType().toString() + " for $" + price);
+    private void handleFleaPurchase(Player player, ItemStack fleaItem, FleaListing listing){
+        if (listing.getSeller() != player.getUniqueId()){
+            if (FleaListingUtils.findPostedListingByItem(fleaItem) != null) {
+                PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+                int price = listing.getPrice();
+                if (!isInventoryFull(player)) {
+                    if (playerData.balance >= price) {
+                        playerData.balance -= price;
+                        updateScoreboard(player);
+                        player.getInventory().addItem(listing.getItem());
+                        FleaMarket.removeListing(listing);
+                        player.closeInventory();
+                        openFleaGUI(player);
+    
+                        // Give money to the seller
+                        Player seller = Bukkit.getPlayer(listing.getSeller());
+                        if (seller != null){
+                            PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
+                            sellerData.balance += price;
+                            updateScoreboard(player);
+                        }
+    
+                        // Display confirmation message
+                        ItemStack item = listing.getItem();
+                        ItemMeta itemMeta = item.getItemMeta();
+                        if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
+                            player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price);
+                        } else { // for vanilla items
+                            player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + item.getType().toString() + " for $" + price);
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Not enough funds!");
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "No space in inventory!");
                 }
             } else {
-                player.sendMessage(ChatColor.RED + "Not enough funds!");
+                player.closeInventory();
+                player.sendMessage(ChatColor.RED + "Listing has already been purchased or no longer exists!");
             }
         } else {
-            player.sendMessage(ChatColor.RED + "No space in inventory!");
+            player.closeInventory();
+            player.sendMessage(ChatColor.RED + "You can not purchase your own listings!");
         }
+        
         
 
     }
