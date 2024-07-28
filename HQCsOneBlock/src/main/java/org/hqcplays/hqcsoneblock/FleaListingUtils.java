@@ -1,12 +1,18 @@
 package org.hqcplays.hqcsoneblock;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class FleaListingUtils {
     private static final NamespacedKey idKey = new NamespacedKey(HQCsOneBlock.getPlugin(), "listing_id");
@@ -22,14 +28,69 @@ public class FleaListingUtils {
             meta.getPersistentDataContainer().set(idKey, PersistentDataType.STRING, listing.getId().toString());
             meta.getPersistentDataContainer().set(priceKey, PersistentDataType.INTEGER, listing.getPrice());
             meta.getPersistentDataContainer().set(sellerKey, PersistentDataType.STRING, listing.getSeller().toString());
+
+            // Make the details of the listing visible in the lore of the item
+            List<Component> lore = new ArrayList<>();
+            lore.add(Component.text("Price: " + listing.getPrice()).color(NamedTextColor.GOLD));
+            if (Bukkit.getPlayer(listing.getSeller()) != null) { // If the player UUID matches a real player
+                lore.add(Component.text("Seller: " + Bukkit.getPlayer(listing.getSeller()).getName()).color(NamedTextColor.AQUA));
+            } else { // If UUID of player selling item is unknown
+                lore.add(Component.text("Seller: Unknown").color(NamedTextColor.AQUA)); 
+            }
+            if (meta.lore() != null) { // If item already has lore (custom items)
+                List<Component> originalLore = meta.lore();
+                originalLore.addAll(lore);
+                meta.lore(originalLore);
+            } else { // If item has no lore (vanilla items)
+                meta.lore(lore);
+            }
             item.setItemMeta(meta);
         }
 
         return item;
     }
 
+
+    // returns the actual listing via the listingID
+    public static FleaListing findPostedListingByItem(ItemStack item){
+        UUID listingId = getListingIdFromItem(item);
+        if (listingId != null) {
+            for (FleaListing listing : FleaMarket.getFleaListings()) {
+                if (listing.getId().equals(listingId)) {
+                    return listing;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static FleaListing findPendingListingByItem(ItemStack item){
+        UUID listingId = getListingIdFromItem(item);
+        if (listingId != null) {
+            for (FleaListing listing : FleaMarket.getPendingFleaListings()) {
+                if (listing.getId().equals(listingId)) {
+                    return listing;
+                }
+            }
+        }
+        return null;
+    }
+
+    // returns the actual listing via the listingID
+    public static FleaListing findListingByItem(ItemStack item){
+        UUID listingId = getListingIdFromItem(item);
+        if (listingId != null) {
+            for (FleaListing listing : FleaMarket.getFleaListings()) {
+                if (listing.getId().equals(listingId)) {
+                    return listing;
+                }
+            }
+        }
+        return null;
+    }
+
     // Obtain the id of the listing from the item
-    public static UUID getListingIdFromItem(ItemStack item) {
+    private static UUID getListingIdFromItem(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             String idString = meta.getPersistentDataContainer().get(idKey, PersistentDataType.STRING);

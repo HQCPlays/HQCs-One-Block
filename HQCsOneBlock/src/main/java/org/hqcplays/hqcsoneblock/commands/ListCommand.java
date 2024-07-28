@@ -69,6 +69,7 @@ public class ListCommand implements CommandExecutor, Listener {
                 ItemStack fleaItem = itemInHand.clone();
                 fleaItem.setAmount(amount);
                 FleaListing listing = new FleaListing(fleaItem, price, player.getUniqueId());
+                FleaMarket.addPendingListing(listing);
                 ItemStack fleaListingItem = FleaListingUtils.createListingItem(listing);
 
                 // subtract the amount of the item the player tried to list from their inventory
@@ -135,8 +136,12 @@ public class ListCommand implements CommandExecutor, Listener {
                     // Give the player their original item that they tried to list back
                     ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
                     if (itemInMainHand.getType() == Material.AIR){ // If the player tried to sell all of the original item stack
-                        ItemStack originalItem = FleaListingUtils.getOriginalItemFromItem(fleaItem);
-                        player.getInventory().setItemInMainHand(originalItem);
+                        FleaListing pendingListing = FleaListingUtils.findPendingListingByItem(fleaItem);
+                        if (pendingListing != null){
+                            ItemStack originalItem = pendingListing.getItem();
+                            FleaMarket.removePendingListing(pendingListing);
+                            player.getInventory().setItemInMainHand(originalItem); 
+                        }
                     } else { // If the player only sold part of the original item stack
                         itemInMainHand.setAmount(itemInMainHand.getAmount() + fleaItem.getAmount());
                     }
@@ -145,17 +150,23 @@ public class ListCommand implements CommandExecutor, Listener {
                     interactionFlag = 0; // POTENTIAL MASSIVE ERROR DOES NOT SCALE IN MULTIPLAYER
                 } else if (clickedItem.getType() == Material.LIME_CONCRETE) { // if player confirms the listing
                     interactionFlag = 1;
-                    FleaListing fleaListing = FleaListingUtils.getListingFromItem(fleaItem);
-                    FleaMarket.addListing(fleaListing);
-                    ItemStack fleaOriginalItem = fleaListing.getItem();
-                    ItemMeta fleaOriginalItemMeta = fleaOriginalItem.getItemMeta();
+                    FleaListing pendingListing = FleaListingUtils.findPendingListingByItem(fleaItem);
+                    if (pendingListing != null){
+                        ItemStack originalItem = pendingListing.getItem();
+                        ItemMeta originalItemMeta = originalItem.getItemMeta();
+                        FleaMarket.addListing(pendingListing);
+                        FleaMarket.removePendingListing(pendingListing);
 
-                    // Display confirmation message
-                    if (fleaOriginalItemMeta != null && fleaOriginalItemMeta.hasDisplayName()) { // For custom items
-                        player.sendMessage(ChatColor.GREEN + "Successfully listed " + fleaOriginalItem.getAmount() + " " + fleaOriginalItemMeta.getDisplayName() + " for $" + fleaListing.getPrice());
-                    } else { // for vanilla items
-                        player.sendMessage(ChatColor.GREEN + "Successfully listed " + fleaOriginalItem.getAmount() + " " + fleaOriginalItem.getType().toString() + " for $" + fleaListing.getPrice());
+                        // Display confirmation message
+                        if (originalItemMeta != null && originalItemMeta.hasDisplayName()) { // For custom items
+                            player.sendMessage(ChatColor.GREEN + "Successfully listed " + originalItem.getAmount() + " " + originalItemMeta.getDisplayName() + " for $" + pendingListing.getPrice());
+                        } else { // for vanilla items
+                            player.sendMessage(ChatColor.GREEN + "Successfully listed " + originalItem.getAmount() + " " + originalItem.getType().toString() + " for $" + pendingListing.getPrice());
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Listing canceled! Item Not Found!");
                     }
+
                     
                     player.closeInventory();
                     interactionFlag = 0; // POTENTIAL MASSIVE ERROR DOES NOT SCALE IN MULTIPLAYER
@@ -174,8 +185,12 @@ public class ListCommand implements CommandExecutor, Listener {
                 // Give the player their original item that they tried to list back
                 ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
                 if (itemInMainHand.getType() == Material.AIR){ // If the player tried to sell all of the original item stack
-                    ItemStack originalItem = FleaListingUtils.getOriginalItemFromItem(fleaItem);
-                    player.getInventory().setItemInMainHand(originalItem);
+                    FleaListing pendingListing = FleaListingUtils.findPendingListingByItem(fleaItem);
+                    if (pendingListing != null){
+                        ItemStack originalItem = pendingListing.getItem();
+                        FleaMarket.removePendingListing(pendingListing);
+                        player.getInventory().setItemInMainHand(originalItem); 
+                    }
                 } else { // If the player only sold part of the original item stack
                     itemInMainHand.setAmount(itemInMainHand.getAmount() + fleaItem.getAmount());
                 }

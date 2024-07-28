@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 public class FleaMarket {
     
     private static ArrayList<FleaListing> listings = new ArrayList<>();
+    private static ArrayList<FleaListing> pendingListings = new ArrayList<>();
 
 
     public FleaMarket(ArrayList<FleaListing> listings){
@@ -31,6 +32,18 @@ public class FleaMarket {
 
     public static void removeListing(FleaListing fleaListing){
         listings.remove(fleaListing);
+    }
+
+    public static ArrayList<FleaListing> getPendingFleaListings(){
+        return pendingListings;
+    }
+
+    public static void addPendingListing(FleaListing fleaListing){
+        pendingListings.add(fleaListing);
+    }
+
+    public static void removePendingListing(FleaListing fleaListing){
+        pendingListings.remove(fleaListing);
     }
 
     public static void clearFleaMarket(){

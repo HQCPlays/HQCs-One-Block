@@ -83,13 +83,9 @@ public class FleaCommand implements CommandExecutor, Listener {
                 event.setCancelled(true); // prevents players from taking item
 
                 if (clickedItem != null) {
-                    UUID listingID = FleaListingUtils.getListingIdFromItem(clickedItem); //obtain the listing ID from the clicked item
-
-                    if (listingID != null) {
-                        FleaListing fleaListing = findListingById(listingID);
-                        if (fleaListing != null) {
-                            handleFleaPurchase(player, fleaListing);
-                        }
+                    FleaListing fleaListing = FleaListingUtils.findPostedListingByItem(clickedItem);
+                    if (fleaListing != null) {
+                        handleFleaPurchase(player, fleaListing);
                     }
                 }
             }
@@ -117,6 +113,12 @@ public class FleaCommand implements CommandExecutor, Listener {
                 player.closeInventory();
                 openFleaGUI(player);
                 updateScoreboard(player);
+
+                // Give money to the seller
+                Player seller = Bukkit.getPlayer(listing.getSeller());
+                PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
+                sellerData.balance += price;
+
                 // Display confirmation message
                 ItemStack item = listing.getItem();
                 ItemMeta itemMeta = item.getItemMeta();
