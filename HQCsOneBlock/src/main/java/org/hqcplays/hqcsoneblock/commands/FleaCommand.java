@@ -64,6 +64,8 @@ public class FleaCommand implements CommandExecutor, Listener {
 
         fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET              " + ChatColor.RED + "PAGE: " + pageNum);
         PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        // playerData.balance = 10000;
+        // updateScoreboard(player);
         // Add flea items to the screen. Each page can hold 36 items, thus the items we should add should consider which page we are on
         int startingIndex = (pageNum - 1) * 36;
         int endIndex = Math.min(startingIndex + 36, FleaMarket.getFleaListings().size());
@@ -219,7 +221,7 @@ public class FleaCommand implements CommandExecutor, Listener {
                         if (seller != null){
                             PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
                             sellerData.balance += price;
-                            updateScoreboard(player);
+                            updateScoreboard(seller);
                         }
     
                         // Display confirmation message
@@ -227,8 +229,10 @@ public class FleaCommand implements CommandExecutor, Listener {
                         ItemMeta itemMeta = item.getItemMeta();
                         if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
                             player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price);
+                            seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price + " has been purchased!");
                         } else { // for vanilla items
                             player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + item.getType().toString() + " for $" + price);
+                            seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + item.getType().toString() + " for $" + price + " has been purchased!");
                         }
                     } else {
                         player.sendMessage(ChatColor.RED + "Not enough funds!");

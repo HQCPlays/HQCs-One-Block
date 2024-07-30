@@ -13,6 +13,7 @@ public class PlayerSaveData implements Serializable {
     public Map<Material, Double> blockChances;
     public Set<Material> unlockedBlocks;
     public ArrayList<FleaListing> playerFleaListings;
+    public int listingLimit = 5;
 
     public PlayerSaveData() {
         // Set up some default values for new players
