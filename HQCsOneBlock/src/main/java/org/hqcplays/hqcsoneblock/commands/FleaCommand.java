@@ -50,7 +50,7 @@ public class FleaCommand implements CommandExecutor, Listener {
         // Checks if sender is a player, if so open the flea market, otherwise throw error message
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            openFleaGUI(player, 2);
+            openFleaGUI(player, 1);
             return true;
         } else {
             sender.sendMessage("This command can only be run by a player.");
@@ -61,9 +61,9 @@ public class FleaCommand implements CommandExecutor, Listener {
 
     public void openFleaGUI(Player player, int pageNumber) {
         pageNum = pageNumber;
+
         fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET              " + ChatColor.RED + "PAGE: " + pageNum);
         PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-
         // Add flea items to the screen. Each page can hold 36 items, thus the items we should add should consider which page we are on
         int startingIndex = (pageNum - 1) * 36;
         int endIndex = Math.min(startingIndex + 36, FleaMarket.getFleaListings().size());
@@ -204,18 +204,18 @@ public class FleaCommand implements CommandExecutor, Listener {
         if (listing.getSeller() != player.getUniqueId()){
             if (FleaListingUtils.findPostedListingByItem(fleaItem) != null) {
                 PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+                Player seller = Bukkit.getPlayer(listing.getSeller());
                 int price = listing.getPrice();
                 if (!isInventoryFull(player)) {
                     if (playerData.balance >= price) {
                         playerData.balance -= price;
                         updateScoreboard(player);
                         player.getInventory().addItem(listing.getItem());
-                        FleaMarket.removeListing(listing);
+                        FleaMarket.removeListing(listing, seller);
                         player.closeInventory();
                         openFleaGUI(player, 1);
     
                         // Give money to the seller
-                        Player seller = Bukkit.getPlayer(listing.getSeller());
                         if (seller != null){
                             PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
                             sellerData.balance += price;

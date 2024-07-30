@@ -1,12 +1,15 @@
 package org.hqcplays.hqcsoneblock;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 import org.bukkit.inventory.ItemStack;
 
-public class FleaListing {
+public class FleaListing implements Serializable {
     
+    private static final long serialVersionUID = 1L;
+
     // Properties of a listing
     private UUID id;
     private ItemStack item;

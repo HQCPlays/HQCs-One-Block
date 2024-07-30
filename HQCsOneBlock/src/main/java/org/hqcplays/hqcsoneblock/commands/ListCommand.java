@@ -159,7 +159,7 @@ public class ListCommand implements CommandExecutor, Listener {
                     if (pendingListing != null){
                         ItemStack originalItem = pendingListing.getItem();
                         ItemMeta originalItemMeta = originalItem.getItemMeta();
-                        FleaMarket.addListing(pendingListing);
+                        FleaMarket.addListing(pendingListing, player);
                         FleaMarket.removePendingListing(pendingListing);
 
                         // Display confirmation message
