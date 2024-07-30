@@ -1,20 +1,31 @@
 package org.hqcplays.hqcsoneblock.items;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
-public class CustomPickaxes {
+import static org.hqcplays.hqcsoneblock.items.RareOneBlockItems.stardust;
+
+public class CustomPickaxes implements Listener {
     private static final NamespacedKey modifierKey = new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "pickaxe_modifier");
 
+    // Vanilla Pickaxes
     public static ItemStack woodPickaxe;
     public static ItemStack stonePickaxe;
     public static ItemStack ironPickaxe;
@@ -22,16 +33,24 @@ public class CustomPickaxes {
     public static ItemStack diamondPickaxe;
     public static ItemStack netheritePickaxe;
 
+    // Custom Pickaxes
+    public static ItemStack lapisPickaxe;
+    public static ItemStack redstonePickaxe;
+    public static ItemStack stardustPickaxe;
+
     public static void init() {
-        woodPickaxe = createCustomPickaxe(Material.WOODEN_PICKAXE, ChatColor.AQUA + "Tier 1 Pickaxe", 0.5f);
-        stonePickaxe = createCustomPickaxe(Material.STONE_PICKAXE, ChatColor.AQUA + "Tier 2 Pickaxe", 0.75f);
-        ironPickaxe = createCustomPickaxe(Material.IRON_PICKAXE, ChatColor.AQUA + "Tier 3 Pickaxe", 1.0f);
-        goldenPickaxe = createCustomPickaxe(Material.GOLDEN_PICKAXE, ChatColor.AQUA + "Tier 4 Pickaxe", 1.25f);
-        diamondPickaxe = createCustomPickaxe(Material.DIAMOND_PICKAXE, ChatColor.AQUA + "Tier 5 Pickaxe", 1.5f);
-        netheritePickaxe = createCustomPickaxe(Material.NETHERITE_PICKAXE, ChatColor.AQUA + "Tier 6 Pickaxe", 2.0f);
+        woodPickaxe = createVanillaPickaxe(Material.WOODEN_PICKAXE, ChatColor.WHITE + "Wooden Pickaxe", 0.5f);
+        stonePickaxe = createVanillaPickaxe(Material.STONE_PICKAXE, ChatColor.WHITE + "Stone Pickaxe", 0.75f);
+        lapisPickaxe = createCustomPickaxe(Material.STONE_PICKAXE, ChatColor.WHITE + "Lapis Pickaxe", 0.90f, ItemStack.of(Material.LAPIS_LAZULI), "lapis_pickaxe");
+        ironPickaxe = createVanillaPickaxe(Material.IRON_PICKAXE, ChatColor.WHITE + "Iron Pickaxe", 1.0f);
+        redstonePickaxe = createCustomPickaxe(Material.IRON_PICKAXE, ChatColor.WHITE + "Redstone Pickaxe", 1.10f, ItemStack.of(Material.REDSTONE), "redstone_pickaxe");
+        goldenPickaxe = createVanillaPickaxe(Material.GOLDEN_PICKAXE, ChatColor.WHITE + "Gold Pickaxe", 1.25f);
+        diamondPickaxe = createVanillaPickaxe(Material.DIAMOND_PICKAXE, ChatColor.WHITE + "Diamond Pickaxe", 1.5f);
+        netheritePickaxe = createVanillaPickaxe(Material.NETHERITE_PICKAXE, ChatColor.WHITE + "Netherite Pickaxe", 2.0f);
+        stardustPickaxe = createCustomPickaxe(Material.GOLDEN_PICKAXE, ChatColor.WHITE + "Stardust Pickaxe", 3.0f, RareOneBlockItems.stardust, "stardust_pickaxe");
     }
 
-    private static ItemStack createCustomPickaxe(Material type, String name, float miningSpeedModifier) {
+    private static ItemStack createVanillaPickaxe(Material type, String name, float miningSpeedModifier) {
         ItemStack customPickaxe = new ItemStack(type);
 
         float modifierValue = getBaseMiningSpeed(type) * miningSpeedModifier - 1.0f;
@@ -41,8 +60,41 @@ public class CustomPickaxes {
         meta.setDisplayName(name);
         meta.addAttributeModifier(Attribute.PLAYER_BLOCK_BREAK_SPEED, modifier);
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        meta.setLore(Collections.singletonList("x" + miningSpeedModifier + " Mining Speed"));
+        meta.setLore(Collections.singletonList("+" + miningSpeedModifier + " Mining Speed"));
         customPickaxe.setItemMeta(meta);
+
+        return customPickaxe;
+    }
+
+    private static ItemStack createCustomPickaxe(Material type, String name, float miningSpeedModifier, ItemStack pickaxeMaterial, String craftingKey) {
+        ItemStack customPickaxe = new ItemStack(type);
+
+        float modifierValue = getBaseMiningSpeed(type) * miningSpeedModifier - 1.0f;
+        AttributeModifier modifier = new AttributeModifier(modifierKey, modifierValue, AttributeModifier.Operation.ADD_SCALAR);
+
+        ItemMeta meta = customPickaxe.getItemMeta();
+        meta.setDisplayName(name);
+        meta.addAttributeModifier(Attribute.PLAYER_BLOCK_BREAK_SPEED, modifier);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+
+        if (name.contains("Lapis Pickaxe")) {
+            meta.setLore(Collections.singletonList("+" + miningSpeedModifier + " Mining Speed. Has a chance to drop extra experience!"));
+        } else if (name.contains("Redstone Pickaxe")) {
+            meta.setLore(Collections.singletonList("+" + miningSpeedModifier + " Mining Speed. Has a chance to give you Haste upon mining a block!"));
+        } else {
+            meta.setLore(Collections.singletonList("+" + miningSpeedModifier + " Mining Speed"));
+        }
+
+        customPickaxe.setItemMeta(meta);
+
+        // Crafting recipe
+        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customPickaxe);
+        sr.shape("AAA",
+                " S ",
+                " S ");
+        sr.setIngredient('A', pickaxeMaterial);
+        sr.setIngredient('S', Material.STICK);
+        Bukkit.getServer().addRecipe(sr);
 
         return customPickaxe;
     }
@@ -64,6 +116,27 @@ public class CustomPickaxes {
                 return 0.25f * multiplier;
             default:
                 return multiplier;
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Random rand = new Random(System.currentTimeMillis());
+
+        // Lapis Pickaxe effect
+        if (rand.nextInt(5) == 0) {
+            ItemStack itemInHand = event.getPlayer().getItemInHand();
+            if (itemInHand != null && itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasDisplayName() && itemInHand.getItemMeta().getDisplayName().equals(ChatColor.WHITE + "Lapis Pickaxe")) {
+                event.getPlayer().giveExp(10);
+            }
+        }
+
+        // Redstone Pickaxe effect
+        if (rand.nextInt(10) == 0) {
+            ItemStack itemInHand = event.getPlayer().getItemInHand();
+            if (itemInHand != null && itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasDisplayName() && itemInHand.getItemMeta().getDisplayName().equals(ChatColor.WHITE + "Redstone Pickaxe")) {
+                event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HASTE, 40, 2));
+            }
         }
     }
 }

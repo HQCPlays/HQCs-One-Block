@@ -1,5 +1,5 @@
 name: HQCsOneBlock
-version: 1.0.1
+version: 1.1.0
 main: org.hqcplays.hqcsoneblock.HQCsOneBlock
 api-version: 1.21
 commands:

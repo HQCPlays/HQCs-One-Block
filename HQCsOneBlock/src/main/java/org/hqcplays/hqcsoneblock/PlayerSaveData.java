@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class PlayerSaveData implements Serializable {
-    public int balance;
+    public double balance;
     public Map<Material, Double> blockChances;
     public Set<Material> unlockedBlocks;
 

@@ -14,6 +14,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
 import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
+import org.hqcplays.hqcsoneblock.items.RareOneBlockItems;
+import org.hqcplays.hqcsoneblock.items.VanillaPlusItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class CheatMenuCommand implements CommandExecutor, Listener {
         cheatItemList.add(AmethystShardItems.effectShard);
 
         // Swords
+        cheatItemList.add(VanillaPlusItems.coalSword);
         cheatItemList.add(AmethystShardItems.blackShardSword);
         cheatItemList.add(AmethystShardItems.whiteShardSword);
         cheatItemList.add(AmethystShardItems.redShardSword);
@@ -57,6 +60,12 @@ public class CheatMenuCommand implements CommandExecutor, Listener {
         cheatItemList.add(CustomPickaxes.goldenPickaxe);
         cheatItemList.add(CustomPickaxes.diamondPickaxe);
         cheatItemList.add(CustomPickaxes.netheritePickaxe);
+        cheatItemList.add(CustomPickaxes.lapisPickaxe);
+        cheatItemList.add(CustomPickaxes.redstonePickaxe);
+        cheatItemList.add(CustomPickaxes.stardustPickaxe);
+
+        // Misc. items
+        cheatItemList.add(RareOneBlockItems.stardust);
     }
 
     @Override

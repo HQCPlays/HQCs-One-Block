@@ -1,18 +1,13 @@
 package org.hqcplays.hqcsoneblock;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -27,8 +22,7 @@ import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
 import org.hqcplays.hqcsoneblock.commands.IslandCommand;
 import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
-import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
-import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
+import org.hqcplays.hqcsoneblock.items.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,6 +55,11 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new OneBlockController(), this);
         getServer().getPluginManager().registerEvents(new PickaxeController(), this);
         getServer().getPluginManager().registerEvents(new AmethystShardItems(), this);
+        getServer().getPluginManager().registerEvents(new RareOneBlockItems(), this);
+        getServer().getPluginManager().registerEvents(new CustomPickaxes(), this);
+        getServer().getPluginManager().registerEvents(new VanillaPlusItems(), this);
+        getServer().getPluginManager().registerEvents(new AccessoriesController(), this);
+        getServer().getPluginManager().registerEvents(new AccessoryItems(), this);
 
         // Register enchantments
         ShardEnchantment.createEnchantments();
@@ -107,7 +106,13 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
 
         // Initialize items or other components
         AmethystShardItems.init();
+        RareOneBlockItems.init();
         CustomPickaxes.init();
+        VanillaPlusItems.init();
+        AccessoryItems.init();
+
+        // Checking stuffs
+        new AccessoriesController.BonusChecker().runTaskTimer(this, 0, 20);
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");
 
@@ -169,7 +174,23 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         // Create new player data if none exists yet
         playerData.putIfAbsent(playerUUID, new PlayerSaveData());
 
+        player.teleport(new Location(Bukkit.getWorld("world"), 0, 78, 0));
+
         setupScoreboard(player);
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        player.teleport(new Location(Bukkit.getWorld("world"), 0, 78, 0));
+    }
+
+    @EventHandler
+    public void onPortalCreate(PortalCreateEvent event) {
+        if (event.getReason() == PortalCreateEvent.CreateReason.FIRE) {
+            // Cancel the event if the portal is being created by fire, which is typical for Nether portals
+            event.setCancelled(true);
+        }
     }
 
     // Disable durability globally
@@ -233,9 +254,9 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     }
 
     public static void updateScoreboard(Player player, Scoreboard scoreboard) {
-        int balance = playerData.get(player.getUniqueId()).balance;
+        double balance = playerData.get(player.getUniqueId()).balance;
         Objective objective = scoreboard.getObjective("blockCoins");
         Score score = objective.getScore(ChatColor.GREEN + "Coins: ");
-        score.setScore(balance);
+        score.setScore((int) balance);
     }
 }
