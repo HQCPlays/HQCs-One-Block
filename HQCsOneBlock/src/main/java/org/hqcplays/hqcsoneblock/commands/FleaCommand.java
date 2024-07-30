@@ -41,7 +41,9 @@ public class FleaCommand implements CommandExecutor, Listener {
 
 
     Inventory fleaGUI;
-    Inventory listGUI;
+    Inventory purchaseGUI;
+    Inventory myListingsGUI;
+    Inventory removeListingGUI;
     int pageNum;
 
     @Override
@@ -101,14 +103,20 @@ public class FleaCommand implements CommandExecutor, Listener {
         nextPageMeta.setDisplayName(ChatColor.GREEN + "Next page");
         nextPage.setItemMeta(nextPageMeta);
 
+        // Create 'view my listings' button
+        ItemStack myListings = new ItemStack(Material.BOOK);
+        myListings.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        ItemMeta myListingsMeta = myListings.getItemMeta();
+        myListingsMeta.setDisplayName(ChatColor.GREEN + "View My Listings");
+        myListings.setItemMeta(myListingsMeta);
+
         // Create and place line separating listings and menu controls
         for (int i = 36; i < 45; i++){
             ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
             fleaGUI.setItem(i, pane);
         }
 
-        // Place Information and menu control items
-        fleaGUI.setItem(49, listingInformation);
+        // Place page controls
         if (pageNum > 1) {
             fleaGUI.setItem(48, previousPage); 
         }
@@ -116,11 +124,16 @@ public class FleaCommand implements CommandExecutor, Listener {
             fleaGUI.setItem(50, nextPage);
         }
 
+        // Place information item
+        fleaGUI.setItem(49, listingInformation);
+        // Place 'my listings' button
+        fleaGUI.setItem(45, myListings);
+
         player.openInventory(fleaGUI);
     }
 
     public void openPurchaseConfirmationGUI(Player player, ItemStack fleaItem) {
-        listGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "CONFIRM PURCHASE");
+        purchaseGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "CONFIRM PURCHASE");
 
         // Create Cancel and Confirm items to act as buttons
         ItemStack cancelButton = new ItemStack(Material.RED_CONCRETE);
@@ -135,11 +148,76 @@ public class FleaCommand implements CommandExecutor, Listener {
 
 
         // Place the items in the GUI
-        listGUI.setItem(13, fleaItem);
-        listGUI.setItem(29, cancelButton);
-        listGUI.setItem(33, confirmButton);
+        purchaseGUI.setItem(13, fleaItem);
+        purchaseGUI.setItem(29, cancelButton);
+        purchaseGUI.setItem(33, confirmButton);
 
-        player.openInventory(listGUI);
+        player.openInventory(purchaseGUI);
+    }
+
+    public void openMyListingsGUI(Player player) {
+        myListingsGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "MY LISTINGS");
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        ArrayList<FleaListing> playerFleaListings = playerData.playerFleaListings;
+
+        // Create and place players listings
+        for (FleaListing listing : playerFleaListings) {
+            ItemStack fleaListingItem = FleaListingUtils.createListingItem(listing);
+            myListingsGUI.addItem(fleaListingItem);
+        }
+
+        // Create and place line separating listings and menu controls
+        for (int i = 36; i < 45; i++){
+            ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+            myListingsGUI.setItem(i, pane);
+        }
+
+        // Create Information Item
+        ItemStack myListingInformation = new ItemStack(Material.EYE_ARMOR_TRIM_SMITHING_TEMPLATE);
+        myListingInformation.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        ItemMeta myListingInformationMeta = myListingInformation.getItemMeta();
+        myListingInformationMeta.setDisplayName(ChatColor.GOLD + "My listings information:");
+        List<Component> myListingInformationlore = new ArrayList<>();
+        myListingInformationlore.add(Component.text("- A list of all your current listings can be found above.").color(NamedTextColor.WHITE));
+        myListingInformationlore.add(Component.text("- To remove a listing, click it and confirm the removal!").color(NamedTextColor.WHITE));
+        myListingInformationMeta.lore(myListingInformationlore);
+        myListingInformation.setItemMeta(myListingInformationMeta);
+
+        // Create back button
+        ItemStack backButton = new ItemStack(Material.FIREWORK_ROCKET);
+        backButton.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        ItemMeta backButtonMeta = backButton.getItemMeta();
+        backButtonMeta.setDisplayName(ChatColor.GREEN + "Back to Flea Market");
+        backButton.setItemMeta(backButtonMeta);
+
+        // Place information item and back button
+        myListingsGUI.setItem(49, myListingInformation);
+        myListingsGUI.setItem(45, backButton);
+
+        player.openInventory(myListingsGUI);
+    }
+
+    public void openRemoveListingGUI(Player player, ItemStack fleaItem) {
+        removeListingGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "REMOVE LISTING");
+
+        // Create Cancel and Confirm items to act as buttons
+        ItemStack cancelButton = new ItemStack(Material.RED_CONCRETE);
+        ItemMeta cancelButtonMeta = cancelButton.getItemMeta();
+        cancelButtonMeta.setDisplayName(ChatColor.GOLD + "CANCEL REMOVAL");
+        cancelButton.setItemMeta(cancelButtonMeta);
+
+        ItemStack confirmButton = new ItemStack(Material.LIME_CONCRETE);
+        ItemMeta confirmButtonMeta = confirmButton.getItemMeta();
+        confirmButtonMeta.setDisplayName(ChatColor.GOLD + "CONFIRM REMOVAL");
+        confirmButton.setItemMeta(confirmButtonMeta);
+
+
+        // Place the items in the GUI
+        removeListingGUI.setItem(13, fleaItem);
+        removeListingGUI.setItem(29, cancelButton);
+        removeListingGUI.setItem(33, confirmButton);
+
+        player.openInventory(removeListingGUI);
     }
 
 
@@ -156,36 +234,32 @@ public class FleaCommand implements CommandExecutor, Listener {
         ItemMeta clickedItemMeta = clickedItem.getItemMeta();
         String inventoryTitle = event.getView().getTitle();
 
+        // Main Flea Market GUI
         if (event.getView().getTitle().startsWith(ChatColor.DARK_GREEN + "FLEA MARKET")) {
-            event.setCancelled(true);
+            event.setCancelled(true); // prevents players from taking item
             // If player is trying to click on a purchaseable item (first 36 slots of the flea)
             if (event.getSlot() < 37) {
                 if (event.getClickedInventory() == event.getView().getTopInventory()) {
-                    event.setCancelled(true); // prevents players from taking item
-
                     if (clickedItem != null) {
-                        // FleaListing fleaListing = FleaListingUtils.findPostedListingByItem(clickedItem);
-                        // if (fleaListing != null) {
-                        //     handleFleaPurchase(player, fleaListing);
-                        // }
                         openPurchaseConfirmationGUI(player, clickedItem);
                     }
                 }
             // if player is clicking on the menu controls 
-            } else if (event.getSlot() > 45){
+            } else if (event.getSlot() > 44){
                 if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Previous page")) {
                     openFleaGUI(player, pageNum-1);
                 }
                 else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Next page")) {
                     openFleaGUI(player, pageNum+1);
                 }
+                else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("View My Listings")) {
+                    openMyListingsGUI(player);
+                }
             }
         }
-
+        // Confirm Purchase GUI
         if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "CONFIRM PURCHASE")) {
             event.setCancelled(true);
-            if (clickedItem == null || clickedItem.getType() == Material.AIR) return; // Do nothing if player doesn't click anything
-
             if (event.getClickedInventory() == event.getView().getTopInventory()) {
                 event.setCancelled(true); // prevents players from taking item
                 ItemStack fleaItem = event.getClickedInventory().getItem(13); 
@@ -197,6 +271,51 @@ public class FleaCommand implements CommandExecutor, Listener {
                     FleaListing listing = FleaListingUtils.findListingByItem(fleaItem);
                     handleFleaPurchase(player, fleaItem, listing);
                     player.closeInventory();
+                } 
+            }
+        }
+        // My listings GUI
+        if (event.getView().getTitle().startsWith(ChatColor.DARK_GREEN + "MY LISTINGS")) {
+            event.setCancelled(true);
+            // If player is trying to click on a purchaseable item (first 36 slots of the flea)
+            if (event.getSlot() < 37) {
+                if (event.getClickedInventory() == event.getView().getTopInventory()) {
+                    if (clickedItem != null) {
+                        openRemoveListingGUI(player, clickedItem);
+                    }
+                }
+            // if player is clicking on the menu controls 
+            } else if (event.getSlot() > 44){
+                if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Back to Flea Market")) {
+                    openFleaGUI(player, 1);
+                }
+            }
+        }
+        // Confirm Removal GUI
+        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "REMOVE LISTING")) {
+            event.setCancelled(true); // prevents players from taking item
+            if (event.getClickedInventory() == event.getView().getTopInventory()) {
+                ItemStack fleaItem = event.getClickedInventory().getItem(13); 
+
+                if (clickedItem.getType() == Material.RED_CONCRETE) { // If player cancels the purchase
+                    player.sendMessage(ChatColor.RED + "Listing removal canceled!");
+                    player.openInventory(myListingsGUI);
+                } else if (clickedItem.getType() == Material.LIME_CONCRETE) { // if player confirms the purchase
+                    FleaListing listing = FleaListingUtils.findListingByItem(fleaItem);
+                    FleaMarket.removeListing(listing, player);
+
+                    // Give the player their item back
+                    player.getInventory().addItem(listing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
+
+                    // Display confirmation message
+                    ItemStack item = listing.getItem();
+                    ItemMeta itemMeta = item.getItemMeta();
+                    if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
+                        player.sendMessage(ChatColor.GREEN + "Successfully removed listing: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + listing.getPrice() + " from the Flea Market!");
+                    } else { // for vanilla items
+                        player.sendMessage(ChatColor.GREEN + "Successfully removed listing: " + item.getAmount() + " " + item.getType().toString() + " for $" + listing.getPrice() + " from the Flea Market!");
+                    }
+                    openMyListingsGUI(player);
                 } 
             }
         }
