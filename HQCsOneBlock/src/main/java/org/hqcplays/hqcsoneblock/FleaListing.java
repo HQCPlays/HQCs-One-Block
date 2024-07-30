@@ -1,5 +1,6 @@
 package org.hqcplays.hqcsoneblock;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +12,8 @@ public class FleaListing {
     private ItemStack item;
     private int price;
     private UUID seller;
+    private long listingTime;
+    private long expirationTime;
 
     // Main Constructor
     public FleaListing(ItemStack item, int price, UUID seller){
@@ -18,6 +21,8 @@ public class FleaListing {
         this.item = item;
         this.price = price;
         this.seller = seller;
+        this.listingTime = Instant.now().getEpochSecond();
+        this.expirationTime = listingTime+604800; // expiration time is 1 week (604800 seconds)
     }
 
     // Getters and Setters
@@ -44,12 +49,27 @@ public class FleaListing {
         this.price = price;
     }
 
-    // Getters and Setters
     public UUID getSeller(){
         return seller;
     }
     
     public void setSellerName(UUID seller){
         this.seller = seller;
+    }
+
+    public long getListingTime(){
+        return listingTime;
+    }
+    
+    public void setListingTime(long listingTime){
+        this.listingTime = listingTime;
+    }
+
+    public long getExpirationTime(){
+        return expirationTime;
+    }
+    
+    public void setExpirationTime(long expirationTime){
+        this.expirationTime = expirationTime;
     }
 }

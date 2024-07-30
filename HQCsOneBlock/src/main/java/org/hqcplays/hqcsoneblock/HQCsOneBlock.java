@@ -52,6 +52,7 @@ import java.util.zip.GZIPOutputStream;
 public final class HQCsOneBlock extends JavaPlugin implements Listener {
     // Variables
     public static Map<UUID, PlayerSaveData> playerData = new HashMap<>();
+    public static List<FleaListing> fleaData;
     private final String scoreboardTitle = ChatColor.GOLD + "Block Coins";
     private File saveDataFile;
     private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Entitylght"); // Replace with actual usernames
@@ -143,6 +144,9 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
 
         // Initialize Flea Market
 
+        // Schedule a repeating task to check for expired flea market items
+        getServer().getScheduler().runTaskTimer(this, () -> FleaListingUtils.checkExpiredListings(), 0L, 20L * 60); // Check every minute
+
         ItemStack testItem = new ItemStack(Material.GRASS_BLOCK);
         testItem.setAmount(64);
 
@@ -154,6 +158,16 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         FleaMarket.addListing(new FleaListing(testItem1, 10000000, UUID.randomUUID()));
         FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200, UUID.randomUUID()));
         FleaMarket.addListing(new FleaListing(AmethystShardItems.redShard, 300, UUID.randomUUID()));
+
+        for (int i = 5; i < 37; i++) {
+            FleaMarket.addListing(new FleaListing(testItem1, 10000000, UUID.randomUUID()));
+        }
+        for (int i = 37; i < 73; i++) {
+            FleaMarket.addListing(new FleaListing(testItem, 10000000, UUID.randomUUID()));
+        }
+        for (int i = 73; i < 80; i++) {
+            FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200, UUID.randomUUID()));
+        }
         plugin = this;
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");
@@ -174,6 +188,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
             BukkitObjectInputStream objectInputStream = new BukkitObjectInputStream(gzipInputStream);
             playerData = (Map<UUID, PlayerSaveData>) objectInputStream.readObject();
+            fleaData = (List<FleaListing>) objectInputStream.readObject();
             objectInputStream.close();
         } catch (FileNotFoundException e) {
             // No save file has been created yet, just use the new empty player data
@@ -192,6 +207,8 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(fileOutputStream);
             BukkitObjectOutputStream objectOutputStream = new BukkitObjectOutputStream(gzipOutputStream);
             objectOutputStream.writeObject(playerData);
+            fleaData = FleaMarket.getFleaListings();
+            objectOutputStream.writeObject(fleaData);
             objectOutputStream.close();
         } catch (IOException e) {
             getLogger().warning("Unable to save player data: " + e.getMessage());

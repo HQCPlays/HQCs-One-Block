@@ -1,13 +1,21 @@
 package org.hqcplays.hqcsoneblock;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
@@ -18,6 +26,8 @@ public class FleaListingUtils {
     private static final NamespacedKey idKey = new NamespacedKey(HQCsOneBlock.getPlugin(), "listing_id");
     private static final NamespacedKey priceKey = new NamespacedKey(HQCsOneBlock.getPlugin(), "listing_price");
     private static final NamespacedKey sellerKey = new NamespacedKey(HQCsOneBlock.getPlugin(), "listing_seller");
+    private static final NamespacedKey listingTimeKey = new NamespacedKey(HQCsOneBlock.getPlugin(), "listing_time");
+    private static final NamespacedKey expirationTimeKey = new NamespacedKey(HQCsOneBlock.getPlugin(), "expiration_time");
 
     // Create a item to be displayed representing a flea market listing
     public static ItemStack createListingItem(FleaListing listing) {
@@ -28,6 +38,8 @@ public class FleaListingUtils {
             meta.getPersistentDataContainer().set(idKey, PersistentDataType.STRING, listing.getId().toString());
             meta.getPersistentDataContainer().set(priceKey, PersistentDataType.INTEGER, listing.getPrice());
             meta.getPersistentDataContainer().set(sellerKey, PersistentDataType.STRING, listing.getSeller().toString());
+            meta.getPersistentDataContainer().set(listingTimeKey, PersistentDataType.LONG, listing.getListingTime());
+            meta.getPersistentDataContainer().set(expirationTimeKey, PersistentDataType.LONG, listing.getExpirationTime());
 
             // Make the details of the listing visible in the lore of the item
             List<Component> lore = new ArrayList<>();
@@ -37,6 +49,20 @@ public class FleaListingUtils {
             } else { // If UUID of player selling item is unknown
                 lore.add(Component.text("Seller: Unknown").color(NamedTextColor.AQUA)); 
             }
+
+            // Listing and expiration date logic
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"); // Define the desired format
+
+            Instant listingInstant = Instant.ofEpochSecond(listing.getListingTime()); // Convert epoch seconds to Instant
+            LocalDateTime listingDateTime = LocalDateTime.ofInstant(listingInstant, ZoneId.systemDefault()); // Convert Instant to LocalDateTime in system default time zone
+            String formattedListingDateTime = listingDateTime.format(formatter); // Format the LocalDateTime to the desired string
+            lore.add(Component.text("Listing Date: " + formattedListingDateTime).color(NamedTextColor.DARK_PURPLE));
+
+            Instant expirationInstant = Instant.ofEpochSecond(listing.getExpirationTime()); // Convert epoch seconds to Instant
+            LocalDateTime expirationDateTime = LocalDateTime.ofInstant(expirationInstant, ZoneId.systemDefault()); // Convert Instant to LocalDateTime in system default time zone
+            String formattedExpirationDateTime = expirationDateTime.format(formatter); // Format the LocalDateTime to the desired string
+            lore.add(Component.text("Expiration Date: " + formattedExpirationDateTime).color(NamedTextColor.DARK_RED));
+
             if (meta.lore() != null) { // If item already has lore (custom items)
                 List<Component> originalLore = meta.lore();
                 originalLore.addAll(lore);
@@ -99,29 +125,24 @@ public class FleaListingUtils {
         return null;
     }
 
-    //Obtain FleaListing from the item
-    public static FleaListing getListingFromItem(ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            ItemStack originalItem = getOriginalItemFromItem(item);
-            Integer price = meta.getPersistentDataContainer().get(priceKey, PersistentDataType.INTEGER);
-            UUID seller = UUID.fromString(meta.getPersistentDataContainer().get(sellerKey, PersistentDataType.STRING));
-            FleaListing fleaListing = new FleaListing(originalItem, price, seller);
-            return fleaListing;
+    public static void checkExpiredListings(){
+        Iterator<FleaListing> iterator = FleaMarket.getFleaListings().iterator();
+        while (iterator.hasNext()) {
+            FleaListing fleaListing = iterator.next();
+            if (isExpired(fleaListing)) {
+                iterator.remove();
+                Player seller = Bukkit.getPlayer(fleaListing.getSeller());
+                    if (seller != null){
+                        seller.getInventory().addItem(fleaListing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
+                    }
+            }
         }
-        return null;
     }
 
-    public static ItemStack getOriginalItemFromItem(ItemStack item){
-        // Obtain the original item without its flea related attributes
-        ItemStack originalItem = item.clone();
-        ItemMeta originalItemMeta = originalItem.getItemMeta();
-        originalItemMeta.getPersistentDataContainer().remove(idKey);
-        originalItemMeta.getPersistentDataContainer().remove(priceKey);
-        originalItemMeta.getPersistentDataContainer().remove(sellerKey);
 
-        originalItem.setItemMeta(originalItemMeta);
-
-        return originalItem;
+    private static boolean isExpired(FleaListing listing) {
+        long expirationTime = listing.getExpirationTime();
+        long currentTime = Instant.now().getEpochSecond();
+        return currentTime >= expirationTime;
     }
 }
