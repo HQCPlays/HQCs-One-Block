@@ -27,19 +27,19 @@ public class FleaMarket {
     public static ArrayList<FleaListing> getFleaListings(){
         listings.clear();
         for (Map.Entry<UUID,PlayerSaveData> entry : HQCsOneBlock.playerData.entrySet()) {
-            listings.addAll(entry.getValue().playerFleaListings);
+            listings.addAll(entry.getValue().fleaListings);
         }
         return listings;
     }
 
     public static void addListing(FleaListing fleaListing, Player player){
         PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-        playerData.playerFleaListings.add(fleaListing);
+        playerData.fleaListings.add(fleaListing);
     }
 
     public static void removeListing(FleaListing fleaListing, Player player){
         PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-        playerData.playerFleaListings.remove(fleaListing);
+        playerData.fleaListings.remove(fleaListing);
     }
 
     public static ArrayList<FleaListing> getPendingFleaListings(){

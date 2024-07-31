@@ -28,6 +28,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
 import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
 import org.hqcplays.hqcsoneblock.commands.FleaCommand;
+import org.hqcplays.hqcsoneblock.commands.InboxCommand;
 import org.hqcplays.hqcsoneblock.commands.ListCommand;
 import org.hqcplays.hqcsoneblock.commands.IslandCommand;
 import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
@@ -65,6 +66,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private IslandCommand islandCommand;
     private FleaCommand fleaCommand;
     private ListCommand listCommand;
+    private InboxCommand inboxCommand;
 
     // Functions
     @Override
@@ -122,7 +124,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         if (this.getCommand("flea") != null) {
             fleaCommand = new FleaCommand();
             this.getCommand("flea").setExecutor(fleaCommand);
-            // Only register events if fleaCommand implements Listener
+            // Only register events if FleaCommand implements Listener
             getServer().getPluginManager().registerEvents(fleaCommand, this);
         } else {
             getLogger().severe("Command 'flea' is not defined!"); // Not defined in plugin.yml
@@ -131,10 +133,19 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         if (this.getCommand("list") != null) {
             listCommand = new ListCommand();
             this.getCommand("list").setExecutor(listCommand);
-            // Only register events if listCommand implements Listener
+            // Only register events if ListCommand implements Listener
             getServer().getPluginManager().registerEvents(listCommand, this);
         } else {
             getLogger().severe("Command 'list' is not defined!"); // Not defined in plugin.yml
+        }
+
+        if (this.getCommand("inbox") != null) {
+            inboxCommand = new InboxCommand();
+            this.getCommand("inbox").setExecutor(inboxCommand);
+            // Only register events if InboxCommand implements Listener
+            getServer().getPluginManager().registerEvents(inboxCommand, this);
+        } else {
+            getLogger().severe("Command 'inbox' is not defined!"); // Not defined in plugin.yml
         }
 
         // Initialize items or other components

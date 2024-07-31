@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -21,6 +22,7 @@ import org.bukkit.plugin.Plugin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class FleaListingUtils {
     private static final NamespacedKey idKey = new NamespacedKey(HQCsOneBlock.getPlugin(), "listing_id");
@@ -43,7 +45,7 @@ public class FleaListingUtils {
 
             // Make the details of the listing visible in the lore of the item
             List<Component> lore = new ArrayList<>();
-            lore.add(Component.text("Price: " + listing.getPrice()).color(NamedTextColor.GOLD));
+            lore.add(Component.text("Price: $" + listing.getPrice()).color(NamedTextColor.GOLD));
             if (Bukkit.getPlayer(listing.getSeller()) != null) { // If the player UUID matches a real player
                 lore.add(Component.text("Seller: " + Bukkit.getPlayer(listing.getSeller()).getName()).color(NamedTextColor.AQUA));
             } else { // If UUID of player selling item is unknown
@@ -133,7 +135,13 @@ public class FleaListingUtils {
                 iterator.remove();
                 Player seller = Bukkit.getPlayer(fleaListing.getSeller());
                     if (seller != null){
-                        seller.getInventory().addItem(fleaListing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
+                        ItemStack item = fleaListing.getItem();
+                        ItemMeta itemMeta = item.getItemMeta();
+                        //seller.getInventory().addItem(fleaListing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
+                        PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
+                        sellerData.mail.add(fleaListing.getItem());
+                        seller.sendMessage(ChatColor.RED + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + fleaListing.getPrice() + " has expired!");
+                        seller.sendMessage(ChatColor.GOLD + "Reclaim your expired item in your inbox!");
                     }
             }
         }

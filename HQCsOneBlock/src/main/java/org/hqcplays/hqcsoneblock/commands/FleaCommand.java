@@ -23,6 +23,7 @@ import org.hqcplays.hqcsoneblock.OneBlockController;
 import org.hqcplays.hqcsoneblock.PickaxeController;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.items.BlockCoin;
 import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +36,7 @@ import org.hqcplays.hqcsoneblock.FleaListingUtils;
 import org.hqcplays.hqcsoneblock.FleaMarket;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 
+import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerData;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
 public class FleaCommand implements CommandExecutor, Listener {
@@ -103,12 +105,19 @@ public class FleaCommand implements CommandExecutor, Listener {
         nextPageMeta.setDisplayName(ChatColor.GREEN + "Next page");
         nextPage.setItemMeta(nextPageMeta);
 
-        // Create 'view my listings' button
-        ItemStack myListings = new ItemStack(Material.BOOK);
+        // Create 'my listings' button
+        ItemStack myListings = new ItemStack(Material.PAPER);
         myListings.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         ItemMeta myListingsMeta = myListings.getItemMeta();
-        myListingsMeta.setDisplayName(ChatColor.GREEN + "View My Listings");
+        myListingsMeta.setDisplayName(ChatColor.GREEN + "My Listings");
         myListings.setItemMeta(myListingsMeta);
+
+        // Create inbox button
+        ItemStack inbox = new ItemStack(Material.WRITABLE_BOOK);
+        inbox.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        ItemMeta inboxMeta = myListings.getItemMeta();
+        inboxMeta.setDisplayName(ChatColor.GREEN + "Inbox");
+        inbox.setItemMeta(inboxMeta);
 
         // Create and place line separating listings and menu controls
         for (int i = 36; i < 45; i++){
@@ -128,6 +137,8 @@ public class FleaCommand implements CommandExecutor, Listener {
         fleaGUI.setItem(49, listingInformation);
         // Place 'my listings' button
         fleaGUI.setItem(45, myListings);
+        // Place 'my listings' button
+        fleaGUI.setItem(46, inbox);
 
         player.openInventory(fleaGUI);
     }
@@ -158,7 +169,7 @@ public class FleaCommand implements CommandExecutor, Listener {
     public void openMyListingsGUI(Player player) {
         myListingsGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "MY LISTINGS");
         PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-        ArrayList<FleaListing> playerFleaListings = playerData.playerFleaListings;
+        ArrayList<FleaListing> playerFleaListings = playerData.fleaListings;
 
         // Create and place players listings
         for (FleaListing listing : playerFleaListings) {
@@ -184,10 +195,10 @@ public class FleaCommand implements CommandExecutor, Listener {
         myListingInformation.setItemMeta(myListingInformationMeta);
 
         // Create back button
-        ItemStack backButton = new ItemStack(Material.FIREWORK_ROCKET);
+        ItemStack backButton = new ItemStack(Material.EMERALD);
         backButton.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         ItemMeta backButtonMeta = backButton.getItemMeta();
-        backButtonMeta.setDisplayName(ChatColor.GREEN + "Back to Flea Market");
+        backButtonMeta.setDisplayName(ChatColor.GREEN + "Flea Market");
         backButton.setItemMeta(backButtonMeta);
 
         // Place information item and back button
@@ -228,6 +239,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
         // Obtain event information
         Player player = (Player) event.getWhoClicked();
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
         UUID playerUUID = player.getUniqueId();
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return; // Do nothing if player doesn't click anything
@@ -252,8 +264,11 @@ public class FleaCommand implements CommandExecutor, Listener {
                 else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Next page")) {
                     openFleaGUI(player, pageNum+1);
                 }
-                else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("View My Listings")) {
+                else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("My Listings")) {
                     openMyListingsGUI(player);
+                }
+                else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Inbox")) {
+                    player.performCommand("inbox");
                 }
             }
         }
@@ -286,7 +301,7 @@ public class FleaCommand implements CommandExecutor, Listener {
                 }
             // if player is clicking on the menu controls 
             } else if (event.getSlot() > 44){
-                if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Back to Flea Market")) {
+                if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Flea Market")) {
                     openFleaGUI(player, 1);
                 }
             }
@@ -305,7 +320,8 @@ public class FleaCommand implements CommandExecutor, Listener {
                     FleaMarket.removeListing(listing, player);
 
                     // Give the player their item back
-                    player.getInventory().addItem(listing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
+                    //player.getInventory().addItem(listing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
+                    playerData.mail.add(listing.getItem());
 
                     // Display confirmation message
                     ItemStack item = listing.getItem();
@@ -314,6 +330,7 @@ public class FleaCommand implements CommandExecutor, Listener {
                         player.sendMessage(ChatColor.GREEN + "Successfully removed listing: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + listing.getPrice() + " from the Flea Market!");
                     } else { // for vanilla items
                         player.sendMessage(ChatColor.GREEN + "Successfully removed listing: " + item.getAmount() + " " + item.getType().toString() + " for $" + listing.getPrice() + " from the Flea Market!");
+                        player.sendMessage(ChatColor.GOLD + "Reclaim your expired item in your inbox!");
                     }
                     openMyListingsGUI(player);
                 } 
@@ -327,37 +344,39 @@ public class FleaCommand implements CommandExecutor, Listener {
                 PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
                 Player seller = Bukkit.getPlayer(listing.getSeller());
                 int price = listing.getPrice();
-                if (!isInventoryFull(player)) {
-                    if (playerData.balance >= price) {
-                        playerData.balance -= price;
-                        updateScoreboard(player);
-                        player.getInventory().addItem(listing.getItem());
-                        FleaMarket.removeListing(listing, seller);
-                        player.closeInventory();
-                        openFleaGUI(player, 1);
-    
-                        // Give money to the seller
-                        if (seller != null){
-                            PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
-                            sellerData.balance += price;
-                            updateScoreboard(seller);
-                        }
-    
-                        // Display confirmation message
-                        ItemStack item = listing.getItem();
-                        ItemMeta itemMeta = item.getItemMeta();
-                        if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
-                            player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price);
-                            seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price + " has been purchased!");
-                        } else { // for vanilla items
-                            player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + item.getType().toString() + " for $" + price);
-                            seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + item.getType().toString() + " for $" + price + " has been purchased!");
-                        }
-                    } else {
-                        player.sendMessage(ChatColor.RED + "Not enough funds!");
+                if (playerData.balance >= price) {
+                    playerData.balance -= price;
+                    updateScoreboard(player);
+                    //player.getInventory().addItem(listing.getItem());
+                    playerData.mail.add(listing.getItem());
+                    FleaMarket.removeListing(listing, seller);
+                    player.closeInventory();
+                    openFleaGUI(player, 1);
+
+                    // Give money to the seller
+                    if (seller != null){
+                        PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
+                        sellerData.mail.add(BlockCoin.createBlockCoin(price));
+                    }
+
+                    // Display confirmation message
+                    ItemStack item = listing.getItem();
+                    ItemMeta itemMeta = item.getItemMeta();
+                    if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
+                        player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price);
+                        player.sendMessage(ChatColor.GOLD + "Claim your purchase in your inbox!");
+                        seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price + " has been purchased!");
+                        seller.sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
+
+                        
+                    } else { // for vanilla items
+                        player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + item.getType().toString() + " for $" + price);
+                        player.sendMessage(ChatColor.GOLD + "Claim your purchase in your inbox!");
+                        seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + item.getType().toString() + " for $" + price + " has been purchased!");
+                        seller.sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED + "No space in inventory!");
+                        player.sendMessage(ChatColor.RED + "Not enough funds!");
                 }
             } else {
                 player.closeInventory();

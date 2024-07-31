@@ -147,7 +147,7 @@ public class ListCommand implements CommandExecutor, Listener {
                 } else if (clickedItem.getType() == Material.LIME_CONCRETE) { // if player confirms the listing
                     interactionFlag = 1;
                     FleaListing pendingListing = FleaListingUtils.findPendingListingByItem(fleaItem);
-                    if (playerData.playerFleaListings.size() < playerData.listingLimit) {
+                    if (playerData.fleaListings.size() < playerData.listingLimit) {
                         if (pendingListing != null){
                             ItemStack originalItem = pendingListing.getItem();
                             ItemMeta originalItemMeta = originalItem.getItemMeta();

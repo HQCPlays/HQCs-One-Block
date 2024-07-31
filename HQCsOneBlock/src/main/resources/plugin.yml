@@ -21,3 +21,6 @@ commands:
   list:
     description: Allows players to list items on the Flea Market
     usage: /list
+  inbox:
+    description: Allows players to view items in their inbox
+    usage: /inbox
