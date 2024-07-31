@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class PlayerSaveData implements Serializable {
-    public double balance;
+    public int balance;
     public Map<Material, Double> blockChances;
     public Set<Material> unlockedBlocks;
     public ArrayList<FleaListing> fleaListings;
