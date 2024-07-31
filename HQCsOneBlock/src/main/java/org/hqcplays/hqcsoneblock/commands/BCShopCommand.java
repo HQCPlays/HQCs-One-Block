@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
-import static org.hqcplays.hqcsoneblock.PickaxeController.playerPickaxes;
 import static org.hqcplays.hqcsoneblock.numberSheets.PricesSheet.*;
 
 public class BCShopCommand implements CommandExecutor, Listener {
@@ -49,11 +48,6 @@ public class BCShopCommand implements CommandExecutor, Listener {
         itemShopMeta.setDisplayName(ChatColor.GOLD + "Item Shop");
         itemShop.setItemMeta(itemShopMeta);
 
-        ItemStack pickaxeUpgradeShop = new ItemStack(Material.DIAMOND_PICKAXE);
-        ItemMeta pickaxeUpgradeShopMeta = pickaxeUpgradeShop.getItemMeta();
-        pickaxeUpgradeShopMeta.setDisplayName(ChatColor.GOLD + "Pickaxe Upgrade Shop");
-        pickaxeUpgradeShop.setItemMeta(pickaxeUpgradeShopMeta);
-
         ItemStack blockUpgradeShop = new ItemStack(Material.GRASS_BLOCK);
         ItemMeta blockUpgradeShopMeta = blockUpgradeShop.getItemMeta();
         blockUpgradeShopMeta.setDisplayName(ChatColor.GOLD + "Block Upgrade Shop");
@@ -61,7 +55,6 @@ public class BCShopCommand implements CommandExecutor, Listener {
 
         // Place display items
         shopGUI.setItem(11, itemShop);
-        shopGUI.setItem(13, pickaxeUpgradeShop);
         shopGUI.setItem(15, blockUpgradeShop);
 
         // Actually open the main menu
@@ -82,24 +75,6 @@ public class BCShopCommand implements CommandExecutor, Listener {
         }
 
         player.openInventory(itemShopGUI);
-    }
-
-    public void openPickaxeUpgradeShopGUI(Player player) {
-        Inventory pickaxeUpgradeShopGUI = Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Pickaxe Upgrade Shop");
-
-        Material currentPickaxe = playerPickaxes.getOrDefault(player.getUniqueId(), Material.WOODEN_PICKAXE);
-        Material nextPickaxe = getPickaxeUpgrade(currentPickaxe);
-        int nextPickaxePrice = getPickaxeUpgradePrices(currentPickaxe);
-
-        // Display the upgrade and its price
-        ItemStack shopItem = new ItemStack(nextPickaxe);
-        ItemMeta shopItemMeta = shopItem.getItemMeta();
-        shopItemMeta.setDisplayName(ChatColor.GOLD + "Upgrade Pickaxe");
-        shopItemMeta.setLore(Collections.singletonList(ChatColor.YELLOW + "Price: " + nextPickaxePrice + " Block Coins"));
-        shopItem.setItemMeta(shopItemMeta);
-        pickaxeUpgradeShopGUI.addItem(shopItem);
-
-        player.openInventory(pickaxeUpgradeShopGUI);
     }
 
     public void openBlockUpgradeShopGUI(Player player) {
@@ -137,24 +112,8 @@ public class BCShopCommand implements CommandExecutor, Listener {
             if (event.getClickedInventory() == event.getView().getTopInventory()) {
                 if (clickedItem.getType() == Material.CHEST) {
                     openItemShopGUI(player);
-                } else if (clickedItem.getType() == Material.DIAMOND_PICKAXE) {
-                    openPickaxeUpgradeShopGUI(player);
                 } else if (clickedItem.getType() == Material.GRASS_BLOCK) {
                     openBlockUpgradeShopGUI(player);
-                }
-            }
-        }
-
-        // Pickaxe upgrade shop controls
-        else if (inventoryTitle.equals(ChatColor.DARK_GREEN + "Pickaxe Upgrade Shop")) {
-            event.setCancelled(true);
-
-            if (event.getClickedInventory() == event.getView().getTopInventory()) {
-                ItemMeta meta = clickedItem.getItemMeta();
-                if (meta != null && meta.getDisplayName().equals(ChatColor.GOLD + "Upgrade Pickaxe") && inventoryTitle.equals(ChatColor.DARK_GREEN + "Pickaxe Upgrade Shop")) {
-                    PickaxeController.handlePickaxeUpgrade(player);
-                    player.closeInventory();
-                    openPickaxeUpgradeShopGUI(player);
                 }
             }
         }

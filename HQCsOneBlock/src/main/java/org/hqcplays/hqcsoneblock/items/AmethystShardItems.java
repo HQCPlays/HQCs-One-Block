@@ -61,6 +61,11 @@ public class AmethystShardItems implements Listener {
     public static ItemStack purpleShardLeggings;
     public static ItemStack purpleShardBoots;
 
+    // Shard Wands
+    public static ItemStack grassifyWand;
+    public static ItemStack treensformWand;
+    public static ItemStack cropformWand;
+
     private static final List<PotionEffectType> potionEffects = Arrays.asList(
             PotionEffectType.SPEED,
             PotionEffectType.SLOWNESS,
@@ -118,6 +123,11 @@ public class AmethystShardItems implements Listener {
         redShardChestplate = createShardChestplate(Material.DIAMOND_CHESTPLATE, ChatColor.RED, "Red Shard Chestplate", "red_shard_chestplate", redShard, ShardEnchantment.vitality);
         redShardLeggings = createShardLeggings(Material.DIAMOND_LEGGINGS, ChatColor.RED, "Red Shard Leggings", "red_shard_leggings", redShard, ShardEnchantment.vitality);
         redShardBoots = createShardBoots(Material.DIAMOND_BOOTS, ChatColor.RED, "Red Shard Boots", "red_shard_boots", redShard, ShardEnchantment.vitality);
+
+        // Wands
+        grassifyWand = createGrassifyWand(Material.STICK, ChatColor.GREEN, "Grassify Wand", "grassify_wand");
+        treensformWand = createTreensformWand(Material.STICK, ChatColor.GREEN, "Tree-nsform Wand", "treensform_wand");
+        cropformWand = createCropformWand(Material.STICK, ChatColor.GREEN, "Cropform Wand", "cropform_wand");
     }
 
     public static void createGoldShard() {
@@ -315,6 +325,68 @@ public class AmethystShardItems implements Listener {
                 "A A",
                 "A A");
         sr1.setIngredient('A', craftingShard);
+        Bukkit.getServer().addRecipe(sr1);
+
+        return customItem;
+    }
+
+    public static ItemStack createGrassifyWand(Material material, ChatColor color, String name, String craftingKey) {
+        ItemStack customItem = new ItemStack(material, 1);
+        ItemMeta meta = customItem.getItemMeta();
+        meta.setDisplayName(color + name);
+        meta.setLore(Collections.singletonList("Turns dirt into grass!"));
+        customItem.setItemMeta(meta);
+
+        // Crafting recipe
+        ShapedRecipe sr1 = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
+        sr1.shape("  G",
+                " D ",
+                "S  ");
+        sr1.setIngredient('S', Material.STICK);
+        sr1.setIngredient('D', Material.DIRT);
+        sr1.setIngredient('G', greenShard);
+        Bukkit.getServer().addRecipe(sr1);
+
+        return customItem;
+    }
+
+    public static ItemStack createTreensformWand(Material material, ChatColor color, String name, String craftingKey) {
+        ItemStack customItem = new ItemStack(material, 1);
+        ItemMeta meta = customItem.getItemMeta();
+        meta.setDisplayName(color + name);
+        meta.setLore(Collections.singletonList("Turns saplings into other types of saplings!"));
+        customItem.setItemMeta(meta);
+
+        // Crafting recipe
+        ShapedRecipe sr1 = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
+        sr1.shape(" RG",
+                " TR",
+                "S  ");
+        sr1.setIngredient('S', Material.STICK);
+        sr1.setIngredient('T', Material.OAK_SAPLING);
+        sr1.setIngredient('G', greenShard);
+        sr1.setIngredient('R', rainbowShard);
+        Bukkit.getServer().addRecipe(sr1);
+
+        return customItem;
+    }
+
+    public static ItemStack createCropformWand(Material material, ChatColor color, String name, String craftingKey) {
+        ItemStack customItem = new ItemStack(material, 1);
+        ItemMeta meta = customItem.getItemMeta();
+        meta.setDisplayName(color + name);
+        meta.setLore(Collections.singletonList("Turns crops into other crops!"));
+        customItem.setItemMeta(meta);
+
+        // Crafting recipe
+        ShapedRecipe sr1 = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
+        sr1.shape(" RG",
+                " TR",
+                "S  ");
+        sr1.setIngredient('S', Material.STICK);
+        sr1.setIngredient('T', Material.WHEAT_SEEDS);
+        sr1.setIngredient('G', greenShard);
+        sr1.setIngredient('R', rainbowShard);
         Bukkit.getServer().addRecipe(sr1);
 
         return customItem;
@@ -598,6 +670,86 @@ public class AmethystShardItems implements Listener {
             case 7:
                 greenShardEffect(event);
                 break;
+        }
+    }
+
+    @EventHandler
+    public static void grassifyWandEffect(PlayerInteractEvent event) {
+        ItemStack item = event.getItem();
+
+        if (event.getAction().isRightClick() && item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Grassify Wand")) {
+            if (event.getClickedBlock().getType() == Material.DIRT) {
+                event.getClickedBlock().setType(Material.GRASS_BLOCK);
+            }
+        }
+    }
+
+    @EventHandler
+    public static void treensformWandEffect(PlayerInteractEvent event) {
+        ItemStack item = event.getItem();
+
+        if (event.getAction().isRightClick() && item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Tree-nsform Wand")) {
+            if (event.getClickedBlock().getType() == Material.OAK_SAPLING || event.getClickedBlock().getType() == Material.ACACIA_SAPLING || event.getClickedBlock().getType() == Material.DARK_OAK_SAPLING || event.getClickedBlock().getType() == Material.CHERRY_SAPLING || event.getClickedBlock().getType() == Material.JUNGLE_SAPLING || event.getClickedBlock().getType() == Material.BIRCH_SAPLING || event.getClickedBlock().getType() == Material.SPRUCE_SAPLING) {
+                Random rand = new Random(System.currentTimeMillis());
+                int randomInt = rand.nextInt(8);
+
+                switch (randomInt) {
+                    case 0:
+                        event.getClickedBlock().setType(Material.ACACIA_SAPLING);
+                        break;
+                    case 1:
+                        event.getClickedBlock().setType(Material.DARK_OAK_SAPLING);
+                        break;
+                    case 2:
+                        event.getClickedBlock().setType(Material.OAK_SAPLING);
+                        break;
+                    case 3:
+                        event.getClickedBlock().setType(Material.CHERRY_SAPLING);
+                        break;
+                    case 4:
+                        event.getClickedBlock().setType(Material.JUNGLE_SAPLING);
+                        break;
+                    case 5:
+                        event.getClickedBlock().setType(Material.SPRUCE_SAPLING);
+                        break;
+                    case 6:
+                        event.getClickedBlock().setType(Material.BIRCH_SAPLING);
+                        break;
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public static void cropformWandEffect(PlayerInteractEvent event) {
+        ItemStack item = event.getItem();
+
+        if (event.getAction().isRightClick() && item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Cropform Wand")) {
+            if (event.getClickedBlock().getType() == Material.WHEAT || event.getClickedBlock().getType() == Material.PUMPKIN_STEM || event.getClickedBlock().getType() == Material.MELON_STEM || event.getClickedBlock().getType() == Material.PUMPKIN_SEEDS || event.getClickedBlock().getType() == Material.MELON_SEEDS || event.getClickedBlock().getType() == Material.BEETROOT_SEEDS || event.getClickedBlock().getType() == Material.CARROTS || event.getClickedBlock().getType() == Material.POTATOES) {
+                Random rand = new Random(System.currentTimeMillis());
+                int randomInt = rand.nextInt(6);
+
+                switch (randomInt) {
+                    case 0:
+                        event.getClickedBlock().setType(Material.WHEAT);
+                        break;
+                    case 1:
+                        event.getClickedBlock().setType(Material.PUMPKIN_STEM);
+                        break;
+                    case 2:
+                        event.getClickedBlock().setType(Material.MELON_STEM);
+                        break;
+                    case 3:
+                        event.getClickedBlock().setType(Material.BEETROOT_SEEDS);
+                        break;
+                    case 4:
+                        event.getClickedBlock().setType(Material.CARROTS);
+                        break;
+                    case 5:
+                        event.getClickedBlock().setType(Material.POTATOES);
+                        break;
+                }
+            }
         }
     }
 }

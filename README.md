@@ -1,5 +1,16 @@
 # HQCs-One-Block
 
+**Version 1.1.0 - The Pickaxe Update:**
+- Custom mining speed system
+- 3 new pickaxes!
+- New lobby!
+- Coal sword (because why not)
+- Removal of durability globally
+- No more pickaxe shop in /bcshop
+- Obsidian is now buyable
+- 3 new wands (Cropsform, Tree-nsform, and Grassify wand). The grassify wand is how you obtain grass!
+- Bug fixes ofc
+
 **Version 1.0.1 - Bug Patch:**
 - New lobby!
 - Block unlock menu fixed (Each OneBlock is now personal rather than server wide)

@@ -16,6 +16,7 @@ import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 import java.util.*;
 
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
+import static org.hqcplays.hqcsoneblock.items.RareOneBlockItems.stardust;
 
 public class OneBlockController implements Listener {
     public static final Map<Material, Double> blockChances = new HashMap<>();
@@ -31,9 +32,6 @@ public class OneBlockController implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
-//        if (!playerBlockChances.containsKey(playerUUID)) {
-//            initializeBlockChances(playerUUID);
-//        }
 
         World world = event.getPlayer().getWorld();
         if (world.getName().contains("island_" + playerUUID.toString())) {
@@ -140,6 +138,12 @@ public class OneBlockController implements Listener {
                             AmethystShardItems.dropGoldShard(player);
                             break;
                     }
+                }
+
+                if (loc.getBlock().getType() == Material.GLOWSTONE) {
+                    event.setCancelled(true);
+
+                    player.getInventory().addItem(stardust);
                 }
 
                 new BukkitRunnable() {
