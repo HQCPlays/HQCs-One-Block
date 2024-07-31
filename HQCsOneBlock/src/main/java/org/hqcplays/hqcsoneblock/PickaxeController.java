@@ -41,6 +41,25 @@ public class PickaxeController implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        Player p = e.getPlayer();
+        boolean hasPA = false;
+
+        for (ItemStack is : p.getInventory().getContents()) {
+            if (is != null) {
+                if (isPickaxe(is.getType())) {
+                    hasPA = true;
+                }
+            }
+        }
+
+        if (!hasPA) {
+            ItemStack newPickaxe = new ItemStack(CustomPickaxes.woodPickaxe);
+            p.getInventory().addItem(newPickaxe);
+        }
+    }
+
     // Override normal pickaxe crafting
     @EventHandler
     public void onPrepareItemCraft(PrepareItemCraftEvent event) {

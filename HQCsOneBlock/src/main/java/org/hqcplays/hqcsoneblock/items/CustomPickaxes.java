@@ -60,7 +60,7 @@ public class CustomPickaxes implements Listener {
         meta.setDisplayName(name);
         meta.addAttributeModifier(Attribute.PLAYER_BLOCK_BREAK_SPEED, modifier);
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-        meta.setLore(Collections.singletonList("+" + miningSpeedModifier + " Mining Speed"));
+        meta.setLore(Collections.singletonList(miningSpeedModifier + " Mining Speed"));
         customPickaxe.setItemMeta(meta);
 
         return customPickaxe;
