@@ -48,6 +48,7 @@ import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
 import org.hqcplays.hqcsoneblock.items.RareOneBlockItems;
 import org.hqcplays.hqcsoneblock.items.TechItems;
 import org.hqcplays.hqcsoneblock.items.VanillaPlusItems;
+import org.hqcplays.hqcsoneblock.progression.Progression;
 
 import java.util.ArrayList;
 
@@ -83,6 +84,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new CustomPickaxes(), this);
         getServer().getPluginManager().registerEvents(new VanillaPlusItems(), this);
         getServer().getPluginManager().registerEvents(new MenuItemController(), this);
+        getServer().getPluginManager().registerEvents(new Progression(), this);
         getServer().getPluginManager().registerEvents(new ProgressionCommand(), this);
         getServer().getPluginManager().registerEvents(new TechItems(), this);
 
@@ -185,6 +187,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         CustomPickaxes.init();
         TechItems.init();
         VanillaPlusItems.init();
+        Progression.init();
 
         dataManager.loadSaveData();
         plugin = this;

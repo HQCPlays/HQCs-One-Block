@@ -16,6 +16,10 @@ public class PlayerSaveData implements Serializable {
     public Map<Material, Double> blockChances;
     public Set<Material> unlockedBlocks;
 
+    // Progression
+    public int currentAge;
+    public Set<String> unlockedGoals; // List of unlocked goal IDs for the current age
+
     // Flea Market
     public ArrayList<FleaListing> fleaListings;
     public int listingLimit = 5;
@@ -30,6 +34,8 @@ public class PlayerSaveData implements Serializable {
         this.balance = 0;
         this.blockChances = OneBlockController.blockChances;
         this.unlockedBlocks = new HashSet<>();
+        this.currentAge = 0;
+        this.unlockedGoals = new HashSet<>();
         this.fleaListings = new ArrayList<>();
         this.mail = new ArrayList<>();
     }

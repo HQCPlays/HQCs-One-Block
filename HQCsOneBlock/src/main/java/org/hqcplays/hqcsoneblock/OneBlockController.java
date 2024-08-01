@@ -1,6 +1,9 @@
 package org.hqcplays.hqcsoneblock;
 
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,8 +15,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
 import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
+import org.hqcplays.hqcsoneblock.progression.Progression;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 import static org.hqcplays.hqcsoneblock.items.RareOneBlockItems.stardust;
@@ -97,6 +104,7 @@ public class OneBlockController implements Listener {
 
         if (world.getName().contains("island_" + playerUUID.toString())) {
             if (loc.getBlockX() == 0 && loc.getBlockY() == 0 && loc.getBlockZ() == 0) {
+                Progression.checkGoalUnlock(player, "mine_oneblock");
                 playerData.balance++;
                 updateScoreboard(player);
 
@@ -183,6 +191,24 @@ public class OneBlockController implements Listener {
             updateScoreboard(player);
             playerData.unlockedBlocks.add(itemType);
             player.sendMessage(ChatColor.GREEN + "You unlocked " + itemType.name() + " for " + price + " Block Coins.");
+
+            switch (itemType) {
+                case COAL_ORE:
+                    Progression.checkGoalUnlock(player, "unlock_coal");
+                    break;
+                case IRON_ORE:
+                    Progression.checkGoalUnlock(player, "unlock_iron");
+                    break;
+                case GOLD_ORE:
+                    Progression.checkGoalUnlock(player, "unlock_gold");
+                    break;
+                case DIAMOND_ORE:
+                    Progression.checkGoalUnlock(player, "unlock_diamond");
+                    break;
+                case ANCIENT_DEBRIS:
+                    Progression.checkGoalUnlock(player, "unlock_netherite");
+                    break;
+            }
         } else {
             player.sendMessage(ChatColor.RED + "You don't have enough Block Coins.");
         }

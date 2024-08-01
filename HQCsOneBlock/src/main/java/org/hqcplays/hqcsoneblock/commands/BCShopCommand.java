@@ -15,16 +15,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.OneBlockController;
-import org.hqcplays.hqcsoneblock.PickaxeController;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
+import org.hqcplays.hqcsoneblock.progression.Progression;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.UUID;
 
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
-import static org.hqcplays.hqcsoneblock.numberSheets.PricesSheet.*;
 
 public class BCShopCommand implements CommandExecutor, Listener {
     @Override
@@ -59,6 +58,8 @@ public class BCShopCommand implements CommandExecutor, Listener {
 
         // Actually open the main menu
         player.openInventory(shopGUI);
+
+        Progression.checkGoalUnlock(player, "use_bcshop");
     }
 
     public void openItemShopGUI(Player player) {
@@ -155,6 +156,9 @@ public class BCShopCommand implements CommandExecutor, Listener {
             ItemStack boughtItem = new ItemStack(item);
             player.getInventory().addItem(boughtItem);
             updateScoreboard(player);
+            if (item == Material.OAK_SAPLING) {
+                Progression.checkGoalUnlock(player, "buy_sapling");
+            }
         }
     }
 }
