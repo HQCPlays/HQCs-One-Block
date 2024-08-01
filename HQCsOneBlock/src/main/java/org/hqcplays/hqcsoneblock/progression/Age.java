@@ -40,16 +40,8 @@ public class Age {
         return this.goals.stream().filter(goal -> goal.id.equals(goalId)).findFirst().orElse(null);
     }
 
-    public boolean isFinalGoal(String goalId) {
-        return goals.getLast().id.equals(goalId);
-    }
-
-    public boolean canUnlockFinalGoal(PlayerSaveData playerData) {
-        for (int i = 0; i < this.goals.size() - 1; i++) {
-            if (!playerData.unlockedGoals.contains(goals.get(i).id))
-                return false;
-        }
-        return true;
+    public boolean hasUnlockedAllGoals(PlayerSaveData playerData) {
+        return this.goals.stream().allMatch(goal -> playerData.unlockedGoals.contains(goal.id));
     }
 
     public void onEnter(Player player) {

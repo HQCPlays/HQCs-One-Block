@@ -20,19 +20,17 @@ import org.hqcplays.hqcsoneblock.progression.Goal;
 import org.hqcplays.hqcsoneblock.progression.Progression;
 
 public class ProgressionCommand implements CommandExecutor, Listener {
-    private int selectedAge;
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            openProgressionMenu(player);
+            openProgressionMenu(player, HQCsOneBlock.dataManager.getPlayerData(player).currentAge);
             return true;
         }
         return false;
     }
 
-    private void openProgressionMenu(Player player) {
+    private void openProgressionMenu(Player player, int selectedAge) {
         Inventory progressionMenu = Bukkit.createInventory(null, 54, ChatColor.GREEN + "Progression Menu");
         PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
 
@@ -81,8 +79,7 @@ public class ProgressionCommand implements CommandExecutor, Listener {
             event.setCancelled(true);
             if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.PAPER) {
                 Player player = (Player) event.getWhoClicked();
-                this.selectedAge = event.getSlot();
-                openProgressionMenu(player);
+                openProgressionMenu(player, event.getSlot());
             }
         }
     }
