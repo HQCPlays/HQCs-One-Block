@@ -52,7 +52,7 @@ public class InboxCommand implements CommandExecutor, Listener {
     public void openInboxGUI(Player player, int pageNumber) {
         pageNum = pageNumber;
         Inventory inboxGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "INBOX                        " + ChatColor.RED + "PAGE: " + pageNum);
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         ArrayList<ItemStack> playerMail = playerData.mail;
 
         int startingIndex = (pageNum - 1) * 36;
@@ -129,7 +129,7 @@ public class InboxCommand implements CommandExecutor, Listener {
                 if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
                 ItemMeta clickedItemMeta = clickedItem.getItemMeta();
                 Player player = (Player) event.getWhoClicked();
-                PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+                PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
 
                 // If player is trying to click on a purchaseable item (first 36 slots of the flea)
                 if (event.getSlot() < 37) {

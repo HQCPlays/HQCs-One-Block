@@ -125,7 +125,7 @@ public class ListCommand implements CommandExecutor, Listener {
         // Obtain event information
         Player player = (Player) event.getWhoClicked();
         UUID playerUUID = player.getUniqueId();
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(playerUUID);
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         ItemStack clickedItem = event.getCurrentItem();
         String inventoryTitle = event.getView().getTitle();
 

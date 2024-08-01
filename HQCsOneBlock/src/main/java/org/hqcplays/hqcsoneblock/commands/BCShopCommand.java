@@ -148,7 +148,7 @@ public class BCShopCommand implements CommandExecutor, Listener {
     }
 
     public static void handleItemShopPurchase(Player player, Material item) {
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         int price = PricesSheet.getItemShopPrices(item);
         if (playerData.balance >= price) {
             playerData.balance -= price;

@@ -141,7 +141,7 @@ public class FleaListingUtils {
                     ItemStack item = fleaListing.getItem();
                     ItemMeta itemMeta = item.getItemMeta();
                     //seller.getInventory().addItem(fleaListing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
-                    PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
+                    PlayerSaveData sellerData = HQCsOneBlock.dataManager.getPlayerData(seller);
                     sellerData.mail.add(fleaListing.getItem());
                     seller.sendMessage(ChatColor.RED + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + fleaListing.getPrice() + " has expired!");
                     seller.sendMessage(ChatColor.GOLD + "Reclaim your expired item in your inbox!");

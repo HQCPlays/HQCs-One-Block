@@ -93,7 +93,7 @@ public class OneBlockController implements Listener {
         UUID playerUUID = player.getUniqueId();
         World world = player.getWorld();
 
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(playerUUID);
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
 
         if (world.getName().contains("island_" + playerUUID.toString())) {
             if (loc.getBlockX() == 0 && loc.getBlockY() == 0 && loc.getBlockZ() == 0) {
@@ -168,7 +168,7 @@ public class OneBlockController implements Listener {
     }
 
     public static void handleBlockUnlock(Player player, ItemStack item) {
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         Material itemType = item.getType();
         int price = PricesSheet.getBlockUnlockPrices(itemType);
 

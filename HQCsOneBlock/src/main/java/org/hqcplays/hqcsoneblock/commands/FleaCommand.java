@@ -31,7 +31,6 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 
-import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerData;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
 public class FleaCommand implements CommandExecutor, Listener {
@@ -62,7 +61,7 @@ public class FleaCommand implements CommandExecutor, Listener {
         pageNum = pageNumber;
 
         fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET              " + ChatColor.RED + "PAGE: " + pageNum);
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         // playerData.balance = 10000;
         // updateScoreboard(player);
         // Add flea items to the screen. Each page can hold 36 items, thus the items we should add should consider which page we are on
@@ -163,7 +162,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
     public void openMyListingsGUI(Player player) {
         myListingsGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "MY LISTINGS");
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         ArrayList<FleaListing> playerFleaListings = playerData.fleaListings;
 
         // Create and place players listings
@@ -234,8 +233,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
         // Obtain event information
         Player player = (Player) event.getWhoClicked();
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-        UUID playerUUID = player.getUniqueId();
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return; // Do nothing if player doesn't click anything
         ItemMeta clickedItemMeta = clickedItem.getItemMeta();
@@ -336,7 +334,7 @@ public class FleaCommand implements CommandExecutor, Listener {
     private void handleFleaPurchase(Player player, ItemStack fleaItem, FleaListing listing){
         if (listing.getSeller() != player.getUniqueId()){
             if (FleaListingUtils.findPostedListingByItem(fleaItem) != null) {
-                PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+                PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
                 Player seller = Bukkit.getPlayer(listing.getSeller());
                 int price = listing.getPrice();
                 if (playerData.balance >= price) {
@@ -350,7 +348,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
                     // Give money to the seller
                     if (seller != null){
-                        PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
+                        PlayerSaveData sellerData = HQCsOneBlock.dataManager.getPlayerData(seller);
                         sellerData.mail.add(BlockCoin.createBlockCoin(price));
                     }
 

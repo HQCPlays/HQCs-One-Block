@@ -1,12 +1,11 @@
 package org.hqcplays.hqcsoneblock;
 
-import io.papermc.paper.advancement.AdvancementDisplay;
-import net.kyori.adventure.text.Component;
-import org.bukkit.*;
-import org.bukkit.advancement.Advancement;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,7 +13,12 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.inventory.Inventory;
@@ -27,33 +31,31 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.hqcplays.hqcsoneblock.commands.*;
+import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
+import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
+import org.hqcplays.hqcsoneblock.commands.FleaCommand;
+import org.hqcplays.hqcsoneblock.commands.InboxCommand;
+import org.hqcplays.hqcsoneblock.commands.IslandCommand;
+import org.hqcplays.hqcsoneblock.commands.ListCommand;
+import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
+import org.hqcplays.hqcsoneblock.commands.ProfilesCommand;
+import org.hqcplays.hqcsoneblock.commands.ProgressionCommand;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListingUtils;
-import org.hqcplays.hqcsoneblock.items.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
+import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
+import org.hqcplays.hqcsoneblock.items.RareOneBlockItems;
+import org.hqcplays.hqcsoneblock.items.TechItems;
+import org.hqcplays.hqcsoneblock.items.VanillaPlusItems;
 
-import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.ArrayList;
 
 public final class HQCsOneBlock extends JavaPlugin implements Listener {
     // Variables
-    public static Map<UUID, PlayerSaveData> playerData = new HashMap<>();
+    public static SaveDataManager dataManager;
+    public static IslandManager islandManager;
     private final String scoreboardTitle = ChatColor.GOLD + "Block Coins";
-    private File saveDataFile;
 
     private ArrayList<FleaListing> listings = new ArrayList<>();
     private static Plugin plugin;
@@ -67,6 +69,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private ListCommand listCommand;
     private InboxCommand inboxCommand;
     private ProgressionCommand progressionCommand;
+    private ProfilesCommand profilesCommand;
 
     // Functions
     @Override
@@ -88,6 +91,9 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(ShardEnchantment.listener, this);
 
         OneBlockController.initializeBlockChances();
+
+        dataManager = new SaveDataManager(getLogger());
+        islandManager = new IslandManager();
 
         // Register command executors
         if (this.getCommand("bcshop") != null) {
@@ -160,6 +166,15 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             getLogger().severe("Command 'progression' is not defined!"); // Not defined in plugin.yml
         }
 
+        if (this.getCommand("profiles") != null) {
+            profilesCommand = new ProfilesCommand();
+            this.getCommand("profiles").setExecutor(profilesCommand);
+            // Only register events if ProfilesCommand implements Listener
+            getServer().getPluginManager().registerEvents(profilesCommand, this);
+        } else {
+            getLogger().severe("Command 'profiles' is not defined!"); // Not defined in plugin.yml
+        }
+
         // Initialize flea market
         // Schedule a repeating task to check for expired flea market items
         getServer().getScheduler().runTaskTimer(this, () -> FleaListingUtils.checkExpiredListings(), 0L, 20L * 60); // Check every minute
@@ -171,70 +186,32 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         TechItems.init();
         VanillaPlusItems.init();
 
+        dataManager.loadSaveData();
         plugin = this;
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");
-
-        saveDataFile = new File("HQCsOneBlock.dat");
-        loadSaveData();
     }
 
     @Override
     public void onDisable() {
-        writeSaveData();
+        dataManager.writeSaveData();
         getLogger().info("HQC's OneBlock Plugin has been disabled.");
-    }
-
-    public void loadSaveData() {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(saveDataFile);
-            GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
-            BukkitObjectInputStream objectInputStream = new BukkitObjectInputStream(gzipInputStream);
-            playerData = (Map<UUID, PlayerSaveData>) objectInputStream.readObject();
-            objectInputStream.close();
-        } catch (FileNotFoundException e) {
-            // No save file has been created yet, just use the new empty player data
-        } catch (IOException e) {
-            getLogger().severe("Unable to load player data: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            getLogger().severe("Invalid or corrupt save data: " + e.getMessage());
-        }
-        getLogger().info("Sucessfully loaded existing save data");
-    }
-
-    public void writeSaveData() {
-        getLogger().info("Saving player data...");
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(saveDataFile);
-            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(fileOutputStream);
-            BukkitObjectOutputStream objectOutputStream = new BukkitObjectOutputStream(gzipOutputStream);
-            objectOutputStream.writeObject(playerData);
-            objectOutputStream.close();
-        } catch (IOException e) {
-            getLogger().warning("Unable to save player data: " + e.getMessage());
-        }
     }
 
     @EventHandler
     public void onWorldSave(WorldSaveEvent event) {
         // Only save once per auto-save
         if (event.getWorld().getName().equals("world")) {
-            writeSaveData();
+            dataManager.writeSaveData();
         }
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        UUID playerUUID = event.getPlayer().getUniqueId();
-
         player.setGameMode(GameMode.SURVIVAL);
-
-        // Create new player data if none exists yet
-        playerData.putIfAbsent(playerUUID, new PlayerSaveData());
-
         player.teleport(new Location(Bukkit.getWorld("world"), 0, 78, 0));
-
+        dataManager.setupPlayer(player);
         setupScoreboard(player);
     }
 
@@ -374,7 +351,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     }
 
     public static void updateScoreboard(Player player, Scoreboard scoreboard) {
-        double balance = playerData.get(player.getUniqueId()).balance;
+        double balance = dataManager.getPlayerData(player).balance;
         Objective objective = scoreboard.getObjective("blockCoins");
         Score score = objective.getScore(ChatColor.GREEN + "Coins: ");
         score.setScore((int) balance);
