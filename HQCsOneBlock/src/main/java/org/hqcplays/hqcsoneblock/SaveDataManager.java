@@ -3,8 +3,10 @@ package org.hqcplays.hqcsoneblock;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,17 +82,32 @@ public class SaveDataManager {
         // Get the old world name before switching the profile id
         String originalWorldName = HQCsOneBlock.islandManager.getIslandWorldName(player);
 
+        // Save inventory contents
+        profileSet.saveData[profileSet.selectedProfile].savedInventory = player.getInventory().getContents();
+
         profileSet.selectedProfile = id;
         if (profileSet.saveData[id] == null)
             profileSet.saveData[id] = new PlayerSaveData();
 
         HQCsOneBlock.updateScoreboard(player);
 
+        // Load new inventory contents
+        if (profileSet.saveData[profileSet.selectedProfile].savedInventory != null) {
+            player.getInventory().setContents(profileSet.saveData[profileSet.selectedProfile].savedInventory);
+        } else {
+            // No inventory is saved for this profile, set up a new one
+            ItemStack newPickaxe = new ItemStack(CustomPickaxes.woodPickaxe);
+            player.getInventory().clear();
+            player.getInventory().addItem(newPickaxe);
+            player.getInventory().setItem(8, MenuItemController.MENU_ITEM);
+        }
+
         // Switch worlds if the player is in their island world
         if (player.getWorld().getName().equals(originalWorldName)) {
             player.teleport(new Location(HQCsOneBlock.islandManager.getOrCreateIslandWorld(player), 0, 2, 0));
-            player.sendMessage(ChatColor.AQUA + "Switched to profile " + (id + 1));
         }
+
+        player.sendMessage(ChatColor.AQUA + "Switched to profile " + (id + 1));
     }
 
     public void loadSaveData() {

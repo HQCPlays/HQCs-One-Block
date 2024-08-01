@@ -17,6 +17,7 @@ public class PlayerSaveData implements Serializable {
     public Map<Material, Double> blockChances;
     public Set<Material> unlockedBlocks;
     public Set<UUID> islandAllowedPlayers;
+    public ItemStack[] savedInventory;
 
     // Progression
     public int currentAge;
