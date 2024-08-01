@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class PlayerSaveData implements Serializable {
     // Important Player stats
     public int balance;
     public Map<Material, Double> blockChances;
     public Set<Material> unlockedBlocks;
+    public Set<UUID> islandAllowedPlayers;
 
     // Progression
     public int currentAge;
@@ -34,6 +36,7 @@ public class PlayerSaveData implements Serializable {
         this.balance = 0;
         this.blockChances = OneBlockController.blockChances;
         this.unlockedBlocks = new HashSet<>();
+        this.islandAllowedPlayers = new HashSet<>();
         this.currentAge = 0;
         this.unlockedGoals = new HashSet<>();
         this.fleaListings = new ArrayList<>();

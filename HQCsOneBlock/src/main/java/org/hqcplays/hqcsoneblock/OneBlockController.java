@@ -102,7 +102,7 @@ public class OneBlockController implements Listener {
 
         PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
 
-        if (world.getName().contains("island_" + playerUUID.toString())) {
+        if (world.getName().contains("island_")) {
             if (loc.getBlockX() == 0 && loc.getBlockY() == 0 && loc.getBlockZ() == 0) {
                 Progression.checkGoalUnlock(player, "mine_oneblock");
                 playerData.balance++;
