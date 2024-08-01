@@ -1,5 +1,6 @@
 package org.hqcplays.hqcsoneblock;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -104,6 +105,11 @@ public class SaveDataManager {
 
         // Switch worlds if the player is in their island world
         if (player.getWorld().getName().equals(originalWorldName)) {
+            // Kick out any other players on the island to the lobby
+            player.getWorld().getPlayers().stream().filter(p -> p != player).forEach(otherPlayer -> {
+                otherPlayer.teleport(new Location(Bukkit.getWorld("world"), 0, 78, 0));
+                otherPlayer.sendMessage(ChatColor.RED + player.getName() + " has switched to a different profile");
+            });
             player.teleport(new Location(HQCsOneBlock.islandManager.getOrCreateIslandWorld(player), 0, 2, 0));
         }
 
