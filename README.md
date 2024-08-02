@@ -1,14 +1,12 @@
 # HQCs-One-Block
 
 **Version 1.2.0 - The Progression Update:**
-Major changes:
 - New "Progression" system!
 - Flea Market added!
 - Profile system (save file system)!
 - Co-op Islands!
 - Craftable automatic resource generators!
 - Craftable mob spawners!
-Minor changes:
 - New "menu" item added to the player's hotbar
 - Coal sword, which can place infinite torches
 - Automation Core, which is used to craft generators and mob spawners
