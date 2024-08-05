@@ -24,3 +24,6 @@ commands:
   inbox:
     description: Allows players to view items in their inbox
     usage: /inbox
+  warps:
+    description: Opens a list of available warps on the server
+    usage: /warps
