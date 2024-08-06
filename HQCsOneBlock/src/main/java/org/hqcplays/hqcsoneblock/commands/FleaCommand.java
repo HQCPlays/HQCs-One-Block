@@ -312,15 +312,14 @@ public class FleaCommand implements CommandExecutor, Listener {
             if (event.getClickedInventory() == event.getView().getTopInventory()) {
                 ItemStack fleaItem = event.getClickedInventory().getItem(13); 
 
-                if (clickedItem.getType() == Material.RED_CONCRETE) { // If player cancels the purchase
+                if (clickedItem.getType() == Material.RED_CONCRETE) { // If player cancels the removal
                     player.sendMessage(ChatColor.RED + "Listing removal canceled!");
                     player.openInventory(myListingsGUI);
-                } else if (clickedItem.getType() == Material.LIME_CONCRETE) { // if player confirms the purchase
+                } else if (clickedItem.getType() == Material.LIME_CONCRETE) { // if player confirms the removal
                     FleaListing listing = FleaListingUtils.findListingByItem(fleaItem);
-                    FleaMarket.removeListing(listing, player);
+                    FleaMarket.removeListing(listing, player.getUniqueId());
 
                     // Give the player their item back
-                    //player.getInventory().addItem(listing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
                     playerData.mail.add(listing.getItem());
 
                     // Display confirmation message
@@ -342,20 +341,20 @@ public class FleaCommand implements CommandExecutor, Listener {
         if (listing.getSeller() != player.getUniqueId()){
             if (FleaListingUtils.findPostedListingByItem(fleaItem) != null) {
                 PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-                Player seller = Bukkit.getPlayer(listing.getSeller());
+                UUID seller = listing.getSeller();
                 int price = listing.getPrice();
                 if (playerData.balance >= price) {
                     playerData.balance -= price;
                     updateScoreboard(player);
                     //player.getInventory().addItem(listing.getItem());
                     playerData.mail.add(listing.getItem());
-                    FleaMarket.removeListing(listing, seller);
                     player.closeInventory();
                     openFleaGUI(player, 1);
 
                     // Give money to the seller
-                    if (seller != null){
-                        PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller.getUniqueId());
+                    if (HQCsOneBlock.playerData.get(seller) != null){
+                        PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller);
+                        FleaMarket.removeListing(listing, seller);
                         sellerData.mail.add(BlockCoin.createBlockCoin(price));
                     }
 
@@ -365,15 +364,17 @@ public class FleaCommand implements CommandExecutor, Listener {
                     if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
                         player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price);
                         player.sendMessage(ChatColor.GOLD + "Claim your purchase in your inbox!");
-                        seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price + " has been purchased!");
-                        seller.sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
-
-                        
+                        if (Bukkit.getPlayer(seller) != null) {
+                            Bukkit.getPlayer(seller).sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price + " has been purchased!");
+                            Bukkit.getPlayer(seller).sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
+                        }
                     } else { // for vanilla items
                         player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + item.getType().toString() + " for $" + price);
                         player.sendMessage(ChatColor.GOLD + "Claim your purchase in your inbox!");
-                        seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + item.getType().toString() + " for $" + price + " has been purchased!");
-                        seller.sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
+                        if (Bukkit.getPlayer(seller) != null) {
+                            Bukkit.getPlayer(seller).sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + item.getType().toString() + " for $" + price + " has been purchased!");
+                            Bukkit.getPlayer(seller).sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
+                        }
                     }
                 } else {
                         player.sendMessage(ChatColor.RED + "Not enough funds!");

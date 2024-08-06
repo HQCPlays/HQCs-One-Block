@@ -258,7 +258,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         player.setGameMode(GameMode.SURVIVAL);
 
         // Create new player data if none exists yet
-        playerData.putIfAbsent(playerUUID, new PlayerSaveData());
+        playerData.putIfAbsent(playerUUID, new PlayerSaveData(playerUUID));
 
         setupScoreboard(player);
     }

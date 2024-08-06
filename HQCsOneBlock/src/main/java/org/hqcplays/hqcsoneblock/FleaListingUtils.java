@@ -46,11 +46,7 @@ public class FleaListingUtils {
             // Make the details of the listing visible in the lore of the item
             List<Component> lore = new ArrayList<>();
             lore.add(Component.text("Price: $" + listing.getPrice()).color(NamedTextColor.GOLD));
-            if (Bukkit.getPlayer(listing.getSeller()) != null) { // If the player UUID matches a real player
-                lore.add(Component.text("Seller: " + Bukkit.getPlayer(listing.getSeller()).getName()).color(NamedTextColor.AQUA));
-            } else { // If UUID of player selling item is unknown
-                lore.add(Component.text("Seller: Unknown").color(NamedTextColor.AQUA)); 
-            }
+            lore.add(Component.text("Seller: " + HQCsOneBlock.playerData.get(listing.getSeller()).name).color(NamedTextColor.AQUA));
 
             // Listing and expiration date logic
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"); // Define the desired format

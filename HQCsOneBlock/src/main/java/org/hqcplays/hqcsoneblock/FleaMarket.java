@@ -32,13 +32,13 @@ public class FleaMarket {
         return listings;
     }
 
-    public static void addListing(FleaListing fleaListing, Player player){
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+    public static void addListing(FleaListing fleaListing, UUID player){
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player);
         playerData.fleaListings.add(fleaListing);
     }
 
-    public static void removeListing(FleaListing fleaListing, Player player){
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+    public static void removeListing(FleaListing fleaListing, UUID player){
+        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player);
         playerData.fleaListings.remove(fleaListing);
     }
 
