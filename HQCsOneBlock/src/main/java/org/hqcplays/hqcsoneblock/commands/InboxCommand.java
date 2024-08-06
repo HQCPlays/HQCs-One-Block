@@ -135,7 +135,7 @@ public class InboxCommand implements CommandExecutor, Listener {
                 PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
 
                 // If player is trying to click on a purchaseable item (first 36 slots of the flea)
-                if (event.getSlot() < 37) {
+                if (event.getSlot() < 36) {
                     if (event.getClickedInventory() == event.getView().getTopInventory()) {
                         if (clickedItem != null) {
                             if (clickedItemMeta.hasDisplayName()) { // If player clicked on custom item

@@ -250,7 +250,7 @@ public class FleaCommand implements CommandExecutor, Listener {
         if (event.getView().getTitle().startsWith(ChatColor.DARK_GREEN + "FLEA MARKET")) {
             event.setCancelled(true); // prevents players from taking item
             // If player is trying to click on a purchaseable item (first 36 slots of the flea)
-            if (event.getSlot() < 37) {
+            if (event.getSlot() < 36) {
                 if (event.getClickedInventory() == event.getView().getTopInventory()) {
                     if (clickedItem != null) {
                         openPurchaseConfirmationGUI(player, clickedItem);
@@ -293,7 +293,7 @@ public class FleaCommand implements CommandExecutor, Listener {
         if (event.getView().getTitle().startsWith(ChatColor.DARK_GREEN + "MY LISTINGS")) {
             event.setCancelled(true);
             // If player is trying to click on a purchaseable item (first 36 slots of the flea)
-            if (event.getSlot() < 37) {
+            if (event.getSlot() < 36) {
                 if (event.getClickedInventory() == event.getView().getTopInventory()) {
                     if (clickedItem != null) {
                         openRemoveListingGUI(player, clickedItem);
