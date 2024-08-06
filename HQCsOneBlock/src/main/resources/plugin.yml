@@ -27,3 +27,6 @@ commands:
   warps:
     description: Opens a list of available warps on the server
     usage: /warps
+  recipes:
+    description: Opens a menu that allows players to view all the custom recipes on the server
+    usage: /warps

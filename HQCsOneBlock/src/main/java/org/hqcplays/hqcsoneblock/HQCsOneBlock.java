@@ -32,6 +32,7 @@ import org.hqcplays.hqcsoneblock.commands.InboxCommand;
 import org.hqcplays.hqcsoneblock.commands.ListCommand;
 import org.hqcplays.hqcsoneblock.commands.IslandCommand;
 import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
+import org.hqcplays.hqcsoneblock.commands.RecipesCommand;
 import org.hqcplays.hqcsoneblock.commands.WarpsCommand;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
@@ -69,6 +70,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private ListCommand listCommand;
     private InboxCommand inboxCommand;
     private WarpsCommand warpsCommand;
+    private RecipesCommand recipesCommand;
 
     // Functions
     @Override
@@ -156,6 +158,14 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(warpsCommand, this);
         } else {
             getLogger().severe("Command 'warps' is not defined!"); // Not defined in plugin.yml
+        }
+        if (this.getCommand("recipes") != null) {
+            recipesCommand = new RecipesCommand();
+            this.getCommand("recipes").setExecutor(recipesCommand);
+            // Only register events if InboxCommand implements Listener
+            getServer().getPluginManager().registerEvents(recipesCommand, this);
+        } else {
+            getLogger().severe("Command 'recipes' is not defined!"); // Not defined in plugin.yml
         }
 
         // Initialize items or other components
