@@ -1,7 +1,8 @@
 name: HQCsOneBlock
-version: 1.2.0
+version: 1.2.1
 main: org.hqcplays.hqcsoneblock.HQCsOneBlock
 api-version: 1.21
+depend: [ProtocolLib]
 commands:
   bcshop:
     description: Opens the Block Coin shop
@@ -28,5 +29,8 @@ commands:
     description: Opens the Progression menu
     usage: /progression
   profiles:
-    description: Opens the Profiles menu
+    description: Opens the profile selection menu
     usage: /profiles
+  warps:
+    description: Opens the warps menu
+    usage: /warps

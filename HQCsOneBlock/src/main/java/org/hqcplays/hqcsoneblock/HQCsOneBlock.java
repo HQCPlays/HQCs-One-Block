@@ -1,11 +1,9 @@
 package org.hqcplays.hqcsoneblock;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,12 +11,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.inventory.Inventory;
@@ -26,31 +19,23 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
-import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
-import org.hqcplays.hqcsoneblock.commands.FleaCommand;
-import org.hqcplays.hqcsoneblock.commands.InboxCommand;
-import org.hqcplays.hqcsoneblock.commands.IslandCommand;
-import org.hqcplays.hqcsoneblock.commands.ListCommand;
-import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
-import org.hqcplays.hqcsoneblock.commands.ProfilesCommand;
-import org.hqcplays.hqcsoneblock.commands.ProgressionCommand;
+import org.hqcplays.hqcsoneblock.commands.*;
+import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningListener;
+import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningManager;
+import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningSpeedManager;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListingUtils;
-import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
-import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
-import org.hqcplays.hqcsoneblock.items.RareOneBlockItems;
-import org.hqcplays.hqcsoneblock.items.TechItems;
-import org.hqcplays.hqcsoneblock.items.VanillaPlusItems;
+import org.hqcplays.hqcsoneblock.items.*;
 import org.hqcplays.hqcsoneblock.progression.Progression;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public final class HQCsOneBlock extends JavaPlugin implements Listener {
     // Variables
@@ -71,6 +56,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private InboxCommand inboxCommand;
     private ProgressionCommand progressionCommand;
     private ProfilesCommand profilesCommand;
+    private WarpsCommand warpsCommand;
 
     // Functions
     @Override
@@ -78,15 +64,24 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         // Register core plugin events
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new OneBlockController(), this);
+        getServer().getPluginManager().registerEvents(new CustomPickaxes(), this);
         getServer().getPluginManager().registerEvents(new PickaxeController(), this);
         getServer().getPluginManager().registerEvents(new AmethystShardItems(), this);
         getServer().getPluginManager().registerEvents(new RareOneBlockItems(), this);
-        getServer().getPluginManager().registerEvents(new CustomPickaxes(), this);
         getServer().getPluginManager().registerEvents(new VanillaPlusItems(), this);
         getServer().getPluginManager().registerEvents(new MenuItemController(), this);
         getServer().getPluginManager().registerEvents(new Progression(), this);
         getServer().getPluginManager().registerEvents(new ProgressionCommand(), this);
         getServer().getPluginManager().registerEvents(new TechItems(), this);
+        getServer().getPluginManager().registerEvents(new MobController(), this);
+        getServer().getPluginManager().registerEvents(new MobSpawnerController(this), this);
+        getServer().getPluginManager().registerEvents(new ResourceGeneratorController(), this);
+        getServer().getPluginManager().registerEvents(new MiningSpeedManager(), this);
+        getServer().getPluginManager().registerEvents(new DeathController(this), this);
+
+        // Custom Block Breaking registers
+        getServer().getPluginManager().registerEvents(new MiningManager(), this);
+        getServer().getPluginManager().registerEvents(new MiningListener(new MiningManager()), this);
 
         // Register enchantments
         ShardEnchantment.createEnchantments();
@@ -171,25 +166,51 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         if (this.getCommand("profiles") != null) {
             profilesCommand = new ProfilesCommand();
             this.getCommand("profiles").setExecutor(profilesCommand);
-            // Only register events if ProfilesCommand implements Listener
+            // Only register events if ProfilesnCommand implements Listener
             getServer().getPluginManager().registerEvents(profilesCommand, this);
         } else {
             getLogger().severe("Command 'profiles' is not defined!"); // Not defined in plugin.yml
+        }
+
+        if (this.getCommand("warps") != null) {
+            warpsCommand = new WarpsCommand();
+            this.getCommand("warps").setExecutor(warpsCommand);
+            // Only register events if Warps Command implements Listener
+            getServer().getPluginManager().registerEvents(warpsCommand, this);
+        } else {
+            getLogger().severe("Command 'warps' is not defined!"); // Not defined in plugin.yml
         }
 
         // Initialize flea market
         // Schedule a repeating task to check for expired flea market items
         getServer().getScheduler().runTaskTimer(this, () -> FleaListingUtils.checkExpiredListings(), 0L, 20L * 60); // Check every minute
 
+        // Mob name tag updater
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (World world : Bukkit.getWorlds()) {
+                    for (Entity entity : world.getEntities()) {
+                        if (entity instanceof LivingEntity) {
+                            MobController.updateHealthNametag((LivingEntity) entity);
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(HQCsOneBlock.getPlugin(HQCsOneBlock.class), 0L, 20L); // Update every second (20 ticks)
+
         // Initialize items or other components
         AmethystShardItems.init();
         RareOneBlockItems.init();
-        CustomPickaxes.init();
         TechItems.init();
         VanillaPlusItems.init();
+        CustomPickaxes.init();
         Progression.init();
+        ResourceGeneratorItems.init();
+        MobSpawnerController.init();
 
         dataManager.loadSaveData();
+
         plugin = this;
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");
@@ -212,16 +233,20 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        UUID playerUUID = event.getPlayer().getUniqueId();
+
         player.setGameMode(GameMode.SURVIVAL);
         player.teleport(new Location(Bukkit.getWorld("world"), 0, 78, 0));
-        dataManager.setupPlayer(player);
-        setupScoreboard(player);
-    }
 
-    @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-        player.teleport(new Location(Bukkit.getWorld("world"), 0, 78, 0));
+        dataManager.setupPlayer(player);
+
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
+        playerData.miningSpeed = 1;
+
+        // Set the player's mining speed to 0 (this is the 1.21 replacement for -1 Mining Fatigue) for the custom block breaking to work
+        Objects.requireNonNull(player.getAttribute(Attribute.PLAYER_BLOCK_BREAK_SPEED)).setBaseValue(0);
+
+        setupScoreboard(player);
     }
 
     @EventHandler
@@ -255,6 +280,10 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         if (lobbyWorld != null && event.getBlock().getWorld().equals(lobbyWorld)) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.RED + "You cannot place blocks here!");
+        }
+
+        if (event.getItemInHand().getItemMeta().getDisplayName().contains("Tool Core") || event.getItemInHand().getItemMeta().getDisplayName().contains("Automation Core")) {
+            event.setCancelled(true);
         }
     }
 
@@ -295,7 +324,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     }
 
     public void openMainMenu(Player player) {
-        Inventory menu = Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Main Menu");
+        Inventory menu = Bukkit.createInventory(null, 45, ChatColor.DARK_GREEN + "Main Menu");
 
         // Create menu options
         ItemStack progressionItem = new ItemStack(Material.BOOK);
@@ -313,10 +342,22 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         shopMeta.setDisplayName(ChatColor.GOLD + "Block Coin Shop");
         shopItem.setItemMeta(shopMeta);
 
+        ItemStack profilesItem = new ItemStack(Material.WHITE_WOOL);
+        ItemMeta profilesMeta = profilesItem.getItemMeta();
+        profilesMeta.setDisplayName(ChatColor.GOLD + "Profiles");
+        profilesItem.setItemMeta(profilesMeta);
+
+        ItemStack warpsItem = new ItemStack(Material.END_CRYSTAL);
+        ItemMeta warpsMeta = warpsItem.getItemMeta();
+        warpsMeta.setDisplayName(ChatColor.GOLD + "Warps");
+        warpsItem.setItemMeta(warpsMeta);
+
         // Place items in menu
-        menu.setItem(11, progressionItem);
-        menu.setItem(13, fleaMarketItem);
-        menu.setItem(15, shopItem);
+        menu.setItem(20, progressionItem);
+        menu.setItem(22, fleaMarketItem);
+        menu.setItem(24, shopItem);
+        menu.setItem(40, profilesItem);
+        menu.setItem(44, warpsItem);
 
         player.openInventory(menu);
     }
@@ -336,6 +377,10 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
                 player.performCommand("flea");
             } else if (clickedItem.getType() == Material.GOLD_INGOT) {
                 player.performCommand("bcshop");
+            } else if (clickedItem.getType() == Material.WHITE_WOOL) {
+                player.performCommand("profiles");
+            } else if (clickedItem.getType() == Material.END_CRYSTAL) {
+                player.performCommand("warps");
             }
         }
     }

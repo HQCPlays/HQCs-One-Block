@@ -29,12 +29,14 @@ public class PlayerSaveData implements Serializable {
     public ArrayList<ItemStack> mail;
 
     // Upgradeable Player stats
-    public double miningBonus;
+    public int miningSpeed;
     public double damageBonus;
 
     public PlayerSaveData() {
         // Set up some default values for new players
         this.balance = 0;
+        this.miningSpeed = 1;
+        this.damageBonus = 0;
         this.blockChances = OneBlockController.blockChances;
         this.unlockedBlocks = new HashSet<>();
         this.islandAllowedPlayers = new HashSet<>();

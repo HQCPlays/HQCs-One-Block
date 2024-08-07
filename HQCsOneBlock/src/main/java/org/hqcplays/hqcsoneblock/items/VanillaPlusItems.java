@@ -83,16 +83,20 @@ public class VanillaPlusItems implements Listener {
             if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.DARK_GRAY + "Coal Sword")) {
                 Block clickedBlock = event.getClickedBlock();
                 if (clickedBlock != null && !player.getWorld().getName().equals("world")) {
-                    Block blockAbove = clickedBlock.getRelative(org.bukkit.block.BlockFace.UP);
-                    blockAbove.setType(Material.TORCH);
+                    Block blockToPlaceTorch = clickedBlock.getRelative(event.getBlockFace());
+                    if (blockToPlaceTorch.getType() == Material.AIR) {
+                        blockToPlaceTorch.setType(Material.TORCH);
+                    }
                 }
             }
 
             if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.AQUA + "Cobblestone Platforminator")) {
                 Block clickedBlock = event.getClickedBlock();
                 if (clickedBlock != null && !player.getWorld().getName().equals("world")) {
-                    Block blockAbove = clickedBlock.getRelative(org.bukkit.block.BlockFace.UP);
-                    blockAbove.setType(Material.TORCH);
+                    Block blockToPlaceTorch = clickedBlock.getRelative(event.getBlockFace());
+                    if (blockToPlaceTorch.getType() == Material.AIR) {
+                        blockToPlaceTorch.setType(Material.TORCH);
+                    }
                 }
             }
         }

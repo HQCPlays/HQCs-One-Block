@@ -578,7 +578,7 @@ public class AmethystShardItems implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             player.sendMessage(ChatColor.GREEN + "You have died!");
 
-            player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 200, 100));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 2));
 
             item.setAmount(item.getAmount() - 1);
         }

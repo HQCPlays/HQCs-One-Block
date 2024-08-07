@@ -1,8 +1,6 @@
 package org.hqcplays.hqcsoneblock;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,10 +11,8 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
-import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.List;
 
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
@@ -36,8 +32,7 @@ public class PickaxeController implements Listener {
         }
 
         if (!hasPA) {
-            ItemStack newPickaxe = new ItemStack(CustomPickaxes.woodPickaxe);
-            p.getInventory().addItem(newPickaxe);
+            p.getInventory().addItem(CustomPickaxes.woodPickaxe.clone());
         }
     }
 
@@ -55,8 +50,7 @@ public class PickaxeController implements Listener {
         }
 
         if (!hasPA) {
-            ItemStack newPickaxe = new ItemStack(CustomPickaxes.woodPickaxe);
-            p.getInventory().addItem(newPickaxe);
+            p.getInventory().addItem(CustomPickaxes.woodPickaxe.clone());
         }
     }
 
@@ -66,7 +60,7 @@ public class PickaxeController implements Listener {
         CraftingInventory inventory = event.getInventory();
         ItemStack result = inventory.getResult();
 
-        if (result == null || !isPickaxe(result.getType())) {
+        if (result == null || !isVanillaPickaxe(result)) {
             return;
         }
 
@@ -92,6 +86,24 @@ public class PickaxeController implements Listener {
             default:
                 break;
         }
+    }
+
+    private boolean isVanillaPickaxe(ItemStack item) {
+        if (!item.hasItemMeta()) {
+            return true; // No meta means it's a default vanilla item
+        }
+        ItemMeta meta = item.getItemMeta();
+        if (!meta.hasLore()) {
+            return true; // No lore means it's a default vanilla item
+        }
+
+        // Check if the lore matches any custom pickaxe's lore
+        List<String> lore = meta.getLore();
+        return lore == null || lore.isEmpty() || !isCustomPickaxeLore(lore.get(0));
+    }
+
+    private boolean isCustomPickaxeLore(String lore) {
+        return lore.contains("Mining Speed"); // Your custom pickaxes have "Mining Speed" in their lore
     }
 
     private boolean isPickaxe(Material material) {

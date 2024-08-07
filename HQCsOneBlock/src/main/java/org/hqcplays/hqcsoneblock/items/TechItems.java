@@ -15,9 +15,11 @@ import java.util.Collections;
 public class TechItems implements Listener {
     // Crafting materials
     public static ItemStack toolCore;
+    public static ItemStack automationCore;
 
     public static void init() {
         createToolCore();
+        createAutomationCore();
     }
 
     public static void createToolCore() {
@@ -38,5 +40,25 @@ public class TechItems implements Listener {
         Bukkit.getServer().addRecipe(sr);
 
         toolCore = customItem;
+    }
+
+    public static void createAutomationCore() {
+        ItemStack customItem = new ItemStack(Material.IRON_BLOCK, 1);
+        ItemMeta meta = customItem.getItemMeta();
+        meta.setDisplayName(ChatColor.RED + "Automation Core");
+        meta.setLore(Collections.singletonList(ChatColor.GRAY + "Material"));
+        customItem.setItemMeta(meta);
+
+        // Crafting recipe
+        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), "automation_core"), customItem);
+        sr.shape("AIA",
+                "IRI",
+                "AIA");
+        sr.setIngredient('A', Material.ANCIENT_DEBRIS);
+        sr.setIngredient('I', Material.IRON_INGOT);
+        sr.setIngredient('R', Material.REDSTONE_BLOCK);
+        Bukkit.getServer().addRecipe(sr);
+
+        automationCore = customItem;
     }
 }
