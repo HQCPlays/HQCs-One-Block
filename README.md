@@ -1,5 +1,12 @@
 # HQCs-One-Block
 
+**Version 1.2.1 - Bug Patch:**
+- New mining system!
+- Death no longer exists! (Kind of)
+- New warp menu
+- Automation items are out (spawners / generators)
+- Lots of bug fixes
+
 **Version 1.2.0 - The Progression Update:**
 - New "Progression" system!
 - Flea Market added!
