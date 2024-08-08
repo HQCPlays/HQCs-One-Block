@@ -55,35 +55,6 @@ public class CustomPickaxes implements Listener {
         return customPickaxe;
     }
 
-    private static ItemStack createCustomPickaxe(Material type, String name, float miningSpeedModifier, ItemStack pickaxeMaterial, String craftingKey) {
-        ItemStack customPickaxe = new ItemStack(type);
-
-        ItemMeta meta = customPickaxe.getItemMeta();
-        meta.setDisplayName(name);
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-
-        if (name.contains("Lapis Pickaxe")) {
-            meta.setLore(Collections.singletonList("+" + miningSpeedModifier + " Mining Speed. Has a chance to drop extra experience!"));
-        } else if (name.contains("Redstone Pickaxe")) {
-            meta.setLore(Collections.singletonList("+" + miningSpeedModifier + " Mining Speed. Has a chance to give you Haste upon mining a block!"));
-        } else {
-            meta.setLore(Collections.singletonList("+" + miningSpeedModifier + " Mining Speed"));
-        }
-
-        customPickaxe.setItemMeta(meta);
-
-        // Crafting recipe
-        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customPickaxe);
-        sr.shape("AAA",
-                " S ",
-                " S ");
-        sr.setIngredient('A', pickaxeMaterial);
-        sr.setIngredient('S', Material.STICK);
-        Bukkit.getServer().addRecipe(sr);
-
-        return customPickaxe;
-    }
-
     private static ItemStack createStardustPickaxe(float miningSpeedModifier) {
         ItemStack customPickaxe = new ItemStack(Material.GOLDEN_PICKAXE, 1);
 

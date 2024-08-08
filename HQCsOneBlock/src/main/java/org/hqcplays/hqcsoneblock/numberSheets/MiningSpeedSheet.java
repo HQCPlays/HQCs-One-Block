@@ -9,45 +9,47 @@ import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
 
 import static org.hqcplays.hqcsoneblock.items.CustomPickaxes.*;
+import static org.hqcplays.hqcsoneblock.items.CustomAxes.*;
+import static org.hqcplays.hqcsoneblock.items.CustomShovels.*;
 
 public class MiningSpeedSheet {
     // Pickaxe mining speed
     public static int getPickaxeMiningSpeed(ItemStack item) {
         if (item == null) return 1;
 
-        if (item.isSimilar(woodPickaxe)) {
+        if (item.isSimilar(woodPickaxe) || item.isSimilar(woodAxe) || item.isSimilar(woodShovel)) {
             return 20;
         }
 
-        if (item.isSimilar(stonePickaxe)) {
+        if (item.isSimilar(stonePickaxe) || item.isSimilar(stoneAxe) || item.isSimilar(stoneShovel)) {
             return 40;
         }
 
-        if (item.isSimilar(lapisPickaxe)) {
+        if (item.isSimilar(lapisPickaxe) || item.isSimilar(lapisAxe) || item.isSimilar(lapisShovel)) {
             return 50;
         }
 
-        if (item.isSimilar(ironPickaxe)) {
+        if (item.isSimilar(ironPickaxe) || item.isSimilar(ironAxe) || item.isSimilar(ironShovel)) {
             return 60;
         }
 
-        if (item.isSimilar(redstonePickaxe)) {
+        if (item.isSimilar(redstonePickaxe) || item.isSimilar(redstoneAxe) || item.isSimilar(redstoneShovel)) {
             return 70;
         }
 
-        if (item.isSimilar(goldenPickaxe)) {
+        if (item.isSimilar(goldenPickaxe) || item.isSimilar(goldenAxe) || item.isSimilar(goldenShovel)) {
             return 80;
         }
 
-        if (item.isSimilar(diamondPickaxe)) {
+        if (item.isSimilar(diamondPickaxe) || item.isSimilar(diamondAxe) || item.isSimilar(diamondShovel)) {
             return 100;
         }
 
-        if (item.isSimilar(netheritePickaxe)) {
+        if (item.isSimilar(netheritePickaxe) || item.isSimilar(netheriteAxe) || item.isSimilar(netheriteShovel)) {
             return 125;
         }
 
-        if (item.isSimilar(stardustPickaxe)) {
+        if (item.isSimilar(stardustPickaxe) || item.isSimilar(stardustAxe) || item.isSimilar(stardustShovel)) {
             return 150;
         }
 

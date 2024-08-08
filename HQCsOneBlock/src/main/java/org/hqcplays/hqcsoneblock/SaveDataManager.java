@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import static org.hqcplays.hqcsoneblock.numberSheets.MiningSpeedSheet.getPickaxeMiningSpeed;
+
 public class SaveDataManager {
     public static final int NUM_PROFILES = 3;
 
@@ -114,6 +116,9 @@ public class SaveDataManager {
         }
 
         player.sendMessage(ChatColor.AQUA + "Switched to profile " + (id + 1));
+
+        HQCsOneBlock.dataManager.getPlayerData(player).miningSpeed = 1;
+        HQCsOneBlock.dataManager.getPlayerData(player).miningSpeed = getPickaxeMiningSpeed(player.getItemInHand());
     }
 
     public void loadSaveData() {

@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public class PlayerSaveData implements Serializable {
+    public static final long serialVersionUID = 1L;
+
     // Important Player stats
     public int balance;
     public Map<Material, Double> blockChances;

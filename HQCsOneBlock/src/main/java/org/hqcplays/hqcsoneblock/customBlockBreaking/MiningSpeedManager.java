@@ -1,11 +1,12 @@
 package org.hqcplays.hqcsoneblock.customBlockBreaking;
 
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
@@ -33,6 +34,22 @@ public class MiningSpeedManager implements Listener {
         Player player = event.getPlayer();
 
         PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
-        playerData.miningSpeed = 1;
+        playerData.miningSpeed = getPickaxeMiningSpeed(player.getItemInHand());
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
+        playerData.miningSpeed = getPickaxeMiningSpeed(player.getItemInHand());
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
+        playerData.miningSpeed = getPickaxeMiningSpeed(player.getItemInHand());
     }
 }

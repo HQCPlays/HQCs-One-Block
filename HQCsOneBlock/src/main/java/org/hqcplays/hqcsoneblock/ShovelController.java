@@ -10,14 +10,12 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
+import org.hqcplays.hqcsoneblock.items.CustomShovels;
 
 import java.util.List;
 
-import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
-
-public class PickaxeController implements Listener {
-    // Give players a wooden pickaxe if they die and don't have a pickaxe
+public class ShovelController implements Listener {
+    // Give players a wooden Shovel if they die and don't have a Shovel
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent e) {
         Player p = e.getPlayer();
@@ -25,14 +23,14 @@ public class PickaxeController implements Listener {
 
         for (ItemStack is : p.getInventory().getContents()) {
             if (is != null) {
-                if (isPickaxe(is.getType())) {
+                if (isShovel(is.getType())) {
                     hasPA = true;
                 }
             }
         }
 
         if (!hasPA) {
-            p.getInventory().addItem(CustomPickaxes.woodPickaxe.clone());
+            p.getInventory().addItem(CustomShovels.woodShovel.clone());
         }
     }
 
@@ -43,52 +41,52 @@ public class PickaxeController implements Listener {
 
         for (ItemStack is : p.getInventory().getContents()) {
             if (is != null) {
-                if (isPickaxe(is.getType())) {
+                if (isShovel(is.getType())) {
                     hasPA = true;
                 }
             }
         }
 
         if (!hasPA) {
-            p.getInventory().addItem(CustomPickaxes.woodPickaxe.clone());
+            p.getInventory().addItem(CustomShovels.woodShovel.clone());
         }
     }
 
-    // Override normal pickaxe crafting
+    // Override normal Shovel crafting
     @EventHandler
     public void onPrepareItemCraft(PrepareItemCraftEvent event) {
         CraftingInventory inventory = event.getInventory();
         ItemStack result = inventory.getResult();
 
-        if (result == null || !isVanillaPickaxe(result)) {
+        if (result == null || !isVanillaShovel(result)) {
             return;
         }
 
         switch (result.getType()) {
-            case WOODEN_PICKAXE:
-                inventory.setResult(CustomPickaxes.woodPickaxe);
+            case WOODEN_SHOVEL:
+                inventory.setResult(CustomShovels.woodShovel);
                 break;
-            case STONE_PICKAXE:
-                inventory.setResult(CustomPickaxes.stonePickaxe);
+            case STONE_SHOVEL:
+                inventory.setResult(CustomShovels.stoneShovel);
                 break;
-            case IRON_PICKAXE:
-                inventory.setResult(CustomPickaxes.ironPickaxe);
+            case IRON_SHOVEL:
+                inventory.setResult(CustomShovels.ironShovel);
                 break;
-            case GOLDEN_PICKAXE:
-                inventory.setResult(CustomPickaxes.goldenPickaxe);
+            case GOLDEN_SHOVEL:
+                inventory.setResult(CustomShovels.goldenShovel);
                 break;
-            case DIAMOND_PICKAXE:
-                inventory.setResult(CustomPickaxes.diamondPickaxe);
+            case DIAMOND_SHOVEL:
+                inventory.setResult(CustomShovels.diamondShovel);
                 break;
-            case NETHERITE_PICKAXE:
-                inventory.setResult(CustomPickaxes.netheritePickaxe);
+            case NETHERITE_SHOVEL:
+                inventory.setResult(CustomShovels.netheriteShovel);
                 break;
             default:
                 break;
         }
     }
 
-    private boolean isVanillaPickaxe(ItemStack item) {
+    private boolean isVanillaShovel(ItemStack item) {
         if (!item.hasItemMeta()) {
             return true; // No meta means it's a default vanilla item
         }
@@ -97,21 +95,21 @@ public class PickaxeController implements Listener {
             return true; // No lore means it's a default vanilla item
         }
 
-        // Check if the lore matches any custom pickaxe's lore
+        // Check if the lore matches any custom Shovel's lore
         List<String> lore = meta.getLore();
-        return lore == null || lore.isEmpty() || !isCustomPickaxeLore(lore.get(0));
+        return lore == null || lore.isEmpty() || !isCustomShovelLore(lore.get(0));
     }
 
-    private boolean isCustomPickaxeLore(String lore) {
+    private boolean isCustomShovelLore(String lore) {
         return lore.contains("Mining Speed");
     }
 
-    private boolean isPickaxe(Material material) {
-        return material == Material.WOODEN_PICKAXE ||
-                material == Material.STONE_PICKAXE ||
-                material == Material.IRON_PICKAXE ||
-                material == Material.GOLDEN_PICKAXE ||
-                material == Material.DIAMOND_PICKAXE ||
-                material == Material.NETHERITE_PICKAXE;
+    private boolean isShovel(Material material) {
+        return material == Material.WOODEN_SHOVEL ||
+                material == Material.STONE_SHOVEL ||
+                material == Material.IRON_SHOVEL ||
+                material == Material.GOLDEN_SHOVEL ||
+                material == Material.DIAMOND_SHOVEL ||
+                material == Material.NETHERITE_SHOVEL;
     }
 }

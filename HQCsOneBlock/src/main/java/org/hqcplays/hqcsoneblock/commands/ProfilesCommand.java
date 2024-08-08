@@ -71,6 +71,7 @@ public class ProfilesCommand implements CommandExecutor, Listener {
                 chosenProfile = 2;
 
             HQCsOneBlock.dataManager.setSelectedProfile(player, chosenProfile);
+            HQCsOneBlock.dataManager.getPlayerData(player).miningSpeed = 1;
             event.getClickedInventory().close();
             event.setCancelled(true);
         }
