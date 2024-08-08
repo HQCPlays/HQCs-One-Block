@@ -80,12 +80,17 @@ public class BCShopCommand implements CommandExecutor, Listener {
 
     public void openBlockUpgradeShopGUI(Player player) {
         Inventory blockUpgradeShopGUI = Bukkit.createInventory(null, 27, ChatColor.DARK_GREEN + "Block Upgrade Shop");
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
 
         for (Material block : PricesSheet.getBlockUnlockBlocks()) {
             ItemStack shopItem = new ItemStack(block);
             ItemMeta shopItemMeta = shopItem.getItemMeta();
             shopItemMeta.setDisplayName(ChatColor.GOLD + block.name());
-            shopItemMeta.setLore(Collections.singletonList(ChatColor.YELLOW + "Price: " + PricesSheet.getBlockUnlockPrices(block) + " Block Coins"));
+            if (playerData.unlockedBlocks.contains(block)) {
+                shopItemMeta.setLore(Collections.singletonList(ChatColor.DARK_GRAY + "Unlocked!"));
+            } else {
+                shopItemMeta.setLore(Collections.singletonList(ChatColor.YELLOW + "Price: " + PricesSheet.getBlockUnlockPrices(block) + " Block Coins"));
+            }
             shopItem.setItemMeta(shopItemMeta);
 
             blockUpgradeShopGUI.addItem(shopItem);
