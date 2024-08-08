@@ -33,7 +33,7 @@ public class WarpsCommand implements CommandExecutor, Listener {
         // Checks if sender is a player, if so open the flea market, otherwise throw error message
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            //openWarpsGUI(player);
+            openWarpsGUI(player);
             return true;
         } else {
             sender.sendMessage("This command can only be run by a player.");
