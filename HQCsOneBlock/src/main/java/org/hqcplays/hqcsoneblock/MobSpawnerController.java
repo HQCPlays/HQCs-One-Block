@@ -67,7 +67,7 @@ public class MobSpawnerController implements Listener {
         // Define the ingredients
         recipe.setIngredient('P', mobMaterial);
         recipe.setIngredient('I', Material.IRON_BARS);
-        recipe.setIngredient('A', automationCore);
+        recipe.setIngredient('A', automationCore.item);
 
         // Register the recipe
         Bukkit.addRecipe(recipe);

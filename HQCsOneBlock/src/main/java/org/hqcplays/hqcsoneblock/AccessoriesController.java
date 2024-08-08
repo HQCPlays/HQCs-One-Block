@@ -18,7 +18,7 @@ import java.util.UUID;
 import static org.hqcplays.hqcsoneblock.items.AccessoryItems.redShardAmulet;
 
 public class AccessoriesController implements Listener {
-    private static final ItemStack bonusItem = new ItemStack(redShardAmulet);
+    private static final ItemStack bonusItem = new ItemStack(redShardAmulet.item);
     private static final UUID healthBonusUUID = UUID.randomUUID();
 
     @EventHandler

@@ -116,34 +116,34 @@ public class OneBlockController implements Listener {
 
                     switch (randomInt) {
                         case 0:
-                            AmethystShardItems.dropGoldShard(player);
+                            player.getInventory().addItem(AmethystShardItems.goldShard.item);
                             break;
                         case 1:
-                            AmethystShardItems.dropRedShard(player);
+                            player.getInventory().addItem(AmethystShardItems.redShard.item);
                             break;
                         case 2:
-                            AmethystShardItems.dropGreenShard(player);
+                            player.getInventory().addItem(AmethystShardItems.greenShard.item);
                             break;
                         case 3:
-                            AmethystShardItems.dropBlackShard(player);
+                            player.getInventory().addItem(AmethystShardItems.blackShard.item);
                             break;
                         case 4:
-                            AmethystShardItems.dropBlueShard(player);
+                            player.getInventory().addItem(AmethystShardItems.blueShard.item);
                             break;
                         case 5:
-                            AmethystShardItems.dropPurpleShard(player);
+                            player.getInventory().addItem(AmethystShardItems.purpleShard.item);
                             break;
                         case 6:
-                            AmethystShardItems.dropRainbowShard(player);
+                            player.getInventory().addItem(AmethystShardItems.rainbowShard.item);
                             break;
                         case 7:
-                            AmethystShardItems.dropWhiteShard(player);
+                            player.getInventory().addItem(AmethystShardItems.whiteShard.item);
                             break;
                         case 8:
-                            AmethystShardItems.dropEffectShard(player);
+                            player.getInventory().addItem(AmethystShardItems.effectShard.item);
                             break;
                         default:
-                            AmethystShardItems.dropGoldShard(player);
+                            player.getInventory().addItem(AmethystShardItems.goldShard.item);
                             break;
                     }
                 }
@@ -151,7 +151,7 @@ public class OneBlockController implements Listener {
                 if (loc.getBlock().getType() == Material.GLOWSTONE) {
                     event.setCancelled(true);
 
-                    player.getInventory().addItem(stardust);
+                    player.getInventory().addItem(stardust.item);
                 }
 
                 new BukkitRunnable() {

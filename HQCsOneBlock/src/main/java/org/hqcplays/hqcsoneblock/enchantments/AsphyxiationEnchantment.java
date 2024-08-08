@@ -1,5 +1,7 @@
 package org.hqcplays.hqcsoneblock.enchantments;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,7 +23,7 @@ public class AsphyxiationEnchantment extends ShardEnchantment {
     }
 
     @Override
-    public String getLoreName() {
-        return ChatColor.DARK_BLUE + "Asphyxiation I";
+    public Component getLoreName() {
+        return Component.text("Asphyxiation I", NamedTextColor.DARK_BLUE);
     }
 }

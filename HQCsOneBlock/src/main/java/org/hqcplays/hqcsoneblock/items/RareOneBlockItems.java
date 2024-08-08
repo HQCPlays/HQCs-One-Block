@@ -1,5 +1,7 @@
 package org.hqcplays.hqcsoneblock.items;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
@@ -8,21 +10,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collections;
 
-public class RareOneBlockItems implements Listener {
+public class RareOneBlockItems {
     // Materials
-    public static ItemStack stardust;
+    public static CustomItem stardust;
 
     public static void init() {
-        createStardust();
-    }
-
-    public static void createStardust() {
-        ItemStack customItem = new ItemStack(Material.GLOWSTONE_DUST, 1);
-        ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.GOLD + "Stardust");
-        meta.setLore(Collections.singletonList(ChatColor.GRAY + "Crafting Material"));
-        customItem.setItemMeta(meta);
-
-        stardust = customItem;
+        stardust = new CustomItem(Material.GLOWSTONE_DUST, Component.text("Stardust", NamedTextColor.GOLD), Component.text("Crafting Material", NamedTextColor.GRAY));
     }
 }

@@ -1,5 +1,7 @@
 package org.hqcplays.hqcsoneblock.enchantments;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -33,7 +35,7 @@ public class VitalityEnchantment extends ShardEnchantment {
     }
 
     @Override
-    public String getLoreName() {
-        return ChatColor.YELLOW + "Vitality I";
+    public Component getLoreName() {
+        return Component.text("Vitality I", NamedTextColor.YELLOW);
     }
 }

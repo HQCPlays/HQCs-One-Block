@@ -1,5 +1,6 @@
 package org.hqcplays.hqcsoneblock.enchantments;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -46,7 +47,7 @@ public abstract class ShardEnchantment {
         return false;
     }
 
-    public abstract String getLoreName();
+    public abstract Component getLoreName();
 
     public NamespacedKey getItemMetaKey() {
         return key;

@@ -1,5 +1,7 @@
 package org.hqcplays.hqcsoneblock.enchantments;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -16,7 +18,7 @@ public class VampirismEnchantment extends ShardEnchantment {
     }
 
     @Override
-    public String getLoreName() {
-        return ChatColor.DARK_RED + "Vampirism I";
+    public Component getLoreName() {
+        return Component.text("Vampirism I", NamedTextColor.DARK_RED);
     }
 }

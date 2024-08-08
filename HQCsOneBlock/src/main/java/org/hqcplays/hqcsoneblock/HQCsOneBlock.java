@@ -66,13 +66,10 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new OneBlockController(), this);
         getServer().getPluginManager().registerEvents(new CustomPickaxes(), this);
         getServer().getPluginManager().registerEvents(new PickaxeController(), this);
-        getServer().getPluginManager().registerEvents(new AmethystShardItems(), this);
-        getServer().getPluginManager().registerEvents(new RareOneBlockItems(), this);
-        getServer().getPluginManager().registerEvents(new VanillaPlusItems(), this);
+        getServer().getPluginManager().registerEvents(new UsableCustomItem.PlayerUseListener(), this);
         getServer().getPluginManager().registerEvents(new MenuItemController(), this);
         getServer().getPluginManager().registerEvents(new Progression(), this);
         getServer().getPluginManager().registerEvents(new ProgressionCommand(), this);
-        getServer().getPluginManager().registerEvents(new TechItems(), this);
         getServer().getPluginManager().registerEvents(new MobController(), this);
         getServer().getPluginManager().registerEvents(new MobSpawnerController(this), this);
         getServer().getPluginManager().registerEvents(new ResourceGeneratorController(), this);

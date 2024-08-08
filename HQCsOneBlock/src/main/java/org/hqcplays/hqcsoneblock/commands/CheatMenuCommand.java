@@ -13,18 +13,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
 import org.hqcplays.hqcsoneblock.items.RareOneBlockItems;
+import org.hqcplays.hqcsoneblock.items.ResourceGeneratorItems;
+import org.hqcplays.hqcsoneblock.items.TechItems;
 import org.hqcplays.hqcsoneblock.items.VanillaPlusItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.hqcplays.hqcsoneblock.items.CustomPickaxes.*;
-import static org.hqcplays.hqcsoneblock.items.ResourceGeneratorItems.*;
-import static org.hqcplays.hqcsoneblock.items.TechItems.automationCore;
-import static org.hqcplays.hqcsoneblock.items.TechItems.toolCore;
 
 public class CheatMenuCommand implements CommandExecutor, Listener {
     private final ArrayList<ItemStack> cheatItemList = new ArrayList<>();
@@ -34,48 +32,48 @@ public class CheatMenuCommand implements CommandExecutor, Listener {
         cheatItemList.clear();
 
         // Shards
-        cheatItemList.add(AmethystShardItems.goldShard);
-        cheatItemList.add(AmethystShardItems.redShard);
-        cheatItemList.add(AmethystShardItems.blueShard);
-        cheatItemList.add(AmethystShardItems.greenShard);
-        cheatItemList.add(AmethystShardItems.purpleShard);
-        cheatItemList.add(AmethystShardItems.whiteShard);
-        cheatItemList.add(AmethystShardItems.blackShard);
-        cheatItemList.add(AmethystShardItems.rainbowShard);
-        cheatItemList.add(AmethystShardItems.effectShard);
+        cheatItemList.add(AmethystShardItems.goldShard.item);
+        cheatItemList.add(AmethystShardItems.redShard.item);
+        cheatItemList.add(AmethystShardItems.blueShard.item);
+        cheatItemList.add(AmethystShardItems.greenShard.item);
+        cheatItemList.add(AmethystShardItems.purpleShard.item);
+        cheatItemList.add(AmethystShardItems.whiteShard.item);
+        cheatItemList.add(AmethystShardItems.blackShard.item);
+        cheatItemList.add(AmethystShardItems.rainbowShard.item);
+        cheatItemList.add(AmethystShardItems.effectShard.item);
 
         // Swords
-        cheatItemList.add(VanillaPlusItems.coalSword);
-        cheatItemList.add(AmethystShardItems.blackShardSword);
-        cheatItemList.add(AmethystShardItems.whiteShardSword);
-        cheatItemList.add(AmethystShardItems.redShardSword);
-        cheatItemList.add(AmethystShardItems.blueShardSword);
+        cheatItemList.add(VanillaPlusItems.coalSword.item);
+        cheatItemList.add(AmethystShardItems.blackShardSword.item);
+        cheatItemList.add(AmethystShardItems.whiteShardSword.item);
+        cheatItemList.add(AmethystShardItems.redShardSword.item);
+        cheatItemList.add(AmethystShardItems.blueShardSword.item);
 
         // Armor
-        cheatItemList.add(AmethystShardItems.redShardHelmet);
-        cheatItemList.add(AmethystShardItems.redShardChestplate);
-        cheatItemList.add(AmethystShardItems.redShardLeggings);
-        cheatItemList.add(AmethystShardItems.redShardBoots);
+        cheatItemList.add(AmethystShardItems.redShardHelmet.item);
+        cheatItemList.add(AmethystShardItems.redShardChestplate.item);
+        cheatItemList.add(AmethystShardItems.redShardLeggings.item);
+        cheatItemList.add(AmethystShardItems.redShardBoots.item);
 
         // Misc. items
-        cheatItemList.add(RareOneBlockItems.stardust);
-        cheatItemList.add(toolCore);
-        cheatItemList.add(automationCore);
+        cheatItemList.add(RareOneBlockItems.stardust.item);
+        cheatItemList.add(TechItems.toolCore.item);
+        cheatItemList.add(TechItems.automationCore.item);
 
         // Generators
-        cheatItemList.add(ironGenerator);
-        cheatItemList.add(coalGenerator);
-        cheatItemList.add(lapisGenerator);
-        cheatItemList.add(goldGenerator);
-        cheatItemList.add(redstoneGenerator);
-        cheatItemList.add(diamondGenerator);
-        cheatItemList.add(ancientDebrisGenerator);
-        cheatItemList.add(cobblestoneGenerator);
+        cheatItemList.add(ResourceGeneratorItems.ironGenerator.item);
+        cheatItemList.add(ResourceGeneratorItems.coalGenerator.item);
+        cheatItemList.add(ResourceGeneratorItems.lapisGenerator.item);
+        cheatItemList.add(ResourceGeneratorItems.goldGenerator.item);
+        cheatItemList.add(ResourceGeneratorItems.redstoneGenerator.item);
+        cheatItemList.add(ResourceGeneratorItems.diamondGenerator.item);
+        cheatItemList.add(ResourceGeneratorItems.ancientDebrisGenerator.item);
+        cheatItemList.add(ResourceGeneratorItems.cobblestoneGenerator.item);
 
         // Pickaxes
-        cheatItemList.add(stardustPickaxe);
-        cheatItemList.add(lapisPickaxe);
-        cheatItemList.add(redstonePickaxe);
+        cheatItemList.add(CustomPickaxes.stardustPickaxe);
+        cheatItemList.add(CustomPickaxes.lapisPickaxe);
+        cheatItemList.add(CustomPickaxes.redstonePickaxe);
     }
 
     @Override

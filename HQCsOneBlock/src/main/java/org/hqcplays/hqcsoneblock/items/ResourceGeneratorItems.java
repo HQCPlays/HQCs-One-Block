@@ -1,5 +1,7 @@
 package org.hqcplays.hqcsoneblock.items;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -14,43 +16,40 @@ import java.util.Collections;
 import static org.hqcplays.hqcsoneblock.items.TechItems.automationCore;
 
 public class ResourceGeneratorItems {
-    public static ItemStack ironGenerator;
-    public static ItemStack coalGenerator;
-    public static ItemStack goldGenerator;
-    public static ItemStack redstoneGenerator;
-    public static ItemStack lapisGenerator;
-    public static ItemStack diamondGenerator;
-    public static ItemStack ancientDebrisGenerator;
-    public static ItemStack cobblestoneGenerator;
+    public static CustomItem ironGenerator;
+    public static CustomItem coalGenerator;
+    public static CustomItem goldGenerator;
+    public static CustomItem redstoneGenerator;
+    public static CustomItem lapisGenerator;
+    public static CustomItem diamondGenerator;
+    public static CustomItem ancientDebrisGenerator;
+    public static CustomItem cobblestoneGenerator;
 
-    public static void init() {
-        ironGenerator = createGenerator("Iron", "iron_generator", Material.IRON_INGOT);
-        coalGenerator = createGenerator("Coal", "coal_generator", Material.COAL);
-        goldGenerator = createGenerator("Gold", "gold_generator", Material.GOLD_INGOT);
-        redstoneGenerator = createGenerator("Redstone", "redstone_generator", Material.REDSTONE);
-        lapisGenerator = createGenerator("Lapis", "lapis_generator", Material.LAPIS_LAZULI);
-        diamondGenerator = createGenerator("Diamond", "diamond_generator", Material.DIAMOND);
-        ancientDebrisGenerator = createGenerator("Ancient Debris", "ancient_debris_generator", Material.ANCIENT_DEBRIS);
-        cobblestoneGenerator = createGenerator("Cobblestone", "cobblestone_generator", Material.COBBLESTONE);
+    public static class GeneratorItem extends CustomItem {
+        public GeneratorItem(String materialName, String craftingKey, Material material) {
+            super(Material.CHEST,
+                    Component.text(materialName + " Generator", NamedTextColor.DARK_GREEN),
+                    Component.text("Place this item to start generating " + materialName + " automatically", NamedTextColor.GRAY));
+
+            ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), this.item);
+            sr.shape("ICI",
+                    "CAC",
+                    "ICI");
+            sr.setIngredient('C', Material.CHEST);
+            sr.setIngredient('I', material);
+            sr.setIngredient('A', automationCore.item);
+            addCraftingRecipe(sr);
+        }
     }
 
-    public static ItemStack createGenerator(String materialName, String craftingKey, Material material) {
-        ItemStack customItem = new ItemStack(Material.CHEST, 1);
-        ItemMeta meta = customItem.getItemMeta();
-        meta.setDisplayName(ChatColor.DARK_GREEN + materialName + " Generator");
-        meta.setLore(Collections.singletonList(ChatColor.GRAY + "Place this item to start generating " + materialName + " automatically"));
-        customItem.setItemMeta(meta);
-
-        // Crafting recipe
-        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(HQCsOneBlock.getPlugin(HQCsOneBlock.class), craftingKey), customItem);
-        sr.shape("ICI",
-                "CAC",
-                "ICI");
-        sr.setIngredient('C', Material.CHEST);
-        sr.setIngredient('I', material);
-        sr.setIngredient('A', automationCore);
-        Bukkit.getServer().addRecipe(sr);
-
-        return customItem;
+    public static void init() {
+        ironGenerator = new GeneratorItem("Iron", "iron_generator", Material.IRON_INGOT);
+        coalGenerator = new GeneratorItem("Coal", "coal_generator", Material.COAL);
+        goldGenerator = new GeneratorItem("Gold", "gold_generator", Material.GOLD_INGOT);
+        redstoneGenerator = new GeneratorItem("Redstone", "redstone_generator", Material.REDSTONE);
+        lapisGenerator = new GeneratorItem("Lapis", "lapis_generator", Material.LAPIS_LAZULI);
+        diamondGenerator = new GeneratorItem("Diamond", "diamond_generator", Material.DIAMOND);
+        ancientDebrisGenerator = new GeneratorItem("Ancient Debris", "ancient_debris_generator", Material.ANCIENT_DEBRIS);
+        cobblestoneGenerator = new GeneratorItem("Cobblestone", "cobblestone_generator", Material.COBBLESTONE);
     }
 }

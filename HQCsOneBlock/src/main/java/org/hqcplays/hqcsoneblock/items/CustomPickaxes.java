@@ -99,7 +99,7 @@ public class CustomPickaxes implements Listener {
         sr.shape("AAA",
                 " S ",
                 " S ");
-        sr.setIngredient('A', stardust);
+        sr.setIngredient('A', stardust.item);
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
 
