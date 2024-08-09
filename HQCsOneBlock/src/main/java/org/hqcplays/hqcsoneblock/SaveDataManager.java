@@ -33,10 +33,10 @@ public class SaveDataManager {
         public int selectedProfile;
         public PlayerSaveData[] saveData;
 
-        public PlayerProfileSet() {
+        public PlayerProfileSet(UUID playerUUID) {
             selectedProfile = 0;
             saveData = new PlayerSaveData[NUM_PROFILES];
-            saveData[selectedProfile] = new PlayerSaveData();
+            saveData[selectedProfile] = new PlayerSaveData(playerUUID);
         }
     }
 
@@ -51,12 +51,17 @@ public class SaveDataManager {
 
     public void setupPlayer(Player player) {
         // Create new player data if none exists yet
-        playerData.putIfAbsent(player.getUniqueId(), new PlayerProfileSet());
+        playerData.putIfAbsent(player.getUniqueId(), new PlayerProfileSet(player.getUniqueId()));
     }
 
     public PlayerSaveData getPlayerData(Player player) {
         PlayerProfileSet profileSet = playerData.get(player.getUniqueId());
         return profileSet.saveData[profileSet.selectedProfile];
+    }
+
+    public PlayerSaveData getPlayerData(UUID playerUUID, int profileNum) {
+        PlayerProfileSet profileSet = playerData.get(playerUUID);
+        return profileSet.saveData[profileNum];
     }
 
     public List<PlayerSaveData> getAllPlayerData() {
@@ -90,7 +95,7 @@ public class SaveDataManager {
 
         profileSet.selectedProfile = id;
         if (profileSet.saveData[id] == null)
-            profileSet.saveData[id] = new PlayerSaveData();
+            profileSet.saveData[id] = new PlayerSaveData(player.getUniqueId());
 
         HQCsOneBlock.updateScoreboard(player);
 

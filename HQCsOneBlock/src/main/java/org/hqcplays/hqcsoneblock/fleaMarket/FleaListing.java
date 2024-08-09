@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.bukkit.inventory.ItemStack;
 
 public class FleaListing implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
 
     // Properties of a listing
@@ -15,15 +15,17 @@ public class FleaListing implements Serializable {
     private ItemStack item;
     private int price;
     private UUID seller;
+    private int sellerProfileNum;
     private long listingTime;
     private long expirationTime;
 
     // Main Constructor
-    public FleaListing(ItemStack item, int price, UUID seller){
+    public FleaListing(ItemStack item, int price, UUID seller, int profileNum){
         this.id = UUID.randomUUID(); // Each Listing has a random (and statistically unique) UUID
         this.item = item;
         this.price = price;
         this.seller = seller;
+        this.sellerProfileNum = profileNum;
         this.listingTime = Instant.now().getEpochSecond();
         this.expirationTime = listingTime+604800; // expiration time is 1 week (604800 seconds)
     }
@@ -33,12 +35,12 @@ public class FleaListing implements Serializable {
     public UUID getId(){
         return id;
     }
-
+    
 
     public ItemStack getItem(){
         return item;
     }
-
+    
     public void setItemName(ItemStack item){
         this.item = item;
     }
@@ -47,7 +49,7 @@ public class FleaListing implements Serializable {
     public int getPrice(){
         return price;
     }
-
+    
     public void setPrice(int price){
         this.price = price;
     }
@@ -55,15 +57,23 @@ public class FleaListing implements Serializable {
     public UUID getSeller(){
         return seller;
     }
-
-    public void setSellerName(UUID seller){
+    
+    public void setSeller(UUID seller){
         this.seller = seller;
+    }
+
+    public int getSellerProfileNum(){
+        return sellerProfileNum;
+    }
+    
+    public void setSellerProfileNum(int profileNum){
+        this.sellerProfileNum = profileNum;
     }
 
     public long getListingTime(){
         return listingTime;
     }
-
+    
     public void setListingTime(long listingTime){
         this.listingTime = listingTime;
     }
@@ -71,7 +81,7 @@ public class FleaListing implements Serializable {
     public long getExpirationTime(){
         return expirationTime;
     }
-
+    
     public void setExpirationTime(long expirationTime){
         this.expirationTime = expirationTime;
     }

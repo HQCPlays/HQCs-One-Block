@@ -19,13 +19,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+import org.hqcplays.hqcsoneblock.HQCsOneBlock;
+import org.hqcplays.hqcsoneblock.PlayerSaveData;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.hqcplays.hqcsoneblock.HQCsOneBlock;
-import org.hqcplays.hqcsoneblock.PlayerSaveData;
-import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
 
 public class FleaListingUtils {
     private static final NamespacedKey idKey = new NamespacedKey(HQCsOneBlock.getPlugin(), "listing_id");
@@ -49,11 +48,7 @@ public class FleaListingUtils {
             // Make the details of the listing visible in the lore of the item
             List<Component> lore = new ArrayList<>();
             lore.add(Component.text("Price: $" + listing.getPrice()).color(NamedTextColor.GOLD));
-            if (Bukkit.getPlayer(listing.getSeller()) != null) { // If the player UUID matches a real player
-                lore.add(Component.text("Seller: " + Bukkit.getPlayer(listing.getSeller()).getName()).color(NamedTextColor.AQUA));
-            } else { // If UUID of player selling item is unknown
-                lore.add(Component.text("Seller: Unknown").color(NamedTextColor.AQUA));
-            }
+            lore.add(Component.text("Seller: " + HQCsOneBlock.dataManager.getPlayerData(listing.getSeller(), listing.getSellerProfileNum()).name).color(NamedTextColor.AQUA));
 
             // Listing and expiration date logic
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"); // Define the desired format
@@ -137,18 +132,19 @@ public class FleaListingUtils {
             if (isExpired(fleaListing)) {
                 iterator.remove();
                 Player seller = Bukkit.getPlayer(fleaListing.getSeller());
-                if (seller != null){
-                    ItemStack item = fleaListing.getItem();
-                    ItemMeta itemMeta = item.getItemMeta();
-                    //seller.getInventory().addItem(fleaListing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
-                    PlayerSaveData sellerData = HQCsOneBlock.dataManager.getPlayerData(seller);
-                    sellerData.mail.add(fleaListing.getItem());
-                    seller.sendMessage(ChatColor.RED + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + fleaListing.getPrice() + " has expired!");
-                    seller.sendMessage(ChatColor.GOLD + "Reclaim your expired item in your inbox!");
-                }
+                    if (seller != null){
+                        ItemStack item = fleaListing.getItem();
+                        ItemMeta itemMeta = item.getItemMeta();
+                        //seller.getInventory().addItem(fleaListing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
+                        PlayerSaveData sellerData = HQCsOneBlock.dataManager.getPlayerData(seller.getUniqueId(), fleaListing.getSellerProfileNum());
+                        sellerData.mail.add(fleaListing.getItem());
+                        seller.sendMessage(ChatColor.RED + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + fleaListing.getPrice() + " has expired!");
+                        seller.sendMessage(ChatColor.GOLD + "Reclaim your expired item in your inbox!");
+                    }
             }
         }
     }
+
 
     private static boolean isExpired(FleaListing listing) {
         long expirationTime = listing.getExpirationTime();

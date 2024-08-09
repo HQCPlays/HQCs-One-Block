@@ -76,7 +76,7 @@ public class MiningListener implements Listener {
         int ticksToMine = MiningSpeedSheet.ticksToMine(player, block.getType());
         int blockStage = miningManager.getBlockStage(block.getLocation());
         float progress = blockStage / (float) ticksToMine; // Progress as a fraction of ticksToMine
-        miningManager.sendBlockDamage(player, block.getLocation(), progress);
+        //miningManager.sendBlockDamage(player, block.getLocation(), progress);
         blockStage = (blockStage + 1) % ticksToMine;
         miningManager.setBlockStage(block.getLocation(), blockStage);
 

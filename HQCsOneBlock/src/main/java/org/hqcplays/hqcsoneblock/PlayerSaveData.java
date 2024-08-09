@@ -3,8 +3,6 @@ package org.hqcplays.hqcsoneblock;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,6 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
 
 public class PlayerSaveData implements Serializable {
     public static final long serialVersionUID = 1L;
@@ -36,9 +36,6 @@ public class PlayerSaveData implements Serializable {
     // Upgradeable Player stats
     public int miningSpeed;
     public double damageBonus;
-    public ArrayList<FleaListing> fleaListings;
-    public int listingLimit = 5;
-    public ArrayList<ItemStack> mail;
 
     public PlayerSaveData(UUID playerUUID) {
         // Set up some default values for new players

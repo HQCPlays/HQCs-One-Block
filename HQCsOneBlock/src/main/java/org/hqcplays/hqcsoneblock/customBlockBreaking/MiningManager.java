@@ -1,10 +1,10 @@
 package org.hqcplays.hqcsoneblock.customBlockBreaking;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.BlockPosition;
+// import com.comphenix.protocol.PacketType;
+// import com.comphenix.protocol.ProtocolLibrary;
+// import com.comphenix.protocol.ProtocolManager;
+// import com.comphenix.protocol.events.PacketContainer;
+// import com.comphenix.protocol.wrappers.BlockPosition;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class MiningManager implements Listener {
     private final HashMap<UUID, Long> nextPhase = new HashMap<>();
     private final HashMap<Location, Integer> blockStages = new HashMap<>();
-    private final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+    //private final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 
     public boolean updatePhaseCooldown(Player player, Block block) {
         List<UUID> toRemove = new ArrayList<>();
@@ -52,18 +52,18 @@ public class MiningManager implements Listener {
         return false;
     }
 
-    public void sendBlockDamage(Player player, Location location, float progress) {
-        int locationId = location.getBlockX() + location.getBlockY() + location.getBlockZ();
-        PacketContainer packet = manager.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-        packet.getIntegers().write(0, locationId);
-        packet.getBlockPositionModifier().write(0, new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-        packet.getIntegers().write(1, (int) (progress * 10)); // Progress should be between 0 and 10
-        try {
-            manager.sendServerPacket(player, packet);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
+    // public void sendBlockDamage(Player player, Location location, float progress) {
+    //     int locationId = location.getBlockX() + location.getBlockY() + location.getBlockZ();
+    //     PacketContainer packet = manager.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+    //     packet.getIntegers().write(0, locationId);
+    //     packet.getBlockPositionModifier().write(0, new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+    //     packet.getIntegers().write(1, (int) (progress * 10)); // Progress should be between 0 and 10
+    //     try {
+    //         manager.sendServerPacket(player, packet);
+    //     } catch (InvocationTargetException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     public int getBlockStage(Location loc) {
         return blockStages.getOrDefault(loc, 0);
@@ -80,7 +80,7 @@ public class MiningManager implements Listener {
     // Resets blocks
     public void resetPlayerBlockStages(Player player) {
         for (Location loc : new ArrayList<>(blockStages.keySet())) {
-            sendBlockDamage(player, loc, -1);
+            //sendBlockDamage(player, loc, -1);
             setBlockStage(loc, -1);
             removeBlockStage(loc);
         }

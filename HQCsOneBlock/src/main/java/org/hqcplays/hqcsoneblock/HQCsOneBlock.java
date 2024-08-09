@@ -54,24 +54,18 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private ArrayList<FleaListing> listings = new ArrayList<>();
     private static Plugin plugin;
     private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Entitylght"); // Replace with actual usernames
-    private ArrayList<FleaListing> listings = new ArrayList<>();
-    private static Plugin plugin;
 
     // Command classes
     private BCShopCommand bcShopCommand;
     private CheatMenuCommand cheatMenuCommand;
     private LobbyCommand lobbyCommand;
     private IslandCommand islandCommand;
-    private FleaCommand fleaCommand;
-    private ListCommand listCommand;
-    private InboxCommand inboxCommand;
     private ProgressionCommand progressionCommand;
     private ProfilesCommand profilesCommand;
     private WarpsCommand warpsCommand;
     private FleaCommand fleaCommand;
     private ListCommand listCommand;
     private InboxCommand inboxCommand;
-    private WarpsCommand warpsCommand;
     private RecipesCommand recipesCommand;
 
     // Functions
@@ -218,49 +212,6 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskTimer(HQCsOneBlock.getPlugin(HQCsOneBlock.class), 0L, 20L); // Update every second (20 ticks)
-
-        if (this.getCommand("flea") != null) {
-            fleaCommand = new FleaCommand();
-            this.getCommand("flea").setExecutor(fleaCommand);
-            // Only register events if FleaCommand implements Listener
-            getServer().getPluginManager().registerEvents(fleaCommand, this);
-        } else {
-            getLogger().severe("Command 'flea' is not defined!"); // Not defined in plugin.yml
-        }
-
-        if (this.getCommand("list") != null) {
-            listCommand = new ListCommand();
-            this.getCommand("list").setExecutor(listCommand);
-            // Only register events if ListCommand implements Listener
-            getServer().getPluginManager().registerEvents(listCommand, this);
-        } else {
-            getLogger().severe("Command 'list' is not defined!"); // Not defined in plugin.yml
-        }
-
-        if (this.getCommand("inbox") != null) {
-            inboxCommand = new InboxCommand();
-            this.getCommand("inbox").setExecutor(inboxCommand);
-            // Only register events if InboxCommand implements Listener
-            getServer().getPluginManager().registerEvents(inboxCommand, this);
-        } else {
-            getLogger().severe("Command 'inbox' is not defined!"); // Not defined in plugin.yml
-        }
-        if (this.getCommand("warps") != null) {
-            warpsCommand = new WarpsCommand();
-            this.getCommand("warps").setExecutor(warpsCommand);
-            // Only register events if InboxCommand implements Listener
-            getServer().getPluginManager().registerEvents(warpsCommand, this);
-        } else {
-            getLogger().severe("Command 'warps' is not defined!"); // Not defined in plugin.yml
-        }
-        if (this.getCommand("recipes") != null) {
-            recipesCommand = new RecipesCommand();
-            this.getCommand("recipes").setExecutor(recipesCommand);
-            // Only register events if InboxCommand implements Listener
-            getServer().getPluginManager().registerEvents(recipesCommand, this);
-        } else {
-            getLogger().severe("Command 'recipes' is not defined!"); // Not defined in plugin.yml
-        }
 
         // Initialize items or other components
         AmethystShardItems.init();

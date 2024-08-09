@@ -2,7 +2,6 @@ name: HQCsOneBlock
 version: 1.2.2
 main: org.hqcplays.hqcsoneblock.HQCsOneBlock
 api-version: 1.21
-depend: [ProtocolLib]
 commands:
   bcshop:
     description: Opens the Block Coin shop

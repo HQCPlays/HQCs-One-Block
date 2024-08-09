@@ -16,11 +16,11 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.hqcplays.hqcsoneblock.HQCsOneBlock;
-import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListingUtils;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaMarket;
+import org.hqcplays.hqcsoneblock.HQCsOneBlock;
+import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -31,7 +31,7 @@ public class ListCommand implements CommandExecutor, Listener {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
+        
         // Checks if sender is a player, if so open the flea market, otherwise throw error message
         if (sender instanceof Player) {
             Player player = (Player) sender;
@@ -45,7 +45,7 @@ public class ListCommand implements CommandExecutor, Listener {
                 player.sendMessage(ChatColor.RED + "Usage: /list <amount> <price>.");
                 return true;
             }
-            try {
+             try {
                 // Check for valid integers
                 int amount = Integer.parseInt(args[0]);
                 int price = Integer.parseInt(args[1]);
@@ -73,7 +73,7 @@ public class ListCommand implements CommandExecutor, Listener {
                 // Convert the held item into a flea listing item
                 ItemStack fleaItem = itemInHand.clone();
                 fleaItem.setAmount(amount);
-                FleaListing listing = new FleaListing(fleaItem, price, player.getUniqueId());
+                FleaListing listing = new FleaListing(fleaItem, price, player.getUniqueId(), HQCsOneBlock.dataManager.getSelectedProfile(player));
                 FleaMarket.addPendingListing(listing);
                 ItemStack fleaListingItem = FleaListingUtils.createListingItem(listing);
 
@@ -135,7 +135,7 @@ public class ListCommand implements CommandExecutor, Listener {
 
             if (event.getClickedInventory() == event.getView().getTopInventory()) {
                 event.setCancelled(true); // prevents players from taking item
-                ItemStack fleaItem = event.getClickedInventory().getItem(13);
+                ItemStack fleaItem = event.getClickedInventory().getItem(13); 
 
                 if (clickedItem.getType() == Material.RED_CONCRETE) { // If player cancels the listing
                     interactionFlag = 1;
@@ -151,9 +151,9 @@ public class ListCommand implements CommandExecutor, Listener {
                         if (pendingListing != null){
                             ItemStack originalItem = pendingListing.getItem();
                             ItemMeta originalItemMeta = originalItem.getItemMeta();
-                            FleaMarket.addListing(pendingListing, player);
+                            FleaMarket.addListing(pendingListing, pendingListing.getSeller());
                             FleaMarket.removePendingListing(pendingListing);
-
+    
                             // Display confirmation message
                             if (originalItemMeta != null && originalItemMeta.hasDisplayName()) { // For custom items
                                 player.sendMessage(ChatColor.GREEN + "Successfully listed " + originalItem.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(originalItemMeta.displayName()) + " for $" + pendingListing.getPrice());
@@ -169,10 +169,10 @@ public class ListCommand implements CommandExecutor, Listener {
                         FleaMarket.removePendingListing(pendingListing);
                     }
 
-
+                    
                     player.closeInventory();
                     interactionFlag = 0; // POTENTIAL MASSIVE ERROR DOES NOT SCALE IN MULTIPLAYER
-                }
+                } 
             }
         }
     }
@@ -183,10 +183,10 @@ public class ListCommand implements CommandExecutor, Listener {
             // If the interaction flag is 0, the player probably closed the inventory via the 'escape' key in which case we want to run this code
             if (interactionFlag == 0){
                 Player player = (Player) event.getPlayer();
-                ItemStack fleaItem = event.getInventory().getItem(13);
+                ItemStack fleaItem = event.getInventory().getItem(13); 
                 // Give the player their original item that they tried to list back
                 giveItemBack(player, fleaItem);
-                player.sendMessage(ChatColor.RED + "Listing canceled!");
+                player.sendMessage(ChatColor.RED + "Listing canceled!"); 
             }
         }
     }
@@ -199,7 +199,7 @@ public class ListCommand implements CommandExecutor, Listener {
             if (pendingListing != null){
                 ItemStack originalItem = pendingListing.getItem();
                 FleaMarket.removePendingListing(pendingListing);
-                player.getInventory().setItemInMainHand(originalItem);
+                player.getInventory().setItemInMainHand(originalItem); 
             }
         } else { // If the player only sold part of the original item stack
             itemInMainHand.setAmount(itemInMainHand.getAmount() + fleaItem.getAmount());
