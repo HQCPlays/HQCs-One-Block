@@ -1,5 +1,24 @@
 # HQCs-One-Block
 
+**Version 1.2.1 - Bug Patch:**
+- New mining system!
+- Death no longer exists! (Kind of)
+- New warp menu
+- Automation items are out (spawners / generators)
+- Lots of bug fixes
+
+**Version 1.2.0 - The Progression Update:**
+- New "Progression" system!
+- Flea Market added!
+- Profile system (save file system)!
+- Co-op Islands!
+- Craftable automatic resource generators!
+- Craftable mob spawners!
+- New "menu" item added to the player's hotbar
+- Coal sword, which can place infinite torches
+- Automation Core, which is used to craft generators and mob spawners
+- Mobs now have their name and health above their heads
+
 **Version 1.1.0 - The Pickaxe Update:**
 - Custom mining speed system
 - 3 new pickaxes!

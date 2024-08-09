@@ -1,62 +1,58 @@
 package org.hqcplays.hqcsoneblock;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
+import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.hqcplays.hqcsoneblock.commands.BCShopCommand;
-import org.hqcplays.hqcsoneblock.commands.CheatMenuCommand;
+import org.hqcplays.hqcsoneblock.commands.*;
+import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningListener;
 import org.hqcplays.hqcsoneblock.commands.FleaCommand;
 import org.hqcplays.hqcsoneblock.commands.InboxCommand;
 import org.hqcplays.hqcsoneblock.commands.ListCommand;
-import org.hqcplays.hqcsoneblock.commands.IslandCommand;
-import org.hqcplays.hqcsoneblock.commands.LobbyCommand;
+import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningManager;
+import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningSpeedManager;
 import org.hqcplays.hqcsoneblock.commands.RecipesCommand;
 import org.hqcplays.hqcsoneblock.commands.WarpsCommand;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
-import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
-import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
+import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
+import org.hqcplays.hqcsoneblock.fleaMarket.FleaListingUtils;
+import org.hqcplays.hqcsoneblock.items.*;
+import org.hqcplays.hqcsoneblock.progression.Progression;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.*;
 
 public final class HQCsOneBlock extends JavaPlugin implements Listener {
     // Variables
-    public static Map<UUID, PlayerSaveData> playerData = new HashMap<>();
+    public static SaveDataManager dataManager;
+    public static IslandManager islandManager;
     private final String scoreboardTitle = ChatColor.GOLD + "Block Coins";
-    private File saveDataFile;
+
+    private ArrayList<FleaListing> listings = new ArrayList<>();
+    private static Plugin plugin;
     private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Entitylght"); // Replace with actual usernames
     private ArrayList<FleaListing> listings = new ArrayList<>();
     private static Plugin plugin;
@@ -69,6 +65,12 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private FleaCommand fleaCommand;
     private ListCommand listCommand;
     private InboxCommand inboxCommand;
+    private ProgressionCommand progressionCommand;
+    private ProfilesCommand profilesCommand;
+    private WarpsCommand warpsCommand;
+    private FleaCommand fleaCommand;
+    private ListCommand listCommand;
+    private InboxCommand inboxCommand;
     private WarpsCommand warpsCommand;
     private RecipesCommand recipesCommand;
 
@@ -78,15 +80,37 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         // Register core plugin events
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new OneBlockController(), this);
-        getServer().getPluginManager().registerEvents(new PickaxeController(), this);
-        getServer().getPluginManager().registerEvents(new AmethystShardItems(), this);
         getServer().getPluginManager().registerEvents(new CustomPickaxes(), this);
+        getServer().getPluginManager().registerEvents(new CustomAxes(), this);
+        getServer().getPluginManager().registerEvents(new CustomShovels(), this);
+        getServer().getPluginManager().registerEvents(new PickaxeController(), this);
+        getServer().getPluginManager().registerEvents(new AxeController(), this);
+        getServer().getPluginManager().registerEvents(new ShovelController(), this);
+        getServer().getPluginManager().registerEvents(new AmethystShardItems(), this);
+        getServer().getPluginManager().registerEvents(new RareOneBlockItems(), this);
+        getServer().getPluginManager().registerEvents(new VanillaPlusItems(), this);
+        getServer().getPluginManager().registerEvents(new MenuItemController(), this);
+        getServer().getPluginManager().registerEvents(new Progression(), this);
+        getServer().getPluginManager().registerEvents(new ProgressionCommand(), this);
+        getServer().getPluginManager().registerEvents(new TechItems(), this);
+        getServer().getPluginManager().registerEvents(new MobController(), this);
+        getServer().getPluginManager().registerEvents(new MobSpawnerController(this), this);
+        getServer().getPluginManager().registerEvents(new ResourceGeneratorController(), this);
+        getServer().getPluginManager().registerEvents(new MiningSpeedManager(), this);
+        getServer().getPluginManager().registerEvents(new DeathController(this), this);
+
+        // Custom Block Breaking registers
+        getServer().getPluginManager().registerEvents(new MiningManager(), this);
+        getServer().getPluginManager().registerEvents(new MiningListener(new MiningManager()), this);
 
         // Register enchantments
         ShardEnchantment.createEnchantments();
         getServer().getPluginManager().registerEvents(ShardEnchantment.listener, this);
 
         OneBlockController.initializeBlockChances();
+
+        dataManager = new SaveDataManager(getLogger());
+        islandManager = new IslandManager();
 
         // Register command executors
         if (this.getCommand("bcshop") != null) {
@@ -124,6 +148,76 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         } else {
             getLogger().severe("Command 'island' is not defined!"); // Not defined in plugin.yml
         }
+
+        if (this.getCommand("flea") != null) {
+            fleaCommand = new FleaCommand();
+            this.getCommand("flea").setExecutor(fleaCommand);
+            getServer().getPluginManager().registerEvents(fleaCommand, this);
+        } else {
+            getLogger().severe("Command 'flea' is not defined!"); // Not defined in plugin.yml
+        }
+
+        if (this.getCommand("list") != null) {
+            listCommand = new ListCommand();
+            this.getCommand("list").setExecutor(listCommand);
+            getServer().getPluginManager().registerEvents(listCommand, this);
+        } else {
+            getLogger().severe("Command 'list' is not defined!"); // Not defined in plugin.yml
+        }
+
+        if (this.getCommand("inbox") != null) {
+            inboxCommand = new InboxCommand();
+            this.getCommand("inbox").setExecutor(inboxCommand);
+            // Only register events if InboxCommand implements Listener
+            getServer().getPluginManager().registerEvents(inboxCommand, this);
+        } else {
+            getLogger().severe("Command 'inbox' is not defined!"); // Not defined in plugin.yml
+        }
+
+        if (this.getCommand("progression") != null) {
+            progressionCommand = new ProgressionCommand();
+            this.getCommand("progression").setExecutor(progressionCommand);
+            // Only register events if ProgressionCommand implements Listener
+            getServer().getPluginManager().registerEvents(progressionCommand, this);
+        } else {
+            getLogger().severe("Command 'progression' is not defined!"); // Not defined in plugin.yml
+        }
+
+        if (this.getCommand("profiles") != null) {
+            profilesCommand = new ProfilesCommand();
+            this.getCommand("profiles").setExecutor(profilesCommand);
+            // Only register events if ProfilesnCommand implements Listener
+            getServer().getPluginManager().registerEvents(profilesCommand, this);
+        } else {
+            getLogger().severe("Command 'profiles' is not defined!"); // Not defined in plugin.yml
+        }
+
+        if (this.getCommand("warps") != null) {
+            warpsCommand = new WarpsCommand();
+            this.getCommand("warps").setExecutor(warpsCommand);
+            // Only register events if Warps Command implements Listener
+            getServer().getPluginManager().registerEvents(warpsCommand, this);
+        } else {
+            getLogger().severe("Command 'warps' is not defined!"); // Not defined in plugin.yml
+        }
+
+        // Initialize flea market
+        // Schedule a repeating task to check for expired flea market items
+        getServer().getScheduler().runTaskTimer(this, () -> FleaListingUtils.checkExpiredListings(), 0L, 20L * 60); // Check every minute
+
+        // Mob name tag updater
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (World world : Bukkit.getWorlds()) {
+                    for (Entity entity : world.getEntities()) {
+                        if (entity instanceof LivingEntity) {
+                            MobController.updateHealthNametag((LivingEntity) entity);
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(HQCsOneBlock.getPlugin(HQCsOneBlock.class), 0L, 20L); // Update every second (20 ticks)
 
         if (this.getCommand("flea") != null) {
             fleaCommand = new FleaCommand();
@@ -170,83 +264,40 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
 
         // Initialize items or other components
         AmethystShardItems.init();
+        RareOneBlockItems.init();
+        TechItems.init();
+        VanillaPlusItems.init();
+        CustomPickaxes.init();
+        CustomAxes.init();
+        CustomShovels.init();
+        Progression.init();
+        ResourceGeneratorItems.init();
+        MobSpawnerController.init();
 
+        dataManager.loadSaveData();
+
+        plugin = this;
 
         // Initialize Flea Market
 
         // Schedule a repeating task to check for expired flea market items
         getServer().getScheduler().runTaskTimer(this, () -> FleaListingUtils.checkExpiredListings(), 0L, 20L * 60); // Check every minute
 
-        ItemStack testItem = new ItemStack(Material.GRASS_BLOCK);
-        testItem.setAmount(64);
-
-        ItemStack testItem1 = new ItemStack(Material.DIAMOND);
-        testItem1.setAmount(64);
-
-        // FleaMarket.clearFleaMarket(); // temporary empty flea market on init
-        // FleaMarket.addListing(new FleaListing(testItem, 100, UUID.randomUUID()));
-        // FleaMarket.addListing(new FleaListing(testItem1, 10000000, UUID.randomUUID()));
-        // FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200, UUID.randomUUID()));
-        // FleaMarket.addListing(new FleaListing(AmethystShardItems.redShard, 300, UUID.randomUUID()));
-
-        // for (int i = 5; i < 37; i++) {
-        //     FleaMarket.addListing(new FleaListing(testItem1, 10000000, UUID.randomUUID()));
-        // }
-        // for (int i = 37; i < 73; i++) {
-        //     FleaMarket.addListing(new FleaListing(testItem, 10000000, UUID.randomUUID()));
-        // }
-        // for (int i = 73; i < 80; i++) {
-        //     FleaMarket.addListing(new FleaListing(AmethystShardItems.blackShard, 200, UUID.randomUUID()));
-        // }
-        plugin = this;
 
         getLogger().info("HQC's OneBlock Plugin has been enabled.");
-
-        saveDataFile = new File("HQCsOneBlock.dat");
-        loadSaveData();
     }
 
     @Override
     public void onDisable() {
-        writeSaveData();
+        dataManager.writeSaveData();
         getLogger().info("HQC's OneBlock Plugin has been disabled.");
-    }
-
-    public void loadSaveData() {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(saveDataFile);
-            GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
-            BukkitObjectInputStream objectInputStream = new BukkitObjectInputStream(gzipInputStream);
-            playerData = (Map<UUID, PlayerSaveData>) objectInputStream.readObject();
-            objectInputStream.close();
-        } catch (FileNotFoundException e) {
-            // No save file has been created yet, just use the new empty player data
-        } catch (IOException e) {
-            getLogger().severe("Unable to load player data: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            getLogger().severe("Invalid or corrupt save data: " + e.getMessage());
-        }
-        getLogger().info("Sucessfully loaded existing save data");
-    }
-
-    public void writeSaveData() {
-        getLogger().info("Saving player data...");
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(saveDataFile);
-            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(fileOutputStream);
-            BukkitObjectOutputStream objectOutputStream = new BukkitObjectOutputStream(gzipOutputStream);
-            objectOutputStream.writeObject(playerData);
-            objectOutputStream.close();
-        } catch (IOException e) {
-            getLogger().warning("Unable to save player data: " + e.getMessage());
-        }
     }
 
     @EventHandler
     public void onWorldSave(WorldSaveEvent event) {
         // Only save once per auto-save
         if (event.getWorld().getName().equals("world")) {
-            writeSaveData();
+            dataManager.writeSaveData();
         }
     }
 
@@ -256,11 +307,25 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         UUID playerUUID = event.getPlayer().getUniqueId();
 
         player.setGameMode(GameMode.SURVIVAL);
+        player.teleport(new Location(Bukkit.getWorld("world"), 0, 78, 0));
 
-        // Create new player data if none exists yet
-        playerData.putIfAbsent(playerUUID, new PlayerSaveData(playerUUID));
+        dataManager.setupPlayer(player);
+
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
+        playerData.miningSpeed = 1;
+
+        // Set the player's mining speed to 0 (this is the 1.21 replacement for -1 Mining Fatigue) for the custom block breaking to work
+        Objects.requireNonNull(player.getAttribute(Attribute.PLAYER_BLOCK_BREAK_SPEED)).setBaseValue(0);
 
         setupScoreboard(player);
+    }
+
+    @EventHandler
+    public void onPortalCreate(PortalCreateEvent event) {
+        if (event.getReason() == PortalCreateEvent.CreateReason.FIRE) {
+            // Cancel the event if the portal is being created by fire, which is typical for Nether portals
+            event.setCancelled(true);
+        }
     }
 
     // Disable durability globally
@@ -287,6 +352,10 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.RED + "You cannot place blocks here!");
         }
+
+        if (event.getItemInHand().getItemMeta().getDisplayName().contains("Tool Core") || event.getItemInHand().getItemMeta().getDisplayName().contains("Automation Core")) {
+            event.setCancelled(true);
+        }
     }
 
     // Temporary fix: prevents players from dropping items in the lobby
@@ -310,6 +379,83 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
         }
     }
 
+    // Clicking the menu item
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getItem() != null && event.getItem().isSimilar(MenuItemController.MENU_ITEM)) {
+            event.setCancelled(true);
+            openMainMenu(event.getPlayer());
+        }
+    }
+
+    // Prevent hunger
+    @EventHandler
+    public void onPlayerHunger(FoodLevelChangeEvent event) {
+        event.setCancelled(true);
+    }
+
+    public void openMainMenu(Player player) {
+        Inventory menu = Bukkit.createInventory(null, 45, ChatColor.DARK_GREEN + "Main Menu");
+
+        // Create menu options
+        ItemStack progressionItem = new ItemStack(Material.BOOK);
+        ItemMeta progressionMeta = progressionItem.getItemMeta();
+        progressionMeta.setDisplayName(ChatColor.GOLD + "Progression");
+        progressionItem.setItemMeta(progressionMeta);
+
+        ItemStack fleaMarketItem = new ItemStack(Material.EMERALD);
+        ItemMeta fleaMarketMeta = fleaMarketItem.getItemMeta();
+        fleaMarketMeta.setDisplayName(ChatColor.GOLD + "Flea Market");
+        fleaMarketItem.setItemMeta(fleaMarketMeta);
+
+        ItemStack shopItem = new ItemStack(Material.GOLD_INGOT);
+        ItemMeta shopMeta = shopItem.getItemMeta();
+        shopMeta.setDisplayName(ChatColor.GOLD + "Block Coin Shop");
+        shopItem.setItemMeta(shopMeta);
+
+        ItemStack profilesItem = new ItemStack(Material.WHITE_WOOL);
+        ItemMeta profilesMeta = profilesItem.getItemMeta();
+        profilesMeta.setDisplayName(ChatColor.GOLD + "Profiles");
+        profilesItem.setItemMeta(profilesMeta);
+
+        ItemStack warpsItem = new ItemStack(Material.END_CRYSTAL);
+        ItemMeta warpsMeta = warpsItem.getItemMeta();
+        warpsMeta.setDisplayName(ChatColor.GOLD + "Warps");
+        warpsItem.setItemMeta(warpsMeta);
+
+        // Place items in menu
+        menu.setItem(20, progressionItem);
+        menu.setItem(22, fleaMarketItem);
+        menu.setItem(24, shopItem);
+        menu.setItem(40, profilesItem);
+        menu.setItem(44, warpsItem);
+
+        player.openInventory(menu);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "Main Menu")) {
+            event.setCancelled(true);
+            if (event.getCurrentItem() == null) return;
+
+            Player player = (Player) event.getWhoClicked();
+            ItemStack clickedItem = event.getCurrentItem();
+
+            if (clickedItem.getType() == Material.BOOK) {
+                player.performCommand("progression");
+            } else if (clickedItem.getType() == Material.EMERALD) {
+                player.performCommand("flea");
+            } else if (clickedItem.getType() == Material.GOLD_INGOT) {
+                player.performCommand("bcshop");
+            } else if (clickedItem.getType() == Material.WHITE_WOOL) {
+                player.performCommand("profiles");
+            } else if (clickedItem.getType() == Material.END_CRYSTAL) {
+                player.performCommand("warps");
+            }
+        }
+    }
+
     private void setupScoreboard(Player player) {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard = manager.getNewScoreboard();
@@ -324,10 +470,10 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     }
 
     public static void updateScoreboard(Player player, Scoreboard scoreboard) {
-        int balance = playerData.get(player.getUniqueId()).balance;
+        double balance = dataManager.getPlayerData(player).balance;
         Objective objective = scoreboard.getObjective("blockCoins");
         Score score = objective.getScore(ChatColor.GREEN + "Coins: ");
-        score.setScore(balance);
+        score.setScore((int) balance);
     }
 
     public static Plugin getPlugin() {

@@ -2,7 +2,6 @@ package org.hqcplays.hqcsoneblock.commands;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -19,24 +18,19 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.hqcplays.hqcsoneblock.OneBlockController;
-import org.hqcplays.hqcsoneblock.PickaxeController;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
-import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
+import org.hqcplays.hqcsoneblock.fleaMarket.FleaListingUtils;
+import org.hqcplays.hqcsoneblock.fleaMarket.FleaMarket;
 import org.hqcplays.hqcsoneblock.items.BlockCoin;
-import org.hqcplays.hqcsoneblock.numberSheets.PricesSheet;
 import org.jetbrains.annotations.NotNull;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-import org.hqcplays.hqcsoneblock.FleaListing;
-import org.hqcplays.hqcsoneblock.FleaListingUtils;
-import org.hqcplays.hqcsoneblock.FleaMarket;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 
-import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerData;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
 public class FleaCommand implements CommandExecutor, Listener {
@@ -50,7 +44,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        
+
         // Checks if sender is a player, if so open the flea market, otherwise throw error message
         if (sender instanceof Player) {
             Player player = (Player) sender;
@@ -67,7 +61,7 @@ public class FleaCommand implements CommandExecutor, Listener {
         pageNum = pageNumber;
 
         fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET              " + ChatColor.RED + "PAGE: " + pageNum);
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         // playerData.balance = 10000;
         // updateScoreboard(player);
         // Add flea items to the screen. Each page can hold 36 items, thus the items we should add should consider which page we are on
@@ -98,7 +92,7 @@ public class FleaCommand implements CommandExecutor, Listener {
         previousPageMeta.setDisplayName(ChatColor.GREEN + "Previous page");
         previousPage.setItemMeta(previousPageMeta);
 
-        
+
         ItemStack nextPage = new ItemStack(Material.FIREWORK_ROCKET);
         nextPage.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         ItemMeta nextPageMeta = nextPage.getItemMeta();
@@ -127,7 +121,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
         // Place page controls
         if (pageNum > 1) {
-            fleaGUI.setItem(48, previousPage); 
+            fleaGUI.setItem(48, previousPage);
         }
         if (FleaMarket.getFleaListings().size() / (pageNum*36.0) > 1.0) {
             fleaGUI.setItem(50, nextPage);
@@ -168,7 +162,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
     public void openMyListingsGUI(Player player) {
         myListingsGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "MY LISTINGS");
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         ArrayList<FleaListing> playerFleaListings = playerData.fleaListings;
 
         // Create and place players listings
@@ -239,8 +233,7 @@ public class FleaCommand implements CommandExecutor, Listener {
 
         // Obtain event information
         Player player = (Player) event.getWhoClicked();
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-        UUID playerUUID = player.getUniqueId();
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return; // Do nothing if player doesn't click anything
         ItemMeta clickedItemMeta = clickedItem.getItemMeta();
@@ -250,13 +243,13 @@ public class FleaCommand implements CommandExecutor, Listener {
         if (event.getView().getTitle().startsWith(ChatColor.DARK_GREEN + "FLEA MARKET")) {
             event.setCancelled(true); // prevents players from taking item
             // If player is trying to click on a purchaseable item (first 36 slots of the flea)
-            if (event.getSlot() < 36) {
+            if (event.getSlot() < 37) {
                 if (event.getClickedInventory() == event.getView().getTopInventory()) {
                     if (clickedItem != null) {
                         openPurchaseConfirmationGUI(player, clickedItem);
                     }
                 }
-            // if player is clicking on the menu controls 
+                // if player is clicking on the menu controls
             } else if (event.getSlot() > 44){
                 if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Previous page")) {
                     openFleaGUI(player, pageNum-1);
@@ -277,7 +270,7 @@ public class FleaCommand implements CommandExecutor, Listener {
             event.setCancelled(true);
             if (event.getClickedInventory() == event.getView().getTopInventory()) {
                 event.setCancelled(true); // prevents players from taking item
-                ItemStack fleaItem = event.getClickedInventory().getItem(13); 
+                ItemStack fleaItem = event.getClickedInventory().getItem(13);
 
                 if (clickedItem.getType() == Material.RED_CONCRETE) { // If player cancels the purchase
                     player.sendMessage(ChatColor.RED + "Purchased canceled!");
@@ -286,20 +279,20 @@ public class FleaCommand implements CommandExecutor, Listener {
                     FleaListing listing = FleaListingUtils.findListingByItem(fleaItem);
                     handleFleaPurchase(player, fleaItem, listing);
                     player.closeInventory();
-                } 
+                }
             }
         }
         // My listings GUI
         if (event.getView().getTitle().startsWith(ChatColor.DARK_GREEN + "MY LISTINGS")) {
             event.setCancelled(true);
             // If player is trying to click on a purchaseable item (first 36 slots of the flea)
-            if (event.getSlot() < 36) {
+            if (event.getSlot() < 37) {
                 if (event.getClickedInventory() == event.getView().getTopInventory()) {
                     if (clickedItem != null) {
                         openRemoveListingGUI(player, clickedItem);
                     }
                 }
-            // if player is clicking on the menu controls 
+                // if player is clicking on the menu controls
             } else if (event.getSlot() > 44){
                 if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Flea Market")) {
                     openFleaGUI(player, 1);
@@ -310,16 +303,17 @@ public class FleaCommand implements CommandExecutor, Listener {
         if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "REMOVE LISTING")) {
             event.setCancelled(true); // prevents players from taking item
             if (event.getClickedInventory() == event.getView().getTopInventory()) {
-                ItemStack fleaItem = event.getClickedInventory().getItem(13); 
+                ItemStack fleaItem = event.getClickedInventory().getItem(13);
 
-                if (clickedItem.getType() == Material.RED_CONCRETE) { // If player cancels the removal
+                if (clickedItem.getType() == Material.RED_CONCRETE) { // If player cancels the purchase
                     player.sendMessage(ChatColor.RED + "Listing removal canceled!");
                     player.openInventory(myListingsGUI);
-                } else if (clickedItem.getType() == Material.LIME_CONCRETE) { // if player confirms the removal
+                } else if (clickedItem.getType() == Material.LIME_CONCRETE) { // if player confirms the purchase
                     FleaListing listing = FleaListingUtils.findListingByItem(fleaItem);
-                    FleaMarket.removeListing(listing, player.getUniqueId());
+                    FleaMarket.removeListing(listing, player);
 
                     // Give the player their item back
+                    //player.getInventory().addItem(listing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
                     playerData.mail.add(listing.getItem());
 
                     // Display confirmation message
@@ -332,7 +326,7 @@ public class FleaCommand implements CommandExecutor, Listener {
                         player.sendMessage(ChatColor.GOLD + "Reclaim your expired item in your inbox!");
                     }
                     openMyListingsGUI(player);
-                } 
+                }
             }
         }
     }
@@ -340,21 +334,21 @@ public class FleaCommand implements CommandExecutor, Listener {
     private void handleFleaPurchase(Player player, ItemStack fleaItem, FleaListing listing){
         if (listing.getSeller() != player.getUniqueId()){
             if (FleaListingUtils.findPostedListingByItem(fleaItem) != null) {
-                PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
-                UUID seller = listing.getSeller();
+                PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
+                Player seller = Bukkit.getPlayer(listing.getSeller());
                 int price = listing.getPrice();
                 if (playerData.balance >= price) {
                     playerData.balance -= price;
                     updateScoreboard(player);
                     //player.getInventory().addItem(listing.getItem());
                     playerData.mail.add(listing.getItem());
+                    FleaMarket.removeListing(listing, seller);
                     player.closeInventory();
                     openFleaGUI(player, 1);
 
                     // Give money to the seller
-                    if (HQCsOneBlock.playerData.get(seller) != null){
-                        PlayerSaveData sellerData = HQCsOneBlock.playerData.get(seller);
-                        FleaMarket.removeListing(listing, seller);
+                    if (seller != null){
+                        PlayerSaveData sellerData = HQCsOneBlock.dataManager.getPlayerData(seller);
                         sellerData.mail.add(BlockCoin.createBlockCoin(price));
                     }
 
@@ -364,20 +358,18 @@ public class FleaCommand implements CommandExecutor, Listener {
                     if (itemMeta != null && itemMeta.hasDisplayName()) { // For custom items
                         player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price);
                         player.sendMessage(ChatColor.GOLD + "Claim your purchase in your inbox!");
-                        if (Bukkit.getPlayer(seller) != null) {
-                            Bukkit.getPlayer(seller).sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price + " has been purchased!");
-                            Bukkit.getPlayer(seller).sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
-                        }
+                        seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + price + " has been purchased!");
+                        seller.sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
+
+
                     } else { // for vanilla items
                         player.sendMessage(ChatColor.GREEN + "Successfully purchased " + item.getAmount() + " " + item.getType().toString() + " for $" + price);
                         player.sendMessage(ChatColor.GOLD + "Claim your purchase in your inbox!");
-                        if (Bukkit.getPlayer(seller) != null) {
-                            Bukkit.getPlayer(seller).sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + item.getType().toString() + " for $" + price + " has been purchased!");
-                            Bukkit.getPlayer(seller).sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
-                        }
+                        seller.sendMessage(ChatColor.GREEN + "Your offer: " + item.getAmount() + " " + item.getType().toString() + " for $" + price + " has been purchased!");
+                        seller.sendMessage(ChatColor.GOLD + "Claim your BlockCoins in your inbox!");
                     }
                 } else {
-                        player.sendMessage(ChatColor.RED + "Not enough funds!");
+                    player.sendMessage(ChatColor.RED + "Not enough funds!");
                 }
             } else {
                 player.closeInventory();
@@ -387,8 +379,8 @@ public class FleaCommand implements CommandExecutor, Listener {
             player.closeInventory();
             player.sendMessage(ChatColor.RED + "You can not purchase your own listings!");
         }
-        
-        
+
+
 
     }
 

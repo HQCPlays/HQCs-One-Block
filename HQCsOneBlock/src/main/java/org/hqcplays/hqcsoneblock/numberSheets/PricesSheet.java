@@ -19,7 +19,7 @@ public class PricesSheet {
     // This function returns the price for the item shop items
     public static int getItemShopPrices(Material itemType) {
         return switch (itemType) {
-            case OAK_SAPLING -> 25;
+            case OAK_SAPLING -> 100;
             case COBBLESTONE -> 5;
             case OBSIDIAN -> 250;
             default -> 100000;

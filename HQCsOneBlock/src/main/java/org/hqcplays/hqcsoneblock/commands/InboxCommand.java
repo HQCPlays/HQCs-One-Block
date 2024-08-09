@@ -17,9 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.hqcplays.hqcsoneblock.FleaListing;
-import org.hqcplays.hqcsoneblock.FleaListingUtils;
-import org.hqcplays.hqcsoneblock.FleaMarket;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
@@ -55,7 +52,7 @@ public class InboxCommand implements CommandExecutor, Listener {
     public void openInboxGUI(Player player, int pageNumber) {
         pageNum = pageNumber;
         Inventory inboxGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "INBOX                        " + ChatColor.RED + "PAGE: " + pageNum);
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
         ArrayList<ItemStack> playerMail = playerData.mail;
 
         int startingIndex = (pageNum - 1) * 36;
@@ -82,7 +79,7 @@ public class InboxCommand implements CommandExecutor, Listener {
         ItemMeta previousPageMeta = previousPage.getItemMeta();
         previousPageMeta.setDisplayName(ChatColor.GREEN + "Previous page");
         previousPage.setItemMeta(previousPageMeta);
-        
+
         ItemStack nextPage = new ItemStack(Material.FIREWORK_ROCKET);
         nextPage.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         ItemMeta nextPageMeta = nextPage.getItemMeta();
@@ -102,11 +99,11 @@ public class InboxCommand implements CommandExecutor, Listener {
             inboxGUI.setItem(i, pane);
         }
 
-        
+
 
         // Place page controls
         if (pageNum > 1) {
-            inboxGUI.setItem(48, previousPage); 
+            inboxGUI.setItem(48, previousPage);
         }
         if (playerMail.size() / (pageNum*36.0) > 1.0) {
             inboxGUI.setItem(50, nextPage);
@@ -116,7 +113,7 @@ public class InboxCommand implements CommandExecutor, Listener {
         inboxGUI.setItem(49, inboxInformation);
         // Place flea button
         inboxGUI.setItem(45, fleaButton);
-        
+
         player.openInventory(inboxGUI);
     }
 
@@ -127,15 +124,15 @@ public class InboxCommand implements CommandExecutor, Listener {
 
             // Check if the click is in the top inventory (custom inventory) only
             if (event.getClickedInventory() == event.getView().getTopInventory()) {
-                
+
                 ItemStack clickedItem = event.getCurrentItem();
                 if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
                 ItemMeta clickedItemMeta = clickedItem.getItemMeta();
                 Player player = (Player) event.getWhoClicked();
-                PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+                PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
 
                 // If player is trying to click on a purchaseable item (first 36 slots of the flea)
-                if (event.getSlot() < 36) {
+                if (event.getSlot() < 37) {
                     if (event.getClickedInventory() == event.getView().getTopInventory()) {
                         if (clickedItem != null) {
                             if (clickedItemMeta.hasDisplayName()) { // If player clicked on custom item
@@ -168,7 +165,7 @@ public class InboxCommand implements CommandExecutor, Listener {
                             }
                         }
                     }
-                // if player is clicking on the menu controls 
+                    // if player is clicking on the menu controls
                 } else if (event.getSlot() > 44){
                     if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Previous page")) {
                         openInboxGUI(player, pageNum-1);
@@ -179,7 +176,7 @@ public class InboxCommand implements CommandExecutor, Listener {
                     else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Flea Market")) {
                         player.performCommand("flea");
                     }
-                }      
+                }
             }
         }
     }

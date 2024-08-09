@@ -13,7 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
-import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
 import org.hqcplays.hqcsoneblock.items.RareOneBlockItems;
 import org.hqcplays.hqcsoneblock.items.VanillaPlusItems;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +20,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.hqcplays.hqcsoneblock.items.CustomPickaxes.*;
+import static org.hqcplays.hqcsoneblock.items.ResourceGeneratorItems.*;
+import static org.hqcplays.hqcsoneblock.items.TechItems.automationCore;
+import static org.hqcplays.hqcsoneblock.items.TechItems.toolCore;
 
 public class CheatMenuCommand implements CommandExecutor, Listener {
     private final ArrayList<ItemStack> cheatItemList = new ArrayList<>();
@@ -41,7 +45,7 @@ public class CheatMenuCommand implements CommandExecutor, Listener {
         cheatItemList.add(AmethystShardItems.effectShard);
 
         // Swords
-        // cheatItemList.add(VanillaPlusItems.coalSword);
+        cheatItemList.add(VanillaPlusItems.coalSword);
         cheatItemList.add(AmethystShardItems.blackShardSword);
         cheatItemList.add(AmethystShardItems.whiteShardSword);
         cheatItemList.add(AmethystShardItems.redShardSword);
@@ -53,19 +57,25 @@ public class CheatMenuCommand implements CommandExecutor, Listener {
         cheatItemList.add(AmethystShardItems.redShardLeggings);
         cheatItemList.add(AmethystShardItems.redShardBoots);
 
-        // // Pickaxes
-        // cheatItemList.add(CustomPickaxes.woodPickaxe);
-        // cheatItemList.add(CustomPickaxes.stonePickaxe);
-        // cheatItemList.add(CustomPickaxes.ironPickaxe);
-        // cheatItemList.add(CustomPickaxes.goldenPickaxe);
-        // cheatItemList.add(CustomPickaxes.diamondPickaxe);
-        // cheatItemList.add(CustomPickaxes.netheritePickaxe);
-        // cheatItemList.add(CustomPickaxes.lapisPickaxe);
-        // cheatItemList.add(CustomPickaxes.redstonePickaxe);
-        // // cheatItemList.add(CustomPickaxes.stardustPickaxe);
+        // Misc. items
+        cheatItemList.add(RareOneBlockItems.stardust);
+        cheatItemList.add(toolCore);
+        cheatItemList.add(automationCore);
 
-        // // Misc. items
-        // cheatItemList.add(RareOneBlockItems.stardust);
+        // Generators
+        cheatItemList.add(ironGenerator);
+        cheatItemList.add(coalGenerator);
+        cheatItemList.add(lapisGenerator);
+        cheatItemList.add(goldGenerator);
+        cheatItemList.add(redstoneGenerator);
+        cheatItemList.add(diamondGenerator);
+        cheatItemList.add(ancientDebrisGenerator);
+        cheatItemList.add(cobblestoneGenerator);
+
+        // Pickaxes
+        cheatItemList.add(stardustPickaxe);
+        cheatItemList.add(lapisPickaxe);
+        cheatItemList.add(redstonePickaxe);
     }
 
     @Override

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.hqcplays.hqcsoneblock.HQCsOneBlock.playerData;
 import static org.hqcplays.hqcsoneblock.HQCsOneBlock.updateScoreboard;
 
 public class AmethystShardItems implements Listener {
@@ -449,7 +448,7 @@ public class AmethystShardItems implements Listener {
     public static void goldShardEffect(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
-        PlayerSaveData playerData = HQCsOneBlock.playerData.get(player.getUniqueId());
+        PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
 
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             // Trigger custom event
@@ -579,7 +578,7 @@ public class AmethystShardItems implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             player.sendMessage(ChatColor.GREEN + "You have died!");
 
-            player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 200, 100));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 100, 2));
 
             item.setAmount(item.getAmount() - 1);
         }

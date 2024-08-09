@@ -19,7 +19,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class BlockCoin implements Listener {
     public static ItemStack blockCoin;
 
-
     public static ItemStack createBlockCoin(int value){
         ItemStack blockCoin = new ItemStack(Material.SUNFLOWER, 1);
         ItemMeta meta = blockCoin.getItemMeta();
