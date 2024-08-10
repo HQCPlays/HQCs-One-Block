@@ -74,6 +74,8 @@ public class CustomAxes implements Listener {
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomTool(customAxe);
+
         return customAxe;
     }
 
@@ -96,6 +98,8 @@ public class CustomAxes implements Listener {
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomTool(customAxe);
+
         return customAxe;
     }
 
@@ -117,6 +121,8 @@ public class CustomAxes implements Listener {
         sr.setIngredient('A', Material.REDSTONE);
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
+
+        CustomItemMasterList.addCustomTool(customAxe);
 
         return customAxe;
     }

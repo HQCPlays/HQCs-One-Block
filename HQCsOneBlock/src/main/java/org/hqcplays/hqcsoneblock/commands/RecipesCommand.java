@@ -18,11 +18,15 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.items.AccessoryItems;
 import org.hqcplays.hqcsoneblock.items.AmethystShardItems;
+import org.hqcplays.hqcsoneblock.items.CustomAxes;
+import org.hqcplays.hqcsoneblock.items.CustomItemMasterList;
 import org.hqcplays.hqcsoneblock.items.CustomPickaxes;
+import org.hqcplays.hqcsoneblock.items.CustomShovels;
 import org.hqcplays.hqcsoneblock.items.RareOneBlockItems;
 import org.hqcplays.hqcsoneblock.items.VanillaPlusItems;
 import org.jetbrains.annotations.NotNull;
@@ -60,23 +64,13 @@ public class RecipesCommand implements CommandExecutor, Listener {
     }
 
     public void openWeaponRecipesGUI(Player player) {
-        Inventory weaponRecipesGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "RECIPES MAIN MENU");
+        Inventory weaponRecipesGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "WEAPON RECIPES");
 
         // Place menu controls
         placeRecipeTabs(weaponRecipesGUI);
 
         // Create and place custom items
-        ArrayList<ItemStack> weaponList = new ArrayList<>();
-        ItemStack coalSword = VanillaPlusItems.coalSword;
-        ItemStack redShardSword = AmethystShardItems.redShardSword;
-        ItemStack blueShardSword = AmethystShardItems.blueShardSword;
-        ItemStack blackShardSword = AmethystShardItems.blackShardSword;
-        ItemStack whiteShardSword = AmethystShardItems.whiteShardSword;
-        weaponList.add(coalSword);
-        weaponList.add(redShardSword);
-        weaponList.add(blueShardSword);
-        weaponList.add(blackShardSword);
-        weaponList.add(whiteShardSword);
+        ArrayList<ItemStack> weaponList = CustomItemMasterList.getCustomWeapons();
 
         for (int i = 18; i < weaponList.size()+18; i++){
             weaponRecipesGUI.setItem(i, weaponList.get(i-18));
@@ -85,9 +79,92 @@ public class RecipesCommand implements CommandExecutor, Listener {
         player.openInventory(weaponRecipesGUI);
     }
 
-    public void openCraftingGridGUI(Player player, ItemStack item) {
-        Inventory craftingGridGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "CRAFTING GRID");
+    public void openArmorRecipesGUI(Player player) {
+        Inventory armorRecipesGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "ARMOR RECIPES");
 
+        // Place menu controls
+        placeRecipeTabs(armorRecipesGUI);
+
+        // Create and place custom items
+        ArrayList<ItemStack> armorList = CustomItemMasterList.getCustomArmors();
+
+        for (int i = 18; i < armorList.size()+18; i++){
+            armorRecipesGUI.setItem(i, armorList.get(i-18));
+        }
+
+        player.openInventory(armorRecipesGUI);
+    }
+
+    public void openAccessoryRecipesGUI(Player player) {
+        Inventory accessoryRecipesGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "ACCESSORY RECIPES");
+
+        // Place menu controls
+        placeRecipeTabs(accessoryRecipesGUI);
+
+        // Create and place custom items
+        ArrayList<ItemStack> accessoryList = CustomItemMasterList.getCustomAccessories();
+
+        for (int i = 18; i < accessoryList.size()+18; i++){
+            accessoryRecipesGUI.setItem(i, accessoryList.get(i-18));
+        }
+
+        player.openInventory(accessoryRecipesGUI);
+    }
+
+    public void openToolRecipesGUI(Player player) {
+        Inventory toolRecipesGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "TOOL RECIPES");
+
+        // Place menu controls
+        placeRecipeTabs(toolRecipesGUI);
+
+        // Create and place custom items
+        ArrayList<ItemStack> toolList = CustomItemMasterList.getCustomTools();
+
+        for (int i = 18; i < toolList.size()+18; i++){
+            toolRecipesGUI.setItem(i, toolList.get(i-18));
+        }
+
+        player.openInventory(toolRecipesGUI);
+    }
+
+    public void openWandRecipesGUI(Player player) {
+        Inventory wandRecipesGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "WAND RECIPES");
+
+        // Place menu controls
+        placeRecipeTabs(wandRecipesGUI);
+
+        // Create and place custom items
+        ArrayList<ItemStack> wandList = CustomItemMasterList.getCustomWands();
+
+        for (int i = 18; i < wandList.size()+18; i++){
+            wandRecipesGUI.setItem(i, wandList.get(i-18));
+        }
+
+        player.openInventory(wandRecipesGUI);
+    }
+
+    public void openAutomatonRecipesGUI(Player player) {
+        Inventory automatonRecipesGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "AUTOMATON RECIPES");
+
+        // Place menu controls
+        placeRecipeTabs(automatonRecipesGUI);
+
+        // Create and place custom items
+        ArrayList<ItemStack> automatonList = CustomItemMasterList.getCustomAutomatons();
+
+        for (int i = 18; i < automatonList.size()+18; i++){
+            automatonRecipesGUI.setItem(i, automatonList.get(i-18));
+        }
+
+        player.openInventory(automatonRecipesGUI);
+    }
+
+    public void openCraftingGridGUI(Player player, ItemStack item, String lastViewedMenu) {
+        Inventory craftingGridGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + PlainTextComponentSerializer.plainText().serialize(item.displayName()) + " RECIPE");
+
+        PersistentDataContainer dataContainer = player.getPersistentDataContainer();
+        NamespacedKey lastViewedkey = new NamespacedKey(HQCsOneBlock.getPlugin(), "last_viewed");
+        dataContainer.set(lastViewedkey, PersistentDataType.STRING, lastViewedMenu);
 
         Map<Integer, ItemStack> recipeMaterials = getCraftingRecipe(item);
 
@@ -130,6 +207,9 @@ public class RecipesCommand implements CommandExecutor, Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        String inventoryTitle = event.getView().getTitle();
+        String strippedTitle = ChatColor.stripColor(inventoryTitle); // Removes color codes
+
         if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "RECIPES MAIN MENU")) {
             event.setCancelled(true);
 
@@ -141,25 +221,73 @@ public class RecipesCommand implements CommandExecutor, Listener {
 
                 ItemMeta clickedItemMeta = clickedItem.getItemMeta();
                 if (clickedItemMeta != null) {
-                    if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Weapons")) {
-                        ItemStack item = new ItemStack(CustomPickaxes.lapisPickaxe);
-                        //openCraftingGridGUI(player, new ItemStack(CustomPickaxes.lapisPickaxe));
-                        //openWeaponRecipesGUI(player);
-                    }
-                    else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Armors")) {
-                        player.performCommand("island");
-                    }
-                    else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Accessories")) {
-                        player.performCommand("island");
-                    }
-                    else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Tools")) {
-                        player.performCommand("island");
-                    }
-                    else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Wands")) {
-                        player.performCommand("island");
+                    recipeMainMenuController(player, clickedItemMeta);
+                }
+            }
+        }
+        else if (strippedTitle.endsWith("RECIPES")) {
+            event.setCancelled(true);
+
+            // Check if the click is in the top inventory (custom inventory) only
+            if (event.getClickedInventory() == event.getView().getTopInventory()) {
+                ItemStack clickedItem = event.getCurrentItem();
+                Player player = (Player) event.getWhoClicked();
+                if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+                ItemMeta clickedItemMeta = clickedItem.getItemMeta();
+                if (clickedItemMeta != null) {
+                    if (event.getSlot() < 18) { // if player is clicking on menu controls
+                        recipeMainMenuController(player, clickedItemMeta);
+                    } else { // if player is clicking on an item
+                        openCraftingGridGUI(player, clickedItem, strippedTitle);
                     }
                 }
             }
+        }
+        else if (strippedTitle.endsWith("RECIPE")) {
+            event.setCancelled(true);
+
+            // Check if the click is in the top inventory (custom inventory) only
+            if (event.getClickedInventory() == event.getView().getTopInventory()) {
+                ItemStack clickedItem = event.getCurrentItem();
+                Player player = (Player) event.getWhoClicked();
+                if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+                ItemMeta clickedItemMeta = clickedItem.getItemMeta();
+                if (clickedItemMeta != null) {
+                    if (clickedItemMeta.hasDisplayName()){
+                        if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Back")) {
+                            openLastViewedMenu(player);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void placeRecipeTabs(Inventory gui){
+
+        // Create new warp buttons
+        ItemStack weaponsButton = createRecipeCatagory(Material.DIAMOND_SWORD, "Weapons");
+        ItemStack armorsButton = createRecipeCatagory(Material.DIAMOND_CHESTPLATE, "Armors");
+        ItemStack accessoryButton = createRecipeCatagory(Material.SHIELD, "Accessories");          
+        ItemStack toolsButton = createRecipeCatagory(Material.DIAMOND_PICKAXE, "Tools");
+        ItemStack wandsButton = createRecipeCatagory(Material.STICK, "Wands");
+        ItemStack automatonButton = createRecipeCatagory(Material.CHEST, "Automaton");
+
+        // Place warp buttons
+        gui.setItem(2, weaponsButton);
+        gui.setItem(3, armorsButton);
+        gui.setItem(4, accessoryButton);
+        gui.setItem(5, toolsButton);
+        gui.setItem(6, wandsButton);
+        gui.setItem(7, automatonButton);
+
+        // Create and place line separating recipes and menu controls
+        for (int i = 9; i < 18; i++){
+            ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+            gui.setItem(i, pane);
         }
     }
 
@@ -174,29 +302,6 @@ public class RecipesCommand implements CommandExecutor, Listener {
 
         return newButton;
 
-    }
-
-    private void placeRecipeTabs(Inventory gui){
-
-        // Create new warp buttons
-        ItemStack weaponsButton = createRecipeCatagory(Material.DIAMOND_SWORD, "Weapons");
-        ItemStack armorsButton = createRecipeCatagory(Material.DIAMOND_CHESTPLATE, "Armors");
-        ItemStack accessoryButton = createRecipeCatagory(Material.SHIELD, "Accessories");          
-        ItemStack toolsButton = createRecipeCatagory(Material.DIAMOND_PICKAXE, "Tools");
-        ItemStack wandsButton = createRecipeCatagory(Material.STICK, "Wands");
-
-        // Place warp buttons
-        gui.setItem(2, weaponsButton);
-        gui.setItem(3, armorsButton);
-        gui.setItem(4, accessoryButton);
-        gui.setItem(5, toolsButton);
-        gui.setItem(6, wandsButton);
-
-        // Create and place line separating recipes and menu controls
-        for (int i = 9; i < 18; i++){
-            ItemStack pane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-            gui.setItem(i, pane);
-        }
     }
 
     public Map<Integer, ItemStack> getCraftingRecipe(ItemStack item) {
@@ -223,13 +328,34 @@ public class RecipesCommand implements CommandExecutor, Listener {
     }
 
     private boolean hasSameCustomMetadata(ItemStack item1, ItemStack item2) {
-        // Compare the custom metadata
-        if (item1.hasItemMeta() && item2.hasItemMeta()) {
-            String customName1 = PlainTextComponentSerializer.plainText().serialize(item1.displayName());
-            String customName2 = PlainTextComponentSerializer.plainText().serialize(item1.displayName());
-            return customName1 != null && customName1.equals(customName2);
+        if (item1 == null || item2 == null) {
+            return false;
         }
-        return false;
+    
+        // Check if the item types match
+        if (item1.getType() != item2.getType()) {
+            return false;
+        }
+    
+        // Check if both items have item meta
+        if (item1.hasItemMeta() && item2.hasItemMeta()) {
+            ItemMeta meta1 = item1.getItemMeta();
+            ItemMeta meta2 = item2.getItemMeta();
+    
+            // Compare display names
+            if (meta1.hasDisplayName() && meta2.hasDisplayName()) {
+                if (!meta1.getDisplayName().equals(meta2.getDisplayName())) {
+                    return false;
+                }
+            } else if (meta1.hasDisplayName() || meta2.hasDisplayName()) {
+                // One has a display name, the other doesn't
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return true;
     }
 
     private Map<Integer, ItemStack> getShapedRecipeMaterials(ShapedRecipe recipe) {
@@ -305,5 +431,53 @@ public class RecipesCommand implements CommandExecutor, Listener {
             }
         }
         return false;
+    }
+
+    private void openLastViewedMenu(Player player) {
+        PersistentDataContainer dataContainer = player.getPersistentDataContainer();
+        NamespacedKey lastViewedkey = new NamespacedKey(HQCsOneBlock.getPlugin(), "last_viewed");
+        String lastViewedMenu = dataContainer.get(lastViewedkey, PersistentDataType.STRING);
+        if (lastViewedMenu.startsWith("WEAPON")) {
+            openWeaponRecipesGUI(player);
+        }
+        else if (lastViewedMenu.startsWith("ARMOR")) {
+            openArmorRecipesGUI(player);
+        }
+        else if (lastViewedMenu.startsWith("ACCESSORY")) {
+            openAccessoryRecipesGUI(player);
+        }
+        else if (lastViewedMenu.startsWith("TOOL")) {
+            openToolRecipesGUI(player);
+        }
+        else if (lastViewedMenu.startsWith("WAND")) {
+            openWandRecipesGUI(player);
+        }
+        else if (lastViewedMenu.startsWith("AUTOMATON")) {
+            openAutomatonRecipesGUI(player);
+        }
+    }
+
+
+    private void recipeMainMenuController(Player player, ItemMeta clickedItemMeta) {
+        if (clickedItemMeta.hasDisplayName()){
+            if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Weapons")) {
+                openWeaponRecipesGUI(player);
+            }
+            else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Armors")) {
+                openArmorRecipesGUI(player);
+            }
+            else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Accessories")) {
+                openAccessoryRecipesGUI(player);
+            }
+            else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Tools")) {
+                openToolRecipesGUI(player);
+            }
+            else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Wands")) {
+                openWandRecipesGUI(player);
+            }
+            else if (PlainTextComponentSerializer.plainText().serialize(clickedItemMeta.displayName()).equals("Automaton")) {
+                openAutomatonRecipesGUI(player);
+            } 
+        }
     }
 }

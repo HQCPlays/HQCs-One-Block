@@ -238,6 +238,8 @@ public class AmethystShardItems implements Listener {
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomWeapon(customItem);
+
         return customItem;
     }
 
@@ -259,6 +261,8 @@ public class AmethystShardItems implements Listener {
                 "   ");
         sr.setIngredient('A', craftingShard);
         Bukkit.getServer().addRecipe(sr);
+
+        CustomItemMasterList.addCustomArmor(customItem);
 
         return customItem;
     }
@@ -282,6 +286,8 @@ public class AmethystShardItems implements Listener {
         sr.setIngredient('A', craftingShard);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomArmor(customItem);
+
         return customItem;
     }
 
@@ -303,6 +309,8 @@ public class AmethystShardItems implements Listener {
                 "A A");
         sr.setIngredient('A', craftingShard);
         Bukkit.getServer().addRecipe(sr);
+
+        CustomItemMasterList.addCustomArmor(customItem);
 
         return customItem;
     }
@@ -326,6 +334,8 @@ public class AmethystShardItems implements Listener {
         sr1.setIngredient('A', craftingShard);
         Bukkit.getServer().addRecipe(sr1);
 
+        CustomItemMasterList.addCustomArmor(customItem);
+
         return customItem;
     }
 
@@ -345,6 +355,8 @@ public class AmethystShardItems implements Listener {
         sr1.setIngredient('D', Material.DIRT);
         sr1.setIngredient('G', greenShard);
         Bukkit.getServer().addRecipe(sr1);
+
+        CustomItemMasterList.addCustomWand(customItem);
 
         return customItem;
     }
@@ -367,6 +379,8 @@ public class AmethystShardItems implements Listener {
         sr1.setIngredient('R', rainbowShard);
         Bukkit.getServer().addRecipe(sr1);
 
+        CustomItemMasterList.addCustomWand(customItem);
+
         return customItem;
     }
 
@@ -387,6 +401,8 @@ public class AmethystShardItems implements Listener {
         sr1.setIngredient('G', greenShard);
         sr1.setIngredient('R', rainbowShard);
         Bukkit.getServer().addRecipe(sr1);
+
+        CustomItemMasterList.addCustomWand(customItem);
 
         return customItem;
     }

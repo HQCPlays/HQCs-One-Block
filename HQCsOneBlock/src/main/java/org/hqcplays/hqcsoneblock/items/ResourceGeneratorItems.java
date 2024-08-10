@@ -51,6 +51,8 @@ public class ResourceGeneratorItems {
         sr.setIngredient('A', automationCore);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomAutomaton(customItem);
+
         return customItem;
     }
 }

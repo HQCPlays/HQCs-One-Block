@@ -39,6 +39,8 @@ public class TechItems implements Listener {
         sr.setIngredient('R', Material.REDSTONE_BLOCK);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomTool(customItem);
+
         toolCore = customItem;
     }
 
@@ -58,6 +60,8 @@ public class TechItems implements Listener {
         sr.setIngredient('I', Material.IRON_INGOT);
         sr.setIngredient('R', Material.REDSTONE_BLOCK);
         Bukkit.getServer().addRecipe(sr);
+
+        CustomItemMasterList.addCustomAutomaton(customItem);
 
         automationCore = customItem;
     }

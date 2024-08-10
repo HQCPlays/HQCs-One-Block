@@ -48,6 +48,8 @@ public class VanillaPlusItems implements Listener {
         sr.setIngredient('C', Material.COAL);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomWeapon(customItem);
+
         coalSword = customItem;
     }
 

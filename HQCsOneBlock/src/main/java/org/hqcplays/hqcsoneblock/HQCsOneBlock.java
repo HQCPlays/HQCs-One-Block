@@ -53,7 +53,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
 
     private ArrayList<FleaListing> listings = new ArrayList<>();
     private static Plugin plugin;
-    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Entitylght"); // Replace with actual usernames
+    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "OfficialNagi"); // Replace with actual usernames
 
     // Command classes
     private BCShopCommand bcShopCommand;
@@ -193,6 +193,14 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(warpsCommand, this);
         } else {
             getLogger().severe("Command 'warps' is not defined!"); // Not defined in plugin.yml
+        }
+        if (this.getCommand("recipes") != null) {
+            recipesCommand = new RecipesCommand();
+            this.getCommand("recipes").setExecutor(recipesCommand);
+            // Only register events if Warps Command implements Listener
+            getServer().getPluginManager().registerEvents(recipesCommand, this);
+        } else {
+            getLogger().severe("Command 'recipes' is not defined!"); // Not defined in plugin.yml
         }
 
         // Initialize flea market

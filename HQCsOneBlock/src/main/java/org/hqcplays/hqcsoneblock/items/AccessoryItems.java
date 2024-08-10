@@ -43,6 +43,8 @@ public class AccessoryItems implements Listener {
         sr.setIngredient('R', redShard);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomAccessory(customItem);
+
         return customItem;
     }
 }

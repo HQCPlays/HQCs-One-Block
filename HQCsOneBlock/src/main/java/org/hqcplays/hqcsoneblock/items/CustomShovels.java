@@ -74,6 +74,8 @@ public class CustomShovels implements Listener {
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomTool(customShovel);
+
         return customShovel;
     }
 
@@ -96,6 +98,8 @@ public class CustomShovels implements Listener {
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomTool(customShovel);
+
         return customShovel;
     }
 
@@ -117,6 +121,8 @@ public class CustomShovels implements Listener {
         sr.setIngredient('A', Material.REDSTONE);
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
+
+        CustomItemMasterList.addCustomTool(customShovel);
 
         return customShovel;
     }

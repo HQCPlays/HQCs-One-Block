@@ -67,10 +67,6 @@ public class WarpsCommand implements CommandExecutor, Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        System.out.println("Event triggered: " + event.getClick());
-        if (event.isLeftClick()) {
-            System.out.println("HElLo");
-        }
         if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "WARP MENU")) {
             event.setCancelled(true);
 

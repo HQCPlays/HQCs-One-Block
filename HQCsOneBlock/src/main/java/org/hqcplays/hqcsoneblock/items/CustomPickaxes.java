@@ -74,6 +74,8 @@ public class CustomPickaxes implements Listener {
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomTool(customPickaxe);
+
         return customPickaxe;
     }
 
@@ -96,6 +98,8 @@ public class CustomPickaxes implements Listener {
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
 
+        CustomItemMasterList.addCustomTool(customPickaxe);
+
         return customPickaxe;
     }
 
@@ -117,6 +121,8 @@ public class CustomPickaxes implements Listener {
         sr.setIngredient('A', Material.REDSTONE);
         sr.setIngredient('S', Material.STICK);
         Bukkit.getServer().addRecipe(sr);
+
+        CustomItemMasterList.addCustomTool(customPickaxe);
 
         return customPickaxe;
     }
