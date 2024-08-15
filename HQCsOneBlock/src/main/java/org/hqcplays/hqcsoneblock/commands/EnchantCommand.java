@@ -24,23 +24,30 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.enchantments.EnchantmentAlgorithm;
+import org.hqcplays.hqcsoneblock.enchantments.EnchantmentFilter;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class EnchantCommand implements CommandExecutor, Listener {
+
+    EnchantmentFilter enchantmentFilter = new EnchantmentFilter();
+    EnchantmentAlgorithm enchantmentAlgorithm = new EnchantmentAlgorithm();
+    final int enchantability = 15;
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            openProgressionMenu(player);
+            openEnchantMenu(player);
             return true;
         }
         return false;
     }
 
-    private void openProgressionMenu(Player player) {
+    private void openEnchantMenu(Player player) {
         Inventory enchantmentGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "ENCHANTMENT TABLE");
 
         // Placeholder item for decorative slots (gray background)
@@ -84,25 +91,10 @@ public class EnchantCommand implements CommandExecutor, Listener {
         enchantmentGUI.setItem(22, enchantingInformation); 
         enchantmentGUI.setItem(49, enchantingInformation);
 
-
-        // Define the enchantment slots
-        ItemStack enchantment1 = new ItemStack(Material.ENCHANTED_BOOK);
-        ItemMeta enchantment1Meta = enchantment1.getItemMeta();
-        enchantment1Meta.setDisplayName("Enchantment 1");
-        enchantment1.setItemMeta(enchantment1Meta);
-        enchantmentGUI.setItem(20, enchantment1);  // Enchantment 1
-
-        ItemStack enchantment2 = new ItemStack(Material.ENCHANTED_BOOK);
-        ItemMeta enchantment2Meta = enchantment2.getItemMeta();
-        enchantment2Meta.setDisplayName("Enchantment 2");
-        enchantment2.setItemMeta(enchantment2Meta);
-        enchantmentGUI.setItem(22, enchantment2);  // Enchantment 2
-
-        ItemStack enchantment3 = new ItemStack(Material.ENCHANTED_BOOK);
-        ItemMeta enchantment3Meta = enchantment3.getItemMeta();
-        enchantment3Meta.setDisplayName("Enchantment 3");
-        enchantment3.setItemMeta(enchantment3Meta);
-        enchantmentGUI.setItem(24, enchantment3);  // Enchantment 3
+        // Placeholder slots for enchanted books
+        enchantmentGUI.setItem(20, new ItemStack(Material.GLASS_PANE));
+        enchantmentGUI.setItem(22, new ItemStack(Material.GLASS_PANE));
+        enchantmentGUI.setItem(24, new ItemStack(Material.GLASS_PANE));
 
         // slots for input item and result
         enchantmentGUI.setItem(4, null);
@@ -131,16 +123,15 @@ public class EnchantCommand implements CommandExecutor, Listener {
             EnchantmentAlgorithm enchantmentAlgorithm = new EnchantmentAlgorithm();
 
             int baseEnchantmentLevel = 30; // Example base enchantment level
-            int enchantability = 5;       // Example enchantability value for the item
 
             // Enchant the item
-            Map<Enchantment, Integer> selectedEnchantments = enchantmentAlgorithm.enchantItem(baseEnchantmentLevel, enchantability, "sword");
+            Map<Enchantment, Integer> selectedEnchantments = enchantmentAlgorithm.enchantItem(baseEnchantmentLevel, enchantability, new ItemStack(Material.DIAMOND_PICKAXE));
 
             // Print the selected enchantments
-        System.out.println("Selected Enchantments:");
-        for (Map.Entry<Enchantment, Integer> entry : selectedEnchantments.entrySet()) {
-            System.out.println(entry.getKey().getName() + " Level " + entry.getValue());
-        }
+            System.out.println("Selected Enchantments:");
+            for (Map.Entry<Enchantment, Integer> entry : selectedEnchantments.entrySet()) {
+                System.out.println(entry.getKey().getName() + " Level " + entry.getValue());
+            }
         }
     }
 }
