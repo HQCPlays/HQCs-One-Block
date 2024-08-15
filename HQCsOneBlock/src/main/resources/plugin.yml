@@ -48,3 +48,6 @@ commands:
   recipes:
     description: Opens a menu that allows players to view all the custom recipes on the server
     usage: /warps
+  enchant:
+    description: Opens the custom enchantment table GUI
+    usage: /enchant

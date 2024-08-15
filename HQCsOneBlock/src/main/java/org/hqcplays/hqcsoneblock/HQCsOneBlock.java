@@ -30,13 +30,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.hqcplays.hqcsoneblock.commands.*;
 import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningListener;
-import org.hqcplays.hqcsoneblock.commands.FleaCommand;
-import org.hqcplays.hqcsoneblock.commands.InboxCommand;
-import org.hqcplays.hqcsoneblock.commands.ListCommand;
 import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningManager;
 import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningSpeedManager;
-import org.hqcplays.hqcsoneblock.commands.RecipesCommand;
-import org.hqcplays.hqcsoneblock.commands.WarpsCommand;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListingUtils;
@@ -67,6 +62,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private ListCommand listCommand;
     private InboxCommand inboxCommand;
     private RecipesCommand recipesCommand;
+    private EnchantCommand enchantCommand;
 
     // Functions
     @Override
@@ -201,6 +197,14 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(recipesCommand, this);
         } else {
             getLogger().severe("Command 'recipes' is not defined!"); // Not defined in plugin.yml
+        }
+        if (this.getCommand("enchant") != null) {
+            enchantCommand = new EnchantCommand();
+            this.getCommand("enchant").setExecutor(enchantCommand);
+            // Only register events if Enchant Command implements Listener
+            getServer().getPluginManager().registerEvents(enchantCommand, this);
+        } else {
+            getLogger().severe("Command 'enchant' is not defined!"); // Not defined in plugin.yml
         }
 
         // Initialize flea market
