@@ -131,16 +131,17 @@ public class FleaListingUtils {
             FleaListing fleaListing = iterator.next();
             if (isExpired(fleaListing)) {
                 iterator.remove();
+                FleaMarket.removeListing(fleaListing, fleaListing.getSeller());
+                ItemStack item = fleaListing.getItem();
+                ItemMeta itemMeta = item.getItemMeta();
+                PlayerSaveData sellerData = HQCsOneBlock.dataManager.getPlayerData(fleaListing.getSeller(), fleaListing.getSellerProfileNum());
+                sellerData.mail.add(fleaListing.getItem());
+
                 Player seller = Bukkit.getPlayer(fleaListing.getSeller());
-                    if (seller != null){
-                        ItemStack item = fleaListing.getItem();
-                        ItemMeta itemMeta = item.getItemMeta();
-                        //seller.getInventory().addItem(fleaListing.getItem()); // Item will be lost if players inventory is full, needs an inbox system
-                        PlayerSaveData sellerData = HQCsOneBlock.dataManager.getPlayerData(seller.getUniqueId(), fleaListing.getSellerProfileNum());
-                        sellerData.mail.add(fleaListing.getItem());
-                        seller.sendMessage(ChatColor.RED + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + fleaListing.getPrice() + " has expired!");
-                        seller.sendMessage(ChatColor.GOLD + "Reclaim your expired item in your inbox!");
-                    }
+                if (seller != null){
+                    seller.sendMessage(ChatColor.RED + "Your offer: " + item.getAmount() + " " + PlainTextComponentSerializer.plainText().serialize(itemMeta.displayName()) + " for $" + fleaListing.getPrice() + " has expired!");
+                    seller.sendMessage(ChatColor.GOLD + "Reclaim your expired item in your inbox!");
+                }
             }
         }
     }

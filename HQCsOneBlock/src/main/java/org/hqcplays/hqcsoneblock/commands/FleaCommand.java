@@ -67,8 +67,8 @@ public class FleaCommand implements CommandExecutor, Listener {
 
         fleaGUI = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "FLEA MARKET              " + ChatColor.RED + "PAGE: " + pageNum);
         PlayerSaveData playerData = HQCsOneBlock.dataManager.getPlayerData(player);
-        // playerData.balance = 10000;
-        // updateScoreboard(player);
+        playerData.balance = 10000;
+        updateScoreboard(player);
         // Add flea items to the screen. Each page can hold 36 items, thus the items we should add should consider which page we are on
         int startingIndex = (pageNum - 1) * 36;
         int endIndex = Math.min(startingIndex + 36, FleaMarket.getFleaListings().size());
