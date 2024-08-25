@@ -20,6 +20,7 @@ public class EnchantmentFilter {
         FISHING_ROD,
         TRIDENT,
         CROSSBOW,
+        BOOK,
         ANY // For enchantments that apply to all items
     }
 
@@ -106,6 +107,10 @@ public class EnchantmentFilter {
 
         // Crossbow
         ITEM_CATEGORY_MAP.put(Material.CROSSBOW, ItemCategory.CROSSBOW);
+
+        // Book
+        ITEM_CATEGORY_MAP.put(Material.BOOK, ItemCategory.BOOK);
+
     }
 
     // Method to get the valid enchantments for a given item
@@ -136,13 +141,18 @@ public class EnchantmentFilter {
     private boolean isApplicableEnchantment(Enchantment enchantment, ItemCategory category) {
         switch (category) {
             case SWORD:
-                return enchantment.equals(Enchantment.SHARPNESS) ||
+                return
                        enchantment.equals(Enchantment.BANE_OF_ARTHROPODS) ||
                        enchantment.equals(Enchantment.SMITE) ||
                        enchantment.equals(Enchantment.KNOCKBACK) ||
                        enchantment.equals(Enchantment.FIRE_ASPECT) ||
                        enchantment.equals(Enchantment.LOOTING) ||
                        enchantment.equals(Enchantment.SWEEPING_EDGE) ||
+                       enchantment.equals(ShardEnchantment.asphyxiation) ||
+                       enchantment.equals(ShardEnchantment.turbulence) ||
+                       enchantment.equals(ShardEnchantment.vampirism) ||
+                       enchantment.equals(ShardEnchantment.vitality) ||
+                       enchantment.equals(ShardEnchantment.voiding) ||
                        isUniversalEnchantment(enchantment);
             case HELMET:
                 return enchantment.equals(Enchantment.PROTECTION) ||
@@ -200,6 +210,47 @@ public class EnchantmentFilter {
                        enchantment.equals(Enchantment.PIERCING) ||
                        enchantment.equals(Enchantment.QUICK_CHARGE) ||
                        isUniversalEnchantment(enchantment);
+            case BOOK:
+                return enchantment.equals(Enchantment.BANE_OF_ARTHROPODS) ||
+                       enchantment.equals(Enchantment.SMITE) ||
+                       enchantment.equals(Enchantment.KNOCKBACK) ||
+                       enchantment.equals(Enchantment.FIRE_ASPECT) ||
+                       enchantment.equals(Enchantment.LOOTING) ||
+                       enchantment.equals(Enchantment.SWEEPING_EDGE) ||
+                       enchantment.equals(ShardEnchantment.asphyxiation) ||
+                       enchantment.equals(ShardEnchantment.turbulence) ||
+                       enchantment.equals(ShardEnchantment.vampirism) ||
+                       enchantment.equals(ShardEnchantment.vitality) ||
+                       enchantment.equals(ShardEnchantment.voiding) ||
+                       enchantment.equals(Enchantment.PROTECTION) ||
+                       enchantment.equals(Enchantment.BLAST_PROTECTION) ||
+                       enchantment.equals(Enchantment.FIRE_PROTECTION) ||
+                       enchantment.equals(Enchantment.PROJECTILE_PROTECTION) ||
+                       enchantment.equals(Enchantment.RESPIRATION) ||
+                       enchantment.equals(Enchantment.AQUA_AFFINITY) ||
+                       enchantment.equals(Enchantment.THORNS) ||
+                       enchantment.equals(Enchantment.BINDING_CURSE) ||
+                       enchantment.equals(Enchantment.DEPTH_STRIDER) ||
+                       enchantment.equals(Enchantment.FROST_WALKER) ||
+                       enchantment.equals(Enchantment.BINDING_CURSE) ||
+                       enchantment.equals(Enchantment.SOUL_SPEED) ||
+                       enchantment.equals(Enchantment.POWER) ||
+                       enchantment.equals(Enchantment.FLAME) ||
+                       enchantment.equals(Enchantment.PUNCH) ||
+                       enchantment.equals(Enchantment.INFINITY) ||
+                       enchantment.equals(Enchantment.EFFICIENCY) ||
+                       enchantment.equals(Enchantment.FORTUNE) ||
+                       enchantment.equals(Enchantment.SILK_TOUCH) ||
+                       enchantment.equals(Enchantment.LUCK_OF_THE_SEA) ||
+                       enchantment.equals(Enchantment.LURE) ||
+                       enchantment.equals(Enchantment.IMPALING) ||
+                       enchantment.equals(Enchantment.RIPTIDE) ||
+                       enchantment.equals(Enchantment.LOYALTY) ||
+                       enchantment.equals(Enchantment.CHANNELING) ||
+                       enchantment.equals(Enchantment.MULTISHOT) ||
+                       enchantment.equals(Enchantment.PIERCING) ||
+                       enchantment.equals(Enchantment.QUICK_CHARGE) ||
+                       isUniversalEnchantment(enchantment);
             case ANY:
                 return isUniversalEnchantment(enchantment);
             default:
@@ -209,8 +260,8 @@ public class EnchantmentFilter {
 
     // Helper method to check if an enchantment is universal (applies to any item)
     private boolean isUniversalEnchantment(Enchantment enchantment) {
-        return enchantment.equals(Enchantment.UNBREAKING) ||
-               enchantment.equals(Enchantment.MENDING) ||
-               enchantment.equals(Enchantment.VANISHING_CURSE);
+        return enchantment.equals(Enchantment.VANISHING_CURSE);
+            //    enchantment.equals(Enchantment.UNBREAKING) ||
+            //    enchantment.equals(Enchantment.MENDING);
     }
 }

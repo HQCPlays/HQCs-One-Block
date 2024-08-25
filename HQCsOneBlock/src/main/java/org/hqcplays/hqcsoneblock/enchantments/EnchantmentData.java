@@ -54,6 +54,16 @@ public class EnchantmentData {
             new int[]{15, 24, 33}, 2, true)); // Looting
         ENCHANTMENT_DETAILS.put(Enchantment.SWEEPING_EDGE, new EnchantmentDetails(
             new int[]{5, 14, 23}, 2, true)); // Sweeping Edge
+        ENCHANTMENT_DETAILS.put(ShardEnchantment.asphyxiation, new EnchantmentDetails(
+            new int[]{5, 14, 23}, 2, true)); // Asphyxiation
+        ENCHANTMENT_DETAILS.put(ShardEnchantment.turbulence, new EnchantmentDetails(
+            new int[]{5, 14, 23}, 2, true)); // Turbulence
+        ENCHANTMENT_DETAILS.put(ShardEnchantment.vampirism, new EnchantmentDetails(
+            new int[]{5, 14, 23}, 2, true)); // Vampirism
+        ENCHANTMENT_DETAILS.put(ShardEnchantment.vitality, new EnchantmentDetails(
+            new int[]{5, 14, 23}, 2, true)); // Vitality
+        ENCHANTMENT_DETAILS.put(ShardEnchantment.voiding, new EnchantmentDetails(
+            new int[]{5, 14, 23}, 2, true)); // Voiding
 
         // Initialize enchantments for Tools (Pickaxe, Shovel, Axe, Hoe, Shears)
         ENCHANTMENT_DETAILS.put(Enchantment.EFFICIENCY, new EnchantmentDetails(

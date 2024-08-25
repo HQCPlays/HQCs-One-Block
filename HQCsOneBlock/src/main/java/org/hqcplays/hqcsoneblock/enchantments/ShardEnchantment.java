@@ -1,6 +1,7 @@
 package org.hqcplays.hqcsoneblock.enchantments;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -8,7 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 
-public abstract class ShardEnchantment {
+public abstract class ShardEnchantment extends Enchantment {
     public static ShardEnchantment voiding;
     public static ShardEnchantment vitality;
     public static ShardEnchantment vampirism;

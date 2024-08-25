@@ -28,7 +28,7 @@ import static org.hqcplays.hqcsoneblock.items.TechItems.toolCore;
 
 public class CheatMenuCommand implements CommandExecutor, Listener {
     private final ArrayList<ItemStack> cheatItemList = new ArrayList<>();
-    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Jestarin", "Cflip_", "Entitylght"); // Replace with actual usernames
+    private final List<String> authorizedUsers = Arrays.asList("HQC_Plays", "Jestarin", "Cflip_", "OfficialNagi"); // Replace with actual usernames
 
     private void addItems() {
         cheatItemList.clear();

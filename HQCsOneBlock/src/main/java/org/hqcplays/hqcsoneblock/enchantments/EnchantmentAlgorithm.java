@@ -38,7 +38,7 @@ public class EnchantmentAlgorithm {
         float randBonusPercent = 1 + (randomFloat() + randomFloat() - 1) * 0.15f;
         int finalLevel = round(k * randBonusPercent);
 
-        return Math.max(finalLevel, 1); // Ensure the final level is at least 1
+        return Math.max(finalLevel, 5); // Ensure the final level is at least 1
     }
 
     // Step 2: Find possible enchantments and their power levels
@@ -66,11 +66,11 @@ public class EnchantmentAlgorithm {
             }
         }
 
-        // Print the selected enchantments
-        System.out.println("Possible Enchantments:");
-        for (Map.Entry<Enchantment, Integer> entry : possibleEnchants) {
-            System.out.println(entry.getKey().getName() + " Level " + entry.getValue());
-        }
+        // // Print the selected enchantments
+        // System.out.println("Possible Enchantments:");
+        // for (Map.Entry<Enchantment, Integer> entry : possibleEnchants) {
+        //     System.out.println(entry.getKey().getName() + " Level " + entry.getValue());
+        // }
 
         return possibleEnchants;
     }

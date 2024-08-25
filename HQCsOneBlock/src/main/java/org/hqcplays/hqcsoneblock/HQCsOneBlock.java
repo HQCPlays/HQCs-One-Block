@@ -3,7 +3,6 @@ package org.hqcplays.hqcsoneblock;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
-import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,11 +31,13 @@ import org.hqcplays.hqcsoneblock.commands.*;
 import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningListener;
 import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningManager;
 import org.hqcplays.hqcsoneblock.customBlockBreaking.MiningSpeedManager;
+import org.hqcplays.hqcsoneblock.enchantments.AsphyxiationEnchantment;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListing;
 import org.hqcplays.hqcsoneblock.fleaMarket.FleaListingUtils;
 import org.hqcplays.hqcsoneblock.items.*;
 import org.hqcplays.hqcsoneblock.progression.Progression;
+import org.bukkit.enchantments.Enchantment;
 
 import java.util.*;
 
