@@ -205,8 +205,19 @@ public class EnchantCommand implements CommandExecutor, Listener {
                                             }
                                         }
 
+                                        int playerLevel = player.getLevel();
+                                        float playerExpProgress = player.getExp();
                                         // Take the players XP
-                                        player.setLevel(player.getLevel() - clickedItem.getAmount());
+                                        if (event.getSlot() == 20) {
+                                            player.setLevel(playerLevel - 1);
+                                        }
+                                        else if (event.getSlot() == 22) {
+                                            player.setLevel(playerLevel - 2);
+                                        }
+                                        else if (event.getSlot() == 24) {
+                                            player.setLevel(playerLevel - 3);
+                                        }
+                                        player.setExp(playerExpProgress);
 
                                         // Place new enchanted item in the finish slot
                                         if (itemToEnchant.getType() == Material.BOOK) {
