@@ -274,8 +274,6 @@ public class AnvilCommand implements CommandExecutor, Listener {
         // Apply combined Vanilla enchantments to the new item
         Map <Enchantment, Integer> combinedVanillaEnchants = combineEnchantMaps(input1Enchantments, input2Enchantments);
         for (Map.Entry<Enchantment, Integer> entry : combinedVanillaEnchants.entrySet()) {
-            System.out.println("Combined Vanilla Enchantments: ");
-            System.out.println(entry.getKey() + " " + entry.getValue());
             if (EnchantmentFilter.isEnchantmentApplicable(entry.getKey(), result)) {
                 // Check if enchantment level is greater than the max, if it is, reset it to the max
                 if (entry.getValue() > entry.getKey().getMaxLevel()) {
@@ -287,12 +285,9 @@ public class AnvilCommand implements CommandExecutor, Listener {
         }
 
         // Apply combined Custom enchantments to the new item
-        System.out.println("Lore of book: " + input2Meta.getLore());
         Map <Enchantment, Integer> combinedCustomEnchants = combineEnchantMaps(extractCustomEnchants(input1Meta.getLore()), extractCustomEnchants(input2Meta.getLore()));
         List<String> resultLore = new ArrayList<>();
-        System.out.println("Combined Custom Enchantments: ");
         for (Map.Entry<Enchantment, Integer> entry : combinedCustomEnchants.entrySet()) {
-            System.out.println(entry.getKey() + " " + entry.getValue());
             Enchantment enchantment = entry.getKey();
             if (EnchantmentFilter.isEnchantmentApplicable(enchantment, result)) {
                 // Check if enchantment level is greater than the max, if it is, reset it to the max
