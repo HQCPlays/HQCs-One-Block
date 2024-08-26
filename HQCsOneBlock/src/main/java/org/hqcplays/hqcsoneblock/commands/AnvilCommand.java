@@ -17,6 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
@@ -118,49 +119,84 @@ public class AnvilCommand implements CommandExecutor, Listener {
 
         if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "ANVIL")) {
             if (event.getClickedInventory() == event.getView().getTopInventory()) {
-                // If player is placing an item in the input slots
-                if (event.getSlot() == 10 || event.getSlot() == 12) {
-                    ItemStack input1 = null;
-                    ItemStack input2 = null;
-                    ItemStack placedItem = event.getCursor();
-                    if (event.getSlot() == 10) {
-                        input1 = placedItem;
-                        input2 = anvilGUI.getItem(12);
-                    }
-                    else if (event.getSlot() == 12) {
-                        input1 = anvilGUI.getItem(10);
-                        input2 = placedItem;
-                    }
-                    // If both of the input slots are full
-                    if (input1 != null && input1.getType() != Material.AIR && input2 != null && input2.getType() != Material.AIR) {
-                        
-                        ItemMeta input1Meta = input1.getItemMeta();
-                        ItemMeta input2Meta = input2.getItemMeta();
-                        if (input1Meta != null && input2Meta != null) {
+                if (event.getClick() != ClickType.DOUBLE_CLICK) {   // double clicks cause glitches
+                    // If player is placing an item in the input slots
+                    if (event.getSlot() == 10 || event.getSlot() == 12) {
+                        ItemStack input1 = null;
+                        ItemStack input2 = null;
+                        ItemStack placedItem = event.getCursor();
+                        if (event.getSlot() == 10) {
+                            input1 = placedItem;
+                            input2 = anvilGUI.getItem(12);
+                        }
+                        else if (event.getSlot() == 12) {
+                            input1 = anvilGUI.getItem(10);
+                            input2 = placedItem;
+                        }
+                        // If both of the input slots are full
+                        if (input1 != null && input1.getType() != Material.AIR && input2 != null && input2.getType() != Material.AIR) {
                             
-                            // Case 1: Applying a book to an item
-                            if (input1.getType() != Material.ENCHANTED_BOOK && input2.getType() == Material.ENCHANTED_BOOK) {
-                                combineInputs(input1, input2, anvilGUI);
-                            }
-                            // Case 2: Combining two items of the same type
-                            else {
-                                // Case 2A: Both items have display names (custom items)
-                                if (input1Meta.hasDisplayName() && input2Meta.hasDisplayName()) {
-                                    if (input1Meta.getDisplayName().equals(input2Meta.getDisplayName())) {
-                                        combineInputs(input1, input2, anvilGUI);
+                            ItemMeta input1Meta = input1.getItemMeta();
+                            ItemMeta input2Meta = input2.getItemMeta();
+                            if (input1Meta != null && input2Meta != null) {
+                                
+                                // Case 1: Applying a book to an item
+                                if (input1.getType() != Material.ENCHANTED_BOOK && input2.getType() == Material.ENCHANTED_BOOK) {
+                                    combineInputs(input1, input2, anvilGUI);
+                                }
+                                // Case 2: Combining two items of the same type
+                                else {
+                                    // Case 2A: Both items have display names (custom items)
+                                    if (input1Meta.hasDisplayName() && input2Meta.hasDisplayName()) {
+                                        if (input1Meta.getDisplayName().equals(input2Meta.getDisplayName())) {
+                                            combineInputs(input1, input2, anvilGUI);
+                                        }
+                                    }
+                                    // Case 2B: Neither item has a display name (vanilla items)
+                                    else if (!input1Meta.hasDisplayName() && !input2Meta.hasDisplayName()) {
+                                        if (input1.getType() == input2.getType()) {
+                                            combineInputs(input1, input2, anvilGUI);
+                                        }
                                     }
                                 }
-                                // Case 2B: Neither item has a display name (vanilla items)
-                                else if (!input1Meta.hasDisplayName() && !input2Meta.hasDisplayName()) {
-                                    if (input1.getType() == input2.getType()) {
-                                        combineInputs(input1, input2, anvilGUI);
-                                    }
+                            }
+                        } else {
+                            anvilGUI.setItem(16, null);
+                            anvilGUI.setItem(5, new ItemStack(Material.LIME_STAINED_GLASS_PANE));
+                        }
+                    }
+                    else if (event.getSlot() == 16) {
+                        // Only allow players to take from the result slot, not place items into it
+                        if (event.getCursor().getType() == Material.AIR) {
+                            ItemStack clickedItem = event.getCurrentItem();
+                            // Player has clicked on the combined result item
+                            if (clickedItem != null) {
+                                // Check if player has enough experience
+                                if (anvilGUI.getItem(5).getAmount() <= player.getLevel()) {
+
+                                    // Take the players XP
+                                    int playerLevel = player.getLevel();
+                                    float playerExpProgress = player.getExp();
+                                    player.setLevel(playerLevel - anvilGUI.getItem(5).getAmount());
+                                    player.setExp(playerExpProgress);
+
+                                    // Delete the input items and exp cost indicator
+                                    anvilGUI.setItem(10, null);
+                                    anvilGUI.setItem(12, null);
+                                    anvilGUI.setItem(5, new ItemStack(Material.LIME_STAINED_GLASS_PANE));
+
+                                    // Play anvil sound
+                                    player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
+                                } else {
+                                    event.setCancelled(true);
+                                    player.sendMessage(ChatColor.RED + "Not enough experience!");
                                 }
                             }
+                        } else {
+                            event.setCancelled(true);
                         }
                     } else {
-                        anvilGUI.setItem(16, null);
-                        anvilGUI.setItem(5, new ItemStack(Material.LIME_STAINED_GLASS_PANE));
+                        event.setCancelled(true);
                     }
                 }
             }  
@@ -169,28 +205,28 @@ public class AnvilCommand implements CommandExecutor, Listener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) { // dragging items is different than clicking an item... causes glitches so just tell player no
-        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "ENCHANTMENT TABLE")) {
+        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "ANVIL")) {
 
             Player player = (Player) event.getWhoClicked();
-            player.sendMessage(ChatColor.RED + "You cannot drag items into the Enchantment Table!");
+            player.sendMessage(ChatColor.RED + "You cannot drag items into the Anvil!");
         }
     }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         // If the player forgets to take their items out of the GUI before closing it, give their items back
-        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "ENCHANTMENT TABLE")) {
-            ItemStack itemToEnchant = event.getView().getTopInventory().getItem(4);
-            if (itemToEnchant != null) {
+        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "ANVIL")) {
+            ItemStack input1 = event.getView().getTopInventory().getItem(10);
+            if (input1 != null) {
                 Location location = event.getPlayer().getLocation();
-                Item item = location.getWorld().dropItem(location, itemToEnchant);
-                item.setItemStack(itemToEnchant);
+                Item item = location.getWorld().dropItem(location, input1);
+                item.setItemStack(input1);
             }
-            ItemStack enchantedItem = event.getView().getTopInventory().getItem(40);
-            if (enchantedItem != null) {
+            ItemStack input2 = event.getView().getTopInventory().getItem(12);
+            if (input2 != null) {
                 Location location = event.getPlayer().getLocation();
-                Item item = location.getWorld().dropItem(location, enchantedItem);
-                item.setItemStack(enchantedItem);
+                Item item = location.getWorld().dropItem(location, input2);
+                item.setItemStack(input2);
             }
         }
     }
@@ -241,7 +277,11 @@ public class AnvilCommand implements CommandExecutor, Listener {
             System.out.println("Combined Vanilla Enchantments: ");
             System.out.println(entry.getKey() + " " + entry.getValue());
             if (EnchantmentFilter.isEnchantmentApplicable(entry.getKey(), result)) {
-                resultMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+                // Check if enchantment level is greater than the max, if it is, reset it to the max
+                if (entry.getValue() > entry.getKey().getMaxLevel()) {
+                    entry.setValue(entry.getKey().getMaxLevel());
+                }
+                resultMeta.addEnchant(entry.getKey(), entry.getValue(), false);
                 combinedAllEnchantments.put(entry.getKey(), entry.getValue());
             }
         }
@@ -255,6 +295,10 @@ public class AnvilCommand implements CommandExecutor, Listener {
             System.out.println(entry.getKey() + " " + entry.getValue());
             Enchantment enchantment = entry.getKey();
             if (EnchantmentFilter.isEnchantmentApplicable(enchantment, result)) {
+                // Check if enchantment level is greater than the max, if it is, reset it to the max
+                if (entry.getValue() > entry.getKey().getMaxLevel()) {
+                    entry.setValue(entry.getKey().getMaxLevel());
+                }
                 resultLore.add(ChatColor.GRAY + enchantment.getName() + " " + intToRoman(entry.getValue()));
                 combinedAllEnchantments.put(enchantment, entry.getValue());
             }
