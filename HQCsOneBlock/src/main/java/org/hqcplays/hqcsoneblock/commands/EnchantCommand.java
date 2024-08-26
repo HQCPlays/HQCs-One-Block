@@ -525,7 +525,7 @@ public class EnchantCommand implements CommandExecutor, Listener {
             case "EFFICIENCY": return Enchantment.EFFICIENCY;
             case "SILK_TOUCH": return Enchantment.SILK_TOUCH;
             case "UNBREAKING": return Enchantment.UNBREAKING;
-            case "FORTUNE": return Enchantment.LOOTING;
+            case "FORTUNE": return Enchantment.FORTUNE;
             case "POWER": return Enchantment.POWER;
             case "PUNCH": return Enchantment.PUNCH;
             case "FLAME": return Enchantment.FLAME;
