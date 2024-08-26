@@ -81,14 +81,16 @@ public class AnvilCommand implements CommandExecutor, Listener {
             anvilGUI.setItem(i, placeholder);
         }
 
+        // Place holder slot for cost of the combination
+        anvilGUI.setItem(5, new ItemStack(Material.LIME_STAINED_GLASS_PANE));
 
         // Define the Anvil information
         ItemStack anvilInformation = new ItemStack(Material.ANVIL);
         ItemMeta anvilInformationMeta = anvilInformation.getItemMeta();
         anvilInformationMeta.setDisplayName(ChatColor.LIGHT_PURPLE + "Anvil Information");
         List<Component> anvilInformationLore = new ArrayList<>();
-        anvilInformationLore.add(Component.text("- To use the anvil, place two items you want to combine in the two empty slots on the left").color(NamedTextColor.WHITE));
-        anvilInformationLore.add(Component.text("- Once you are ready to combine the items, simply take the item from the slot on the right!").color(NamedTextColor.WHITE));
+        anvilInformationLore.add(Component.text("- Place two items you want to combine in the empty slots on the left").color(NamedTextColor.WHITE));
+        anvilInformationLore.add(Component.text("- The cost of the combination is displayed above, take the item on the right to confirm!").color(NamedTextColor.WHITE));
         anvilInformationMeta.lore(anvilInformationLore);
         anvilInformation.setItemMeta(anvilInformationMeta);
 
@@ -158,6 +160,7 @@ public class AnvilCommand implements CommandExecutor, Listener {
                         }
                     } else {
                         anvilGUI.setItem(16, null);
+                        anvilGUI.setItem(5, new ItemStack(Material.LIME_STAINED_GLASS_PANE));
                     }
                 }
             }  
@@ -206,61 +209,77 @@ public class AnvilCommand implements CommandExecutor, Listener {
         }
     }
     private void combineInputs(ItemStack input1, ItemStack input2, Inventory anvilGUI) {
-            ItemMeta input1Meta = input1.getItemMeta();
-            ItemMeta input2Meta = input2.getItemMeta();
 
-            // Create a cleared copy of the input items
-            ItemStack result = new ItemStack(input1);
-            if (input1.getType() == Material.ENCHANTED_BOOK) result = new ItemStack(Material.BOOK); // Enchanting Enchanted Books is weird, just make it a normal book
-            ItemMeta resultMeta = result.getItemMeta();
-            resultMeta.removeEnchantments();
-            resultMeta.lore(null);
+        Map <Enchantment, Integer> combinedAllEnchantments = new HashMap<>();
+        ItemMeta input1Meta = input1.getItemMeta();
+        ItemMeta input2Meta = input2.getItemMeta();
+
+        // Create a cleared copy of the input items
+        ItemStack result = new ItemStack(input1);
+        if (input1.getType() == Material.ENCHANTED_BOOK) result = new ItemStack(Material.BOOK); // Enchanting Enchanted Books is weird, just make it a normal book
+        ItemMeta resultMeta = result.getItemMeta();
+        resultMeta.removeEnchantments();
+        resultMeta.lore(null);
 
 
-            Map <Enchantment, Integer> input1Enchantments = input1Meta.getEnchants();
-            Map <Enchantment, Integer> input2Enchantments = input2Meta.getEnchants();
+        Map <Enchantment, Integer> input1Enchantments = input1Meta.getEnchants();
+        Map <Enchantment, Integer> input2Enchantments = input2Meta.getEnchants();
 
-            // Enchants for vanilla enchanted books are stored differently, if the usual check is empty double check the EnchantmentStorageMeta
-            if (input1.getType() == Material.ENCHANTED_BOOK && input1Enchantments.isEmpty()) {
-                EnchantmentStorageMeta enchantmentMeta = (EnchantmentStorageMeta) input1Meta;
-                input1Enchantments = enchantmentMeta.getStoredEnchants();
+        // Enchants for vanilla enchanted books are stored differently, if the usual check is empty double check the EnchantmentStorageMeta
+        if (input1.getType() == Material.ENCHANTED_BOOK && input1Enchantments.isEmpty()) {
+            EnchantmentStorageMeta enchantmentMeta = (EnchantmentStorageMeta) input1Meta;
+            input1Enchantments = enchantmentMeta.getStoredEnchants();
+        }
+        if (input2.getType() == Material.ENCHANTED_BOOK && input2Enchantments.isEmpty()) {
+            EnchantmentStorageMeta enchantmentMeta = (EnchantmentStorageMeta) input2Meta;
+            input2Enchantments = enchantmentMeta.getStoredEnchants();
+        }
+
+        // Apply combined Vanilla enchantments to the new item
+        Map <Enchantment, Integer> combinedVanillaEnchants = combineEnchantMaps(input1Enchantments, input2Enchantments);
+        for (Map.Entry<Enchantment, Integer> entry : combinedVanillaEnchants.entrySet()) {
+            System.out.println("Combined Vanilla Enchantments: ");
+            System.out.println(entry.getKey() + " " + entry.getValue());
+            if (EnchantmentFilter.isEnchantmentApplicable(entry.getKey(), result)) {
+                resultMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+                combinedAllEnchantments.put(entry.getKey(), entry.getValue());
             }
-            if (input2.getType() == Material.ENCHANTED_BOOK && input2Enchantments.isEmpty()) {
-                EnchantmentStorageMeta enchantmentMeta = (EnchantmentStorageMeta) input2Meta;
-                input2Enchantments = enchantmentMeta.getStoredEnchants();
-            }
+        }
 
-            // Apply combined Vanilla enchantments to the new item
-            Map <Enchantment, Integer> combinedVanillaEnchants = combineEnchantMaps(input1Enchantments, input2Enchantments);
-            for (Map.Entry<Enchantment, Integer> entry : combinedVanillaEnchants.entrySet()) {
-                System.out.println("Combined Vanilla Enchantments: ");
-                System.out.println(entry.getKey() + " " + entry.getValue());
-                if (EnchantmentFilter.isEnchantmentApplicable(entry.getKey(), result)) {
-                    resultMeta.addEnchant(entry.getKey(), entry.getValue(), true);
-                }
+        // Apply combined Custom enchantments to the new item
+        System.out.println("Lore of book: " + input2Meta.getLore());
+        Map <Enchantment, Integer> combinedCustomEnchants = combineEnchantMaps(extractCustomEnchants(input1Meta.getLore()), extractCustomEnchants(input2Meta.getLore()));
+        List<String> resultLore = new ArrayList<>();
+        System.out.println("Combined Custom Enchantments: ");
+        for (Map.Entry<Enchantment, Integer> entry : combinedCustomEnchants.entrySet()) {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+            Enchantment enchantment = entry.getKey();
+            if (EnchantmentFilter.isEnchantmentApplicable(enchantment, result)) {
+                resultLore.add(ChatColor.GRAY + enchantment.getName() + " " + intToRoman(entry.getValue()));
+                combinedAllEnchantments.put(enchantment, entry.getValue());
             }
+        }
+        resultMeta.setLore(resultLore);
 
-            // Apply combined Custom enchantments to the new item
-            System.out.println("Lore of book: " + input2Meta.getLore());
-            Map <Enchantment, Integer> combinedCustomEnchants = combineEnchantMaps(extractCustomEnchants(input1Meta.getLore()), extractCustomEnchants(input2Meta.getLore()));
-            List<String> resultLore = new ArrayList<>();
-            System.out.println("Combined Custom Enchantments: ");
-            for (Map.Entry<Enchantment, Integer> entry : combinedCustomEnchants.entrySet()) {
-                System.out.println(entry.getKey() + " " + entry.getValue());
-                Enchantment enchantment = entry.getKey();
-                if (EnchantmentFilter.isEnchantmentApplicable(enchantment, result)) {
-                    resultLore.add(ChatColor.GRAY + enchantment.getName() + " " + intToRoman(entry.getValue()));
-                }
-            }
-            resultMeta.setLore(resultLore);
+        // Calculate Cost of the combination
+        int cost = 0;
+        for (Map.Entry<Enchantment, Integer> entry : combinedAllEnchantments.entrySet()) {
+            int level = entry.getValue();
+            int anvilCostMultiplier = EnchantmentData.getEnchantmentDetails().get(entry.getKey()).getAnvilCostMultiplier();
+            cost += level * anvilCostMultiplier;
+        }
+        ItemStack costItem = new ItemStack(Material.EXPERIENCE_BOTTLE, cost);
+        ItemMeta costItemMeta = costItem.getItemMeta();
+        costItemMeta.displayName(Component.text("Experience o' Required").color(NamedTextColor.GREEN));
+        costItem.setItemMeta(costItemMeta);
+        anvilGUI.setItem(5, costItem);
 
-            // Convert regular books back into enchanted books after enchantments have been properly applied
-            if (result.getType() == Material.BOOK) {
-                result.setType(Material.ENCHANTED_BOOK);
-            }
-
-            result.setItemMeta(resultMeta);
-            anvilGUI.setItem(16, result);
+        // Convert regular books back into enchanted books after enchantments have been properly applied
+        if (result.getType() == Material.BOOK) {
+            result.setType(Material.ENCHANTED_BOOK);
+        }
+        result.setItemMeta(resultMeta);
+        anvilGUI.setItem(16, result);
     }
 
     // Helper method to combine the enchants of two input items
