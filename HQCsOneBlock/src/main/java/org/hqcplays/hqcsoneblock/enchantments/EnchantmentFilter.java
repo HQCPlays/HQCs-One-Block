@@ -137,8 +137,26 @@ public class EnchantmentFilter {
         return validEnchantments;
     }
 
+    /**
+     * Checks if a given enchantment is applicable to the specified item stack.
+     *
+     * @param enchantment The enchantment to check.
+     * @param item The item stack to check against.
+     * @return true if the enchantment can be applied to the item, false otherwise.
+     */
+    public static boolean isEnchantmentApplicable(Enchantment enchantment, ItemStack item) {
+        Material material = item.getType();
+        ItemCategory category = ITEM_CATEGORY_MAP.get(material);
+
+        if (category == null) {
+            return false; // Item type not mapped, so no valid enchantments
+        }
+
+        return isApplicableEnchantment(enchantment, category);
+    }
+
     // Helper method to determine if an enchantment is applicable to a category
-    private boolean isApplicableEnchantment(Enchantment enchantment, ItemCategory category) {
+    private static boolean isApplicableEnchantment(Enchantment enchantment, ItemCategory category) {
         switch (category) {
             case SWORD:
                 return
@@ -259,7 +277,7 @@ public class EnchantmentFilter {
     }
 
     // Helper method to check if an enchantment is universal (applies to any item)
-    private boolean isUniversalEnchantment(Enchantment enchantment) {
+    private static boolean isUniversalEnchantment(Enchantment enchantment) {
         return enchantment.equals(Enchantment.VANISHING_CURSE);
             //    enchantment.equals(Enchantment.UNBREAKING) ||
             //    enchantment.equals(Enchantment.MENDING);

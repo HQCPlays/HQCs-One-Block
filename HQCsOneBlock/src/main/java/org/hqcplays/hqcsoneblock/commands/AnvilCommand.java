@@ -40,6 +40,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -134,18 +135,24 @@ public class AnvilCommand implements CommandExecutor, Listener {
                         ItemMeta input1Meta = input1.getItemMeta();
                         ItemMeta input2Meta = input2.getItemMeta();
                         if (input1Meta != null && input2Meta != null) {
-                    
-                            // Case 1: Both items have display names (custom items)
-                            if (input1Meta.hasDisplayName() && input2Meta.hasDisplayName()) {
-                                System.out.println("ACTIVATED");
-                                if (input1Meta.getDisplayName().equals(input2Meta.getDisplayName())) {
-                                    combineInputs(input1, input2, anvilGUI);
-                                }
+                            
+                            // Case 1: Applying a book to an item
+                            if (input1.getType() != Material.ENCHANTED_BOOK && input2.getType() == Material.ENCHANTED_BOOK) {
+                                combineInputs(input1, input2, anvilGUI);
                             }
-                            // Case 2: Neither item has a display name (vanilla items)
-                            else if (!input1Meta.hasDisplayName() && !input2Meta.hasDisplayName()) {
-                                if (input1.getType() == input2.getType()) {
-                                    combineInputs(input1, input2, anvilGUI);
+                            // Case 2: Combining two items of the same type
+                            else {
+                                // Case 2A: Both items have display names (custom items)
+                                if (input1Meta.hasDisplayName() && input2Meta.hasDisplayName()) {
+                                    if (input1Meta.getDisplayName().equals(input2Meta.getDisplayName())) {
+                                        combineInputs(input1, input2, anvilGUI);
+                                    }
+                                }
+                                // Case 2B: Neither item has a display name (vanilla items)
+                                else if (!input1Meta.hasDisplayName() && !input2Meta.hasDisplayName()) {
+                                    if (input1.getType() == input2.getType()) {
+                                        combineInputs(input1, input2, anvilGUI);
+                                    }
                                 }
                             }
                         }
@@ -204,32 +211,53 @@ public class AnvilCommand implements CommandExecutor, Listener {
 
             // Create a cleared copy of the input items
             ItemStack result = new ItemStack(input1);
+            if (input1.getType() == Material.ENCHANTED_BOOK) result = new ItemStack(Material.BOOK); // Enchanting Enchanted Books is weird, just make it a normal book
             ItemMeta resultMeta = result.getItemMeta();
             resultMeta.removeEnchantments();
             resultMeta.lore(null);
 
-            // Apply combined Vanilla enchantments to the new item
-            Map <Enchantment, Integer> combinedVanillaEnchants = combineEnchantMaps(input1Meta.getEnchants(), input2Meta.getEnchants());
-            System.out.println("Combined Vanilla Enchants: ");
-            for (Map.Entry<Enchantment, Integer> entry : combinedVanillaEnchants.entrySet()) {
-                System.out.println(entry.getKey() + " " + entry.getValue());
+
+            Map <Enchantment, Integer> input1Enchantments = input1Meta.getEnchants();
+            Map <Enchantment, Integer> input2Enchantments = input2Meta.getEnchants();
+
+            // Enchants for vanilla enchanted books are stored differently, if the usual check is empty double check the EnchantmentStorageMeta
+            if (input1.getType() == Material.ENCHANTED_BOOK && input1Enchantments.isEmpty()) {
+                EnchantmentStorageMeta enchantmentMeta = (EnchantmentStorageMeta) input1Meta;
+                input1Enchantments = enchantmentMeta.getStoredEnchants();
             }
+            if (input2.getType() == Material.ENCHANTED_BOOK && input2Enchantments.isEmpty()) {
+                EnchantmentStorageMeta enchantmentMeta = (EnchantmentStorageMeta) input2Meta;
+                input2Enchantments = enchantmentMeta.getStoredEnchants();
+            }
+
+            // Apply combined Vanilla enchantments to the new item
+            Map <Enchantment, Integer> combinedVanillaEnchants = combineEnchantMaps(input1Enchantments, input2Enchantments);
             for (Map.Entry<Enchantment, Integer> entry : combinedVanillaEnchants.entrySet()) {
-                resultMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+                System.out.println("Combined Vanilla Enchantments: ");
+                System.out.println(entry.getKey() + " " + entry.getValue());
+                if (EnchantmentFilter.isEnchantmentApplicable(entry.getKey(), result)) {
+                    resultMeta.addEnchant(entry.getKey(), entry.getValue(), true);
+                }
             }
 
             // Apply combined Custom enchantments to the new item
+            System.out.println("Lore of book: " + input2Meta.getLore());
             Map <Enchantment, Integer> combinedCustomEnchants = combineEnchantMaps(extractCustomEnchants(input1Meta.getLore()), extractCustomEnchants(input2Meta.getLore()));
-            System.out.println("Combined Custom Enchants: ");
+            List<String> resultLore = new ArrayList<>();
+            System.out.println("Combined Custom Enchantments: ");
             for (Map.Entry<Enchantment, Integer> entry : combinedCustomEnchants.entrySet()) {
                 System.out.println(entry.getKey() + " " + entry.getValue());
-            }
-            List<String> resultLore = new ArrayList<>();
-            for (Map.Entry<Enchantment, Integer> entry : combinedCustomEnchants.entrySet()) {
                 Enchantment enchantment = entry.getKey();
-                resultLore.add(ChatColor.GRAY + enchantment.getName() + " " + intToRoman(entry.getValue()));
+                if (EnchantmentFilter.isEnchantmentApplicable(enchantment, result)) {
+                    resultLore.add(ChatColor.GRAY + enchantment.getName() + " " + intToRoman(entry.getValue()));
+                }
             }
             resultMeta.setLore(resultLore);
+
+            // Convert regular books back into enchanted books after enchantments have been properly applied
+            if (result.getType() == Material.BOOK) {
+                result.setType(Material.ENCHANTED_BOOK);
+            }
 
             result.setItemMeta(resultMeta);
             anvilGUI.setItem(16, result);
@@ -273,19 +301,12 @@ public class AnvilCommand implements CommandExecutor, Listener {
                 String romanLevel = matcher.group(2).trim();
                 int level = romanToInt(romanLevel);
 
-                System.out.println("Found enchantment: " + enchantName + " " + level);
 
                 Enchantment enchantment = EnchantmentData.getEnchantmentByName(enchantName.toUpperCase());
                 if (enchantment != null) {
-                    System.out.println("Activated");
                     customEnchants.put(enchantment, level);
                 }
             }
-        }
-
-        System.out.println("Custom Enchants: ");
-        for (Map.Entry<Enchantment, Integer> entry : customEnchants.entrySet()) {
-            System.out.println(entry.getKey() + " " + entry.getValue());
         }
 
         return customEnchants;
