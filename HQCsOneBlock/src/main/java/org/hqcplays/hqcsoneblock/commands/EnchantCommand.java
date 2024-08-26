@@ -44,6 +44,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.hqcplays.hqcsoneblock.HQCsOneBlock;
 import org.hqcplays.hqcsoneblock.PlayerSaveData;
 import org.hqcplays.hqcsoneblock.enchantments.EnchantmentAlgorithm;
+import org.hqcplays.hqcsoneblock.enchantments.EnchantmentData;
 import org.hqcplays.hqcsoneblock.enchantments.EnchantmentFilter;
 import org.hqcplays.hqcsoneblock.enchantments.ShardEnchantment;
 
@@ -483,7 +484,7 @@ public class EnchantCommand implements CommandExecutor, Listener {
         String[] pairs = serializedData.split(";");
         for (String pair : pairs) {
             String[] keyValue = pair.split(":");
-            Enchantment enchantment = getEnchantmentByName(keyValue[0]);
+            Enchantment enchantment = EnchantmentData.getEnchantmentByName(keyValue[0]);
             int level = Integer.parseInt(keyValue[1]);
             if (enchantment != null) {
                 enchantmentMap.put(enchantment, level);
@@ -491,58 +492,6 @@ public class EnchantCommand implements CommandExecutor, Listener {
         }
 
         return enchantmentMap;
-    }
-    
-    /*
-     * Method for getting an enchantment via its name as a string.
-     * Sadly there is no automatic way to convert a string into an enchantment, must be done manually
-     */
-    private Enchantment getEnchantmentByName(String name) {
-        switch (name) {
-            case "PROTECTION": return Enchantment.PROTECTION;
-            case "FIRE_PROTECTION": return Enchantment.FIRE_PROTECTION;
-            case "FEATHER_FALLING": return Enchantment.FEATHER_FALLING;
-            case "BLAST_PROTECTION": return Enchantment.BLAST_PROTECTION;
-            case "PROJECTILE_PROTECTION": return Enchantment.PROJECTILE_PROTECTION;
-            case "RESPIRATION": return Enchantment.RESPIRATION;
-            case "AQUA_AFFINITY": return Enchantment.AQUA_AFFINITY;
-            case "THORNS": return Enchantment.THORNS;
-            case "DEPTH_STRIDER": return Enchantment.DEPTH_STRIDER;
-            case "FROST_WALKER": return Enchantment.FROST_WALKER;
-            case "BINDING_CURSE": return Enchantment.BINDING_CURSE;
-            case "SHARPNESS": return Enchantment.SHARPNESS;
-            case "SMITE": return Enchantment.SMITE;
-            case "BANE_OF_ARTHROPODS": return Enchantment.BANE_OF_ARTHROPODS;
-            case "KNOCKBACK": return Enchantment.KNOCKBACK;
-            case "FIRE_ASPECT": return Enchantment.FIRE_ASPECT;
-            case "LOOTING": return Enchantment.LOOTING;
-            case "SWEEPING_EDGE": return Enchantment.SWEEPING_EDGE;
-            case "ASPHYXIATION": return ShardEnchantment.asphyxiation;
-            case "TURBULENCE": return ShardEnchantment.turbulence;
-            case "VAMPIRISM": return ShardEnchantment.vampirism;
-            case "VITALITY": return ShardEnchantment.vitality;
-            case "VOIDING": return ShardEnchantment.voiding;
-            case "EFFICIENCY": return Enchantment.EFFICIENCY;
-            case "SILK_TOUCH": return Enchantment.SILK_TOUCH;
-            case "UNBREAKING": return Enchantment.UNBREAKING;
-            case "FORTUNE": return Enchantment.FORTUNE;
-            case "POWER": return Enchantment.POWER;
-            case "PUNCH": return Enchantment.PUNCH;
-            case "FLAME": return Enchantment.FLAME;
-            case "INFINITY": return Enchantment.INFINITY;
-            case "LUCK_OF_THE_SEA": return Enchantment.LUCK_OF_THE_SEA;
-            case "LURE": return Enchantment.LURE;
-            case "LOYALTY": return Enchantment.LOYALTY;
-            case "IMPALING": return Enchantment.IMPALING;
-            case "RIPTIDE": return Enchantment.RIPTIDE;
-            case "CHANNELING": return Enchantment.CHANNELING;
-            case "MULTISHOT": return Enchantment.MULTISHOT;
-            case "QUICK_CHARGE": return Enchantment.QUICK_CHARGE;
-            case "PIERCING": return Enchantment.PIERCING;
-            case "MENDING": return Enchantment.MENDING;
-            case "VANISHING_CURSE": return Enchantment.VANISHING_CURSE;
-            default: return null;
-        }
     }
 
     // Helper method to convert int's to roman numerals

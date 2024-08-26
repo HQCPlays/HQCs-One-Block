@@ -64,6 +64,7 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
     private InboxCommand inboxCommand;
     private RecipesCommand recipesCommand;
     private EnchantCommand enchantCommand;
+    private AnvilCommand anvilCommand;
 
     // Functions
     @Override
@@ -204,6 +205,14 @@ public final class HQCsOneBlock extends JavaPlugin implements Listener {
             this.getCommand("enchant").setExecutor(enchantCommand);
             // Only register events if Enchant Command implements Listener
             getServer().getPluginManager().registerEvents(enchantCommand, this);
+        } else {
+            getLogger().severe("Command 'enchant' is not defined!"); // Not defined in plugin.yml
+        }
+        if (this.getCommand("anvil") != null) {
+            anvilCommand = new AnvilCommand();
+            this.getCommand("anvil").setExecutor(anvilCommand);
+            // Only register events if Anvil Command implements Listener
+            getServer().getPluginManager().registerEvents(anvilCommand, this);
         } else {
             getLogger().severe("Command 'enchant' is not defined!"); // Not defined in plugin.yml
         }

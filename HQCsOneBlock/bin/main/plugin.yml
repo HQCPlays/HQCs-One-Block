@@ -51,3 +51,6 @@ commands:
   enchant:
     description: Opens the custom enchantment table GUI
     usage: /enchant
+  anvil:
+    description: Opens the custom anvil GUI
+    usage: /anvil

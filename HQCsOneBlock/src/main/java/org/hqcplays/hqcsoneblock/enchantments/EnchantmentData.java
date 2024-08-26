@@ -144,4 +144,56 @@ public class EnchantmentData {
     public static Map<Enchantment, EnchantmentDetails> getEnchantmentDetails() {
         return ENCHANTMENT_DETAILS;
     }
+
+    /*
+     * Method for getting an enchantment via its name as a string.
+     * Sadly there is no automatic way to convert a string into an enchantment, must be done manually
+     */
+    public static Enchantment getEnchantmentByName(String name) {
+        switch (name) {
+            case "PROTECTION": return Enchantment.PROTECTION;
+            case "FIRE_PROTECTION": return Enchantment.FIRE_PROTECTION;
+            case "FEATHER_FALLING": return Enchantment.FEATHER_FALLING;
+            case "BLAST_PROTECTION": return Enchantment.BLAST_PROTECTION;
+            case "PROJECTILE_PROTECTION": return Enchantment.PROJECTILE_PROTECTION;
+            case "RESPIRATION": return Enchantment.RESPIRATION;
+            case "AQUA_AFFINITY": return Enchantment.AQUA_AFFINITY;
+            case "THORNS": return Enchantment.THORNS;
+            case "DEPTH_STRIDER": return Enchantment.DEPTH_STRIDER;
+            case "FROST_WALKER": return Enchantment.FROST_WALKER;
+            case "BINDING_CURSE": return Enchantment.BINDING_CURSE;
+            case "SHARPNESS": return Enchantment.SHARPNESS;
+            case "SMITE": return Enchantment.SMITE;
+            case "BANE_OF_ARTHROPODS": return Enchantment.BANE_OF_ARTHROPODS;
+            case "KNOCKBACK": return Enchantment.KNOCKBACK;
+            case "FIRE_ASPECT": return Enchantment.FIRE_ASPECT;
+            case "LOOTING": return Enchantment.LOOTING;
+            case "SWEEPING_EDGE": return Enchantment.SWEEPING_EDGE;
+            case "ASPHYXIATION": return ShardEnchantment.asphyxiation;
+            case "TURBULENCE": return ShardEnchantment.turbulence;
+            case "VAMPIRISM": return ShardEnchantment.vampirism;
+            case "VITALITY": return ShardEnchantment.vitality;
+            case "VOIDING": return ShardEnchantment.voiding;
+            case "EFFICIENCY": return Enchantment.EFFICIENCY;
+            case "SILK_TOUCH": return Enchantment.SILK_TOUCH;
+            case "FORTUNE": return Enchantment.FORTUNE;
+            case "UNBREAKING": return Enchantment.UNBREAKING;
+            case "POWER": return Enchantment.POWER;
+            case "PUNCH": return Enchantment.PUNCH;
+            case "FLAME": return Enchantment.FLAME;
+            case "INFINITY": return Enchantment.INFINITY;
+            case "LUCK_OF_THE_SEA": return Enchantment.LUCK_OF_THE_SEA;
+            case "LURE": return Enchantment.LURE;
+            case "LOYALTY": return Enchantment.LOYALTY;
+            case "IMPALING": return Enchantment.IMPALING;
+            case "RIPTIDE": return Enchantment.RIPTIDE;
+            case "CHANNELING": return Enchantment.CHANNELING;
+            case "MULTISHOT": return Enchantment.MULTISHOT;
+            case "QUICK_CHARGE": return Enchantment.QUICK_CHARGE;
+            case "PIERCING": return Enchantment.PIERCING;
+            case "MENDING": return Enchantment.MENDING;
+            case "VANISHING_CURSE": return Enchantment.VANISHING_CURSE;
+            default: return null;
+        }
+    }
 }
